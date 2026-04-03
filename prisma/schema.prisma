@@ -1,0 +1,112 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/client"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  goals        Goal[]
+  workouts     Workout[]
+  workoutPlans WorkoutPlan[]
+}
+
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Goal {
+  id            String    @id @default(cuid())
+  userId        String
+  exercise      String
+  targetWeight  Float
+  currentWeight Float     @default(0)
+  deadline      DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Workout {
+  id        String        @id @default(cuid())
+  userId    String
+  date      DateTime
+  createdAt DateTime      @default(now())
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercises ExerciseLog[]
+}
+
+model ExerciseLog {
+  id        String  @id @default(cuid())
+  workoutId String
+  exercise  String
+  weight    Float
+  reps      Int
+  sets      Int
+
+  workout Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+}
+
+model WorkoutPlan {
+  id        String                @id @default(cuid())
+  userId    String
+  name      String
+  type      String                // "upper" | "lower" | "custom"
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercises WorkoutPlanExercise[]
+}
+
+model WorkoutPlanExercise {
+  id          String      @id @default(cuid())
+  planId      String
+  exerciseId  String
+  defaultSets Int         @default(3)
+  defaultReps Int         @default(10)
+  restTime    Int         @default(60)
+  order       Int
+
+  plan        WorkoutPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
