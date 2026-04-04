@@ -41,7 +41,7 @@ export type ExerciseLogSumAggregateOutputType = {
 export type ExerciseLogMinAggregateOutputType = {
   id: string | null
   workoutId: string | null
-  exercise: string | null
+  exerciseId: string | null
   weight: number | null
   reps: number | null
   sets: number | null
@@ -50,7 +50,7 @@ export type ExerciseLogMinAggregateOutputType = {
 export type ExerciseLogMaxAggregateOutputType = {
   id: string | null
   workoutId: string | null
-  exercise: string | null
+  exerciseId: string | null
   weight: number | null
   reps: number | null
   sets: number | null
@@ -59,7 +59,7 @@ export type ExerciseLogMaxAggregateOutputType = {
 export type ExerciseLogCountAggregateOutputType = {
   id: number
   workoutId: number
-  exercise: number
+  exerciseId: number
   weight: number
   reps: number
   sets: number
@@ -82,7 +82,7 @@ export type ExerciseLogSumAggregateInputType = {
 export type ExerciseLogMinAggregateInputType = {
   id?: true
   workoutId?: true
-  exercise?: true
+  exerciseId?: true
   weight?: true
   reps?: true
   sets?: true
@@ -91,7 +91,7 @@ export type ExerciseLogMinAggregateInputType = {
 export type ExerciseLogMaxAggregateInputType = {
   id?: true
   workoutId?: true
-  exercise?: true
+  exerciseId?: true
   weight?: true
   reps?: true
   sets?: true
@@ -100,7 +100,7 @@ export type ExerciseLogMaxAggregateInputType = {
 export type ExerciseLogCountAggregateInputType = {
   id?: true
   workoutId?: true
-  exercise?: true
+  exerciseId?: true
   weight?: true
   reps?: true
   sets?: true
@@ -196,7 +196,7 @@ export type ExerciseLogGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 export type ExerciseLogGroupByOutputType = {
   id: string
   workoutId: string
-  exercise: string
+  exerciseId: string | null
   weight: number
   reps: number
   sets: number
@@ -228,7 +228,7 @@ export type ExerciseLogWhereInput = {
   NOT?: Prisma.ExerciseLogWhereInput | Prisma.ExerciseLogWhereInput[]
   id?: Prisma.StringFilter<"ExerciseLog"> | string
   workoutId?: Prisma.StringFilter<"ExerciseLog"> | string
-  exercise?: Prisma.StringFilter<"ExerciseLog"> | string
+  exerciseId?: Prisma.StringNullableFilter<"ExerciseLog"> | string | null
   weight?: Prisma.FloatFilter<"ExerciseLog"> | number
   reps?: Prisma.IntFilter<"ExerciseLog"> | number
   sets?: Prisma.IntFilter<"ExerciseLog"> | number
@@ -238,7 +238,7 @@ export type ExerciseLogWhereInput = {
 export type ExerciseLogOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   workoutId?: Prisma.SortOrder
-  exercise?: Prisma.SortOrder
+  exerciseId?: Prisma.SortOrderInput | Prisma.SortOrder
   weight?: Prisma.SortOrder
   reps?: Prisma.SortOrder
   sets?: Prisma.SortOrder
@@ -251,7 +251,7 @@ export type ExerciseLogWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ExerciseLogWhereInput[]
   NOT?: Prisma.ExerciseLogWhereInput | Prisma.ExerciseLogWhereInput[]
   workoutId?: Prisma.StringFilter<"ExerciseLog"> | string
-  exercise?: Prisma.StringFilter<"ExerciseLog"> | string
+  exerciseId?: Prisma.StringNullableFilter<"ExerciseLog"> | string | null
   weight?: Prisma.FloatFilter<"ExerciseLog"> | number
   reps?: Prisma.IntFilter<"ExerciseLog"> | number
   sets?: Prisma.IntFilter<"ExerciseLog"> | number
@@ -261,7 +261,7 @@ export type ExerciseLogWhereUniqueInput = Prisma.AtLeast<{
 export type ExerciseLogOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   workoutId?: Prisma.SortOrder
-  exercise?: Prisma.SortOrder
+  exerciseId?: Prisma.SortOrderInput | Prisma.SortOrder
   weight?: Prisma.SortOrder
   reps?: Prisma.SortOrder
   sets?: Prisma.SortOrder
@@ -278,7 +278,7 @@ export type ExerciseLogScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ExerciseLogScalarWhereWithAggregatesInput | Prisma.ExerciseLogScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ExerciseLog"> | string
   workoutId?: Prisma.StringWithAggregatesFilter<"ExerciseLog"> | string
-  exercise?: Prisma.StringWithAggregatesFilter<"ExerciseLog"> | string
+  exerciseId?: Prisma.StringNullableWithAggregatesFilter<"ExerciseLog"> | string | null
   weight?: Prisma.FloatWithAggregatesFilter<"ExerciseLog"> | number
   reps?: Prisma.IntWithAggregatesFilter<"ExerciseLog"> | number
   sets?: Prisma.IntWithAggregatesFilter<"ExerciseLog"> | number
@@ -286,7 +286,7 @@ export type ExerciseLogScalarWhereWithAggregatesInput = {
 
 export type ExerciseLogCreateInput = {
   id?: string
-  exercise: string
+  exerciseId?: string | null
   weight: number
   reps: number
   sets: number
@@ -296,7 +296,7 @@ export type ExerciseLogCreateInput = {
 export type ExerciseLogUncheckedCreateInput = {
   id?: string
   workoutId: string
-  exercise: string
+  exerciseId?: string | null
   weight: number
   reps: number
   sets: number
@@ -304,7 +304,7 @@ export type ExerciseLogUncheckedCreateInput = {
 
 export type ExerciseLogUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  exercise?: Prisma.StringFieldUpdateOperationsInput | string
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   reps?: Prisma.IntFieldUpdateOperationsInput | number
   sets?: Prisma.IntFieldUpdateOperationsInput | number
@@ -314,7 +314,7 @@ export type ExerciseLogUpdateInput = {
 export type ExerciseLogUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   workoutId?: Prisma.StringFieldUpdateOperationsInput | string
-  exercise?: Prisma.StringFieldUpdateOperationsInput | string
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   reps?: Prisma.IntFieldUpdateOperationsInput | number
   sets?: Prisma.IntFieldUpdateOperationsInput | number
@@ -323,7 +323,7 @@ export type ExerciseLogUncheckedUpdateInput = {
 export type ExerciseLogCreateManyInput = {
   id?: string
   workoutId: string
-  exercise: string
+  exerciseId?: string | null
   weight: number
   reps: number
   sets: number
@@ -331,7 +331,7 @@ export type ExerciseLogCreateManyInput = {
 
 export type ExerciseLogUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  exercise?: Prisma.StringFieldUpdateOperationsInput | string
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   reps?: Prisma.IntFieldUpdateOperationsInput | number
   sets?: Prisma.IntFieldUpdateOperationsInput | number
@@ -340,7 +340,7 @@ export type ExerciseLogUpdateManyMutationInput = {
 export type ExerciseLogUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   workoutId?: Prisma.StringFieldUpdateOperationsInput | string
-  exercise?: Prisma.StringFieldUpdateOperationsInput | string
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   reps?: Prisma.IntFieldUpdateOperationsInput | number
   sets?: Prisma.IntFieldUpdateOperationsInput | number
@@ -359,7 +359,7 @@ export type ExerciseLogOrderByRelationAggregateInput = {
 export type ExerciseLogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   workoutId?: Prisma.SortOrder
-  exercise?: Prisma.SortOrder
+  exerciseId?: Prisma.SortOrder
   weight?: Prisma.SortOrder
   reps?: Prisma.SortOrder
   sets?: Prisma.SortOrder
@@ -374,7 +374,7 @@ export type ExerciseLogAvgOrderByAggregateInput = {
 export type ExerciseLogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   workoutId?: Prisma.SortOrder
-  exercise?: Prisma.SortOrder
+  exerciseId?: Prisma.SortOrder
   weight?: Prisma.SortOrder
   reps?: Prisma.SortOrder
   sets?: Prisma.SortOrder
@@ -383,7 +383,7 @@ export type ExerciseLogMaxOrderByAggregateInput = {
 export type ExerciseLogMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   workoutId?: Prisma.SortOrder
-  exercise?: Prisma.SortOrder
+  exerciseId?: Prisma.SortOrder
   weight?: Prisma.SortOrder
   reps?: Prisma.SortOrder
   sets?: Prisma.SortOrder
@@ -447,7 +447,7 @@ export type IntFieldUpdateOperationsInput = {
 
 export type ExerciseLogCreateWithoutWorkoutInput = {
   id?: string
-  exercise: string
+  exerciseId?: string | null
   weight: number
   reps: number
   sets: number
@@ -455,7 +455,7 @@ export type ExerciseLogCreateWithoutWorkoutInput = {
 
 export type ExerciseLogUncheckedCreateWithoutWorkoutInput = {
   id?: string
-  exercise: string
+  exerciseId?: string | null
   weight: number
   reps: number
   sets: number
@@ -493,7 +493,7 @@ export type ExerciseLogScalarWhereInput = {
   NOT?: Prisma.ExerciseLogScalarWhereInput | Prisma.ExerciseLogScalarWhereInput[]
   id?: Prisma.StringFilter<"ExerciseLog"> | string
   workoutId?: Prisma.StringFilter<"ExerciseLog"> | string
-  exercise?: Prisma.StringFilter<"ExerciseLog"> | string
+  exerciseId?: Prisma.StringNullableFilter<"ExerciseLog"> | string | null
   weight?: Prisma.FloatFilter<"ExerciseLog"> | number
   reps?: Prisma.IntFilter<"ExerciseLog"> | number
   sets?: Prisma.IntFilter<"ExerciseLog"> | number
@@ -501,7 +501,7 @@ export type ExerciseLogScalarWhereInput = {
 
 export type ExerciseLogCreateManyWorkoutInput = {
   id?: string
-  exercise: string
+  exerciseId?: string | null
   weight: number
   reps: number
   sets: number
@@ -509,7 +509,7 @@ export type ExerciseLogCreateManyWorkoutInput = {
 
 export type ExerciseLogUpdateWithoutWorkoutInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  exercise?: Prisma.StringFieldUpdateOperationsInput | string
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   reps?: Prisma.IntFieldUpdateOperationsInput | number
   sets?: Prisma.IntFieldUpdateOperationsInput | number
@@ -517,7 +517,7 @@ export type ExerciseLogUpdateWithoutWorkoutInput = {
 
 export type ExerciseLogUncheckedUpdateWithoutWorkoutInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  exercise?: Prisma.StringFieldUpdateOperationsInput | string
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   reps?: Prisma.IntFieldUpdateOperationsInput | number
   sets?: Prisma.IntFieldUpdateOperationsInput | number
@@ -525,7 +525,7 @@ export type ExerciseLogUncheckedUpdateWithoutWorkoutInput = {
 
 export type ExerciseLogUncheckedUpdateManyWithoutWorkoutInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  exercise?: Prisma.StringFieldUpdateOperationsInput | string
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   reps?: Prisma.IntFieldUpdateOperationsInput | number
   sets?: Prisma.IntFieldUpdateOperationsInput | number
@@ -536,7 +536,7 @@ export type ExerciseLogUncheckedUpdateManyWithoutWorkoutInput = {
 export type ExerciseLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   workoutId?: boolean
-  exercise?: boolean
+  exerciseId?: boolean
   weight?: boolean
   reps?: boolean
   sets?: boolean
@@ -546,7 +546,7 @@ export type ExerciseLogSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 export type ExerciseLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   workoutId?: boolean
-  exercise?: boolean
+  exerciseId?: boolean
   weight?: boolean
   reps?: boolean
   sets?: boolean
@@ -556,7 +556,7 @@ export type ExerciseLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
 export type ExerciseLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   workoutId?: boolean
-  exercise?: boolean
+  exerciseId?: boolean
   weight?: boolean
   reps?: boolean
   sets?: boolean
@@ -566,13 +566,13 @@ export type ExerciseLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 export type ExerciseLogSelectScalar = {
   id?: boolean
   workoutId?: boolean
-  exercise?: boolean
+  exerciseId?: boolean
   weight?: boolean
   reps?: boolean
   sets?: boolean
 }
 
-export type ExerciseLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "workoutId" | "exercise" | "weight" | "reps" | "sets", ExtArgs["result"]["exerciseLog"]>
+export type ExerciseLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "workoutId" | "exerciseId" | "weight" | "reps" | "sets", ExtArgs["result"]["exerciseLog"]>
 export type ExerciseLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   workout?: boolean | Prisma.WorkoutDefaultArgs<ExtArgs>
 }
@@ -591,7 +591,7 @@ export type $ExerciseLogPayload<ExtArgs extends runtime.Types.Extensions.Interna
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     workoutId: string
-    exercise: string
+    exerciseId: string | null
     weight: number
     reps: number
     sets: number
@@ -1021,7 +1021,7 @@ export interface Prisma__ExerciseLogClient<T, Null = never, ExtArgs extends runt
 export interface ExerciseLogFieldRefs {
   readonly id: Prisma.FieldRef<"ExerciseLog", 'String'>
   readonly workoutId: Prisma.FieldRef<"ExerciseLog", 'String'>
-  readonly exercise: Prisma.FieldRef<"ExerciseLog", 'String'>
+  readonly exerciseId: Prisma.FieldRef<"ExerciseLog", 'String'>
   readonly weight: Prisma.FieldRef<"ExerciseLog", 'Float'>
   readonly reps: Prisma.FieldRef<"ExerciseLog", 'Int'>
   readonly sets: Prisma.FieldRef<"ExerciseLog", 'Int'>

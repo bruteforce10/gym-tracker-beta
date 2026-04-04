@@ -2,7 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { calculate1RM, getWeekBounds } from "@/lib/calculations";
+import { calculate1RM } from "@/lib/calculations";
+import { fetchExercisesByIds } from "@/lib/gymfit";
 
 async function getUserId(): Promise<string> {
   const session = await auth();
@@ -11,6 +12,7 @@ async function getUserId(): Promise<string> {
 }
 
 export interface WeeklyExerciseSummaryResult {
+  exerciseId: string;
   exercise: string;
   peak1RM: number;
   delta: number;
@@ -38,13 +40,24 @@ export async function getWeeklySummary(weekStart: string) {
     }),
   ]);
 
+  const currentIds = Array.from(
+    new Set(
+      currentWorkouts.flatMap((workout) =>
+        workout.exercises.map((exercise) => exercise.exerciseId).filter(Boolean)
+      )
+    )
+  ) as string[];
+  const currentExercises = await fetchExercisesByIds(currentIds);
+  const exerciseNames = new Map(currentExercises.map((exercise) => [exercise.id, exercise.name]));
+
   // Calculate current week peaks
   const currentPeaks = new Map<string, number>();
   for (const w of currentWorkouts) {
     for (const ex of w.exercises) {
+      if (!ex.exerciseId) continue;
       const rm = calculate1RM(ex.weight, ex.reps);
-      const current = currentPeaks.get(ex.exercise) || 0;
-      if (rm > current) currentPeaks.set(ex.exercise, rm);
+      const current = currentPeaks.get(ex.exerciseId) || 0;
+      if (rm > current) currentPeaks.set(ex.exerciseId, rm);
     }
   }
 
@@ -52,18 +65,20 @@ export async function getWeeklySummary(weekStart: string) {
   const prevPeaks = new Map<string, number>();
   for (const w of prevWorkouts) {
     for (const ex of w.exercises) {
+      if (!ex.exerciseId) continue;
       const rm = calculate1RM(ex.weight, ex.reps);
-      const current = prevPeaks.get(ex.exercise) || 0;
-      if (rm > current) prevPeaks.set(ex.exercise, rm);
+      const current = prevPeaks.get(ex.exerciseId) || 0;
+      if (rm > current) prevPeaks.set(ex.exerciseId, rm);
     }
   }
 
   // Build summaries
   const summaries: WeeklyExerciseSummaryResult[] = [];
-  currentPeaks.forEach((peak, exercise) => {
-    const prev = prevPeaks.get(exercise) || 0;
+  currentPeaks.forEach((peak, exerciseId) => {
+    const prev = prevPeaks.get(exerciseId) || 0;
     summaries.push({
-      exercise,
+      exerciseId,
+      exercise: exerciseNames.get(exerciseId) ?? "Unknown Exercise",
       peak1RM: peak,
       delta: prev > 0 ? Math.round((peak - prev) * 10) / 10 : 0,
     });
@@ -89,14 +104,19 @@ export async function getCurrentStats() {
   const allLogs = await prisma.exerciseLog.findMany({
     where: { workout: { userId } },
   });
+  const catalogItems = await fetchExercisesByIds(
+    Array.from(new Set(allLogs.map((log) => log.exerciseId).filter(Boolean))) as string[]
+  );
+  const catalogMap = new Map(catalogItems.map((item) => [item.id, item.name]));
 
   let best1RM = 0;
   let best1RMExercise = "";
   for (const log of allLogs) {
+    if (!log.exerciseId) continue;
     const rm = calculate1RM(log.weight, log.reps);
     if (rm > best1RM) {
       best1RM = rm;
-      best1RMExercise = log.exercise;
+      best1RMExercise = catalogMap.get(log.exerciseId) ?? "Unknown Exercise";
     }
   }
 

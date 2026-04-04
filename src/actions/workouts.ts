@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { fetchExercisesByIds } from "@/lib/gymfit";
 
 async function getUserId(): Promise<string> {
   const session = await auth();
@@ -11,7 +12,7 @@ async function getUserId(): Promise<string> {
 
 export async function createWorkout(
   date: string,
-  exercises: { exercise: string; weight: number; reps: number; sets: number }[]
+  exercises: { exerciseId: string; weight: number; reps: number; sets: number }[]
 ) {
   const userId = await getUserId();
 
@@ -21,7 +22,7 @@ export async function createWorkout(
       date: new Date(date),
       exercises: {
         create: exercises.map((ex) => ({
-          exercise: ex.exercise,
+          exerciseId: ex.exerciseId,
           weight: ex.weight,
           reps: ex.reps,
           sets: ex.sets,
@@ -31,7 +32,8 @@ export async function createWorkout(
     include: { exercises: true },
   });
 
-  return workout;
+  const [serialized] = await serializeWorkoutCollection([workout]);
+  return serialized;
 }
 
 export async function getRecentWorkouts(limit: number = 3) {
@@ -44,7 +46,7 @@ export async function getRecentWorkouts(limit: number = 3) {
     include: { exercises: true },
   });
 
-  return workouts;
+  return serializeWorkoutCollection(workouts);
 }
 
 export async function getWorkoutsByWeek(weekStart: string) {
@@ -62,7 +64,7 @@ export async function getWorkoutsByWeek(weekStart: string) {
     include: { exercises: true },
   });
 
-  return workouts;
+  return serializeWorkoutCollection(workouts);
 }
 
 export async function getAllWorkouts() {
@@ -74,7 +76,7 @@ export async function getAllWorkouts() {
     include: { exercises: true },
   });
 
-  return workouts;
+  return serializeWorkoutCollection(workouts);
 }
 
 export async function clearUserData() {
@@ -92,4 +94,41 @@ export async function clearUserData() {
   await prisma.goal.deleteMany({ where: { userId } });
 
   return { ok: true };
+}
+
+type WorkoutWithExercises = {
+  id: string;
+  userId: string;
+  date: Date;
+  createdAt: Date;
+  exercises: Array<{
+    id: string;
+    workoutId: string;
+    exerciseId: string | null;
+    weight: number;
+    reps: number;
+    sets: number;
+  }>;
+};
+
+async function serializeWorkoutCollection(workouts: WorkoutWithExercises[]) {
+  const exerciseIds = Array.from(
+    new Set(
+      workouts.flatMap((workout) =>
+        workout.exercises.map((entry) => entry.exerciseId).filter(Boolean)
+      )
+    )
+  ) as string[];
+  const catalogItems = await fetchExercisesByIds(exerciseIds);
+  const catalogMap = new Map(catalogItems.map((item) => [item.id, item]));
+
+  return workouts.map((workout) => ({
+    ...workout,
+    exercises: workout.exercises
+      .filter((entry) => Boolean(entry.exerciseId && catalogMap.has(entry.exerciseId)))
+      .map((entry) => ({
+        ...entry,
+        exercise: catalogMap.get(entry.exerciseId!),
+      })),
+  }));
 }

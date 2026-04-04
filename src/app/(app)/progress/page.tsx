@@ -1,21 +1,16 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import PageHeader from "@/components/page-header";
-import WorkoutCard from "@/components/workout-card";
-import WeeklyDelta from "@/components/weekly-delta";
-import { getAllWorkouts } from "@/actions/workouts";
-import {
-  groupWorkoutsByWeek,
-  getWeeklySummary,
-} from "@/lib/calculations";
-import { ChevronLeft, ChevronRight, TrendingUp, Dumbbell } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight, Dumbbell, TrendingUp } from "lucide-react";
 
-interface WorkoutData {
-  id: string;
-  date: string;
+import { getAllWorkouts } from "@/actions/workouts";
+import PageHeader from "@/components/page-header";
+import WeeklyDelta from "@/components/weekly-delta";
+import WorkoutCard from "@/components/workout-card";
+import { groupWorkoutsByWeek, getWeeklySummary, type WorkoutLike } from "@/lib/calculations";
+
+interface WorkoutData extends WorkoutLike {
   createdAt: string;
-  exercises: { exercise: string; weight: number; reps: number; sets: number }[];
 }
 
 export default function ProgressPage() {
@@ -27,34 +22,31 @@ export default function ProgressPage() {
       try {
         const data = await getAllWorkouts();
         setWorkouts(
-          data.map((w) => ({
-            id: w.id,
-            date: w.date.toISOString().split("T")[0],
-            createdAt: w.createdAt.toISOString(),
-            exercises: w.exercises.map((e) => ({
-              exercise: e.exercise,
-              weight: e.weight,
-              reps: e.reps,
-              sets: e.sets,
+          data.map((workout) => ({
+            id: workout.id,
+            date: workout.date.toISOString().split("T")[0],
+            createdAt: workout.createdAt.toISOString(),
+            exercises: workout.exercises.map((exercise) => ({
+              exercise: exercise.exercise?.name ?? "Unknown Exercise",
+              weight: exercise.weight,
+              reps: exercise.reps,
+              sets: exercise.sets,
             })),
           }))
         );
       } catch {
-        // Handle error
+        // Ignore load errors and show empty state.
       }
       setLoading(false);
     }
+
     load();
   }, []);
 
   const weeklyGroups = useMemo(() => {
-    const mapped = workouts.map((w) => ({
-      ...w,
-      userId: "",
-    }));
-    const groups = groupWorkoutsByWeek(mapped);
+    const groups = groupWorkoutsByWeek(workouts);
     return Array.from(groups.entries()).sort(
-      (a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime()
+      (left, right) => new Date(right[0]).getTime() - new Date(left[0]).getTime()
     );
   }, [workouts]);
 
@@ -62,22 +54,12 @@ export default function ProgressPage() {
 
   const currentWeekEntry = weeklyGroups[selectedWeekIndex];
   const prevWeekEntry = weeklyGroups[selectedWeekIndex + 1];
-
   const currentWeekWorkouts = useMemo(
-    () =>
-      (currentWeekEntry?.[1] || []).map((w) => ({
-        ...w,
-        userId: "",
-      })),
+    () => (currentWeekEntry?.[1] || []) as WorkoutLike[],
     [currentWeekEntry]
   );
-
   const prevWeekWorkouts = useMemo(
-    () =>
-      (prevWeekEntry?.[1] || []).map((w) => ({
-        ...w,
-        userId: "",
-      })),
+    () => (prevWeekEntry?.[1] || []) as WorkoutLike[],
     [prevWeekEntry]
   );
 
@@ -93,8 +75,11 @@ export default function ProgressPage() {
   weekEnd.setDate(weekEnd.getDate() + 6);
 
   const formatWeekLabel = useCallback((start: Date, end: Date) => {
-    const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" };
-    return `${start.toLocaleDateString("id-ID", opts)} — ${end.toLocaleDateString("id-ID", opts)}`;
+    const formatter = new Intl.DateTimeFormat("id-ID", {
+      day: "numeric",
+      month: "short",
+    });
+    return `${formatter.format(start)} — ${formatter.format(end)}`;
   }, []);
 
   if (loading) {
@@ -102,7 +87,7 @@ export default function ProgressPage() {
       <div>
         <PageHeader title="Progress" subtitle="Pantau perkembangan kekuatanmu" />
         <div className="glass-card p-8 text-center">
-          <p className="text-sm text-text-muted">Memuat data...</p>
+          <p className="text-sm text-text-muted">Memuat data…</p>
         </div>
       </div>
     );
@@ -114,12 +99,11 @@ export default function ProgressPage() {
 
       {weeklyGroups.length === 0 ? (
         <div className="glass-card p-8 text-center">
-          <Dumbbell className="w-8 h-8 text-text-muted/30 mx-auto mb-2" />
+          <Dumbbell className="w-8 h-8 text-text-muted/30 mx-auto mb-2" aria-hidden="true" />
           <p className="text-sm text-text-muted">Belum ada data latihan</p>
         </div>
       ) : (
         <>
-          {/* Week Selector */}
           <div
             className="glass-card p-3 flex items-center justify-between mb-6 animate-fade-in-up"
             id="week-selector"
@@ -131,34 +115,32 @@ export default function ProgressPage() {
                 )
               }
               disabled={selectedWeekIndex >= weeklyGroups.length - 1}
-              className="w-9 h-9 rounded-lg bg-surface-elevated flex items-center justify-center text-text-muted hover:text-foreground disabled:opacity-30 transition-all"
+              className="w-9 h-9 rounded-lg bg-surface-elevated flex items-center justify-center text-text-muted hover:text-foreground disabled:opacity-30 transition-colors"
+              aria-label="Lihat minggu sebelumnya"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             </button>
             <div className="text-center">
               <p className="text-sm font-semibold text-foreground">
                 {formatWeekLabel(currentWeekStart, weekEnd)}
               </p>
               <p className="text-[10px] text-text-muted mt-0.5">
-                {currentWeekWorkouts.length} workout
-                {currentWeekWorkouts.length !== 1 ? "s" : ""}
+                {currentWeekWorkouts.length} workout{currentWeekWorkouts.length !== 1 ? "s" : ""}
               </p>
             </div>
             <button
-              onClick={() =>
-                setSelectedWeekIndex(Math.max(selectedWeekIndex - 1, 0))
-              }
+              onClick={() => setSelectedWeekIndex(Math.max(selectedWeekIndex - 1, 0))}
               disabled={selectedWeekIndex <= 0}
-              className="w-9 h-9 rounded-lg bg-surface-elevated flex items-center justify-center text-text-muted hover:text-foreground disabled:opacity-30 transition-all"
+              className="w-9 h-9 rounded-lg bg-surface-elevated flex items-center justify-center text-text-muted hover:text-foreground disabled:opacity-30 transition-colors"
+              aria-label="Lihat minggu berikutnya"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
 
-          {/* Weekly Summary */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="w-4 h-4 text-emerald" />
+              <TrendingUp className="w-4 h-4 text-emerald" aria-hidden="true" />
               <h2
                 className="text-base font-bold text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
@@ -168,27 +150,23 @@ export default function ProgressPage() {
             </div>
             {weeklySummary.length === 0 ? (
               <div className="glass-card p-8 text-center">
-                <Dumbbell className="w-8 h-8 text-text-muted/30 mx-auto mb-2" />
-                <p className="text-sm text-text-muted">
-                  Belum ada latihan minggu ini
-                </p>
+                <Dumbbell className="w-8 h-8 text-text-muted/30 mx-auto mb-2" aria-hidden="true" />
+                <p className="text-sm text-text-muted">Belum ada latihan minggu ini</p>
               </div>
             ) : (
               <div className="space-y-2">
-                {weeklySummary.map((summary, i) => (
+                {weeklySummary.map((summary, index) => (
                   <div
                     key={summary.exercise}
                     className="glass-card p-4 flex items-center justify-between animate-fade-in-up"
-                    style={{ animationDelay: `${i * 80}ms` }}
+                    style={{ animationDelay: `${index * 80}ms` }}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-emerald/10 flex items-center justify-center">
-                        <Dumbbell className="w-4 h-4 text-emerald" />
+                        <Dumbbell className="w-4 h-4 text-emerald" aria-hidden="true" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-foreground">
-                          {summary.exercise}
-                        </p>
+                        <p className="text-sm font-semibold text-foreground">{summary.exercise}</p>
                         <p className="text-xs text-text-muted">
                           Peak 1RM:{" "}
                           <span className="font-data text-foreground">
@@ -204,10 +182,9 @@ export default function ProgressPage() {
             )}
           </div>
 
-          {/* Workout History */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Dumbbell className="w-4 h-4 text-emerald" />
+              <Dumbbell className="w-4 h-4 text-emerald" aria-hidden="true" />
               <h2
                 className="text-base font-bold text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
@@ -217,16 +194,10 @@ export default function ProgressPage() {
             </div>
             <div className="space-y-3">
               {currentWeekWorkouts
-                .sort(
-                  (a, b) =>
-                    new Date(b.date).getTime() - new Date(a.date).getTime()
-                )
-                .map((workout, i) => (
-                  <WorkoutCard
-                    key={workout.id}
-                    workout={workout}
-                    delay={i * 100}
-                  />
+                .slice()
+                .sort((left, right) => new Date(right.date).getTime() - new Date(left.date).getTime())
+                .map((workout, index) => (
+                  <WorkoutCard key={workout.id} workout={workout} delay={index * 100} />
                 ))}
             </div>
           </div>

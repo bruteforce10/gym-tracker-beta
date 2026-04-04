@@ -1,6 +1,17 @@
 // ── Core Calculations for Gym Progress Tracker ──
 
-import { ExerciseLog, Workout } from "@/data/dummy";
+export interface ExerciseLogLike {
+  exercise: string;
+  weight: number;
+  reps: number;
+  sets: number;
+}
+
+export interface WorkoutLike<TExercise extends ExerciseLogLike = ExerciseLogLike> {
+  id: string;
+  date: string;
+  exercises: TExercise[];
+}
 
 /**
  * Epley formula: 1RM = weight × (1 + reps / 30)
@@ -23,7 +34,7 @@ export function calculateProgress(current1RM: number, targetWeight: number): num
 /**
  * Get the peak 1RM for a specific exercise from a list of workouts
  */
-export function getPeak1RM(workouts: Workout[], exercise: string): number {
+export function getPeak1RM(workouts: WorkoutLike[], exercise: string): number {
   let peak = 0;
   for (const workout of workouts) {
     for (const log of workout.exercises) {
@@ -39,7 +50,7 @@ export function getPeak1RM(workouts: Workout[], exercise: string): number {
 /**
  * Get the best set (highest 1RM) from an exercise log
  */
-export function getBest1RMFromLog(log: ExerciseLog): number {
+export function getBest1RMFromLog(log: ExerciseLogLike): number {
   return calculate1RM(log.weight, log.reps);
 }
 
@@ -61,8 +72,8 @@ export function getWeekBounds(date: Date): { start: Date; end: Date } {
 /**
  * Group workouts by calendar week
  */
-export function groupWorkoutsByWeek(workouts: Workout[]): Map<string, Workout[]> {
-  const weeks = new Map<string, Workout[]>();
+export function groupWorkoutsByWeek(workouts: WorkoutLike[]): Map<string, WorkoutLike[]> {
+  const weeks = new Map<string, WorkoutLike[]>();
   for (const workout of workouts) {
     const { start } = getWeekBounds(new Date(workout.date));
     const key = start.toISOString().split("T")[0];
@@ -83,8 +94,8 @@ export interface WeeklyExerciseSummary {
 }
 
 export function getWeeklySummary(
-  currentWeekWorkouts: Workout[],
-  previousWeekWorkouts: Workout[]
+  currentWeekWorkouts: WorkoutLike[],
+  previousWeekWorkouts: WorkoutLike[]
 ): WeeklyExerciseSummary[] {
   // Collect all exercises in current week
   const exerciseMap = new Map<string, number>();

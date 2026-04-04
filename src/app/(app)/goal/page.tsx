@@ -1,27 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Calendar as CalendarIcon, Check, Edit3, Target, X } from "lucide-react";
+import { format } from "date-fns";
+
+import { getGoalPageData, upsertGoal } from "@/actions/goals";
+import ExercisePicker from "@/components/exercise-picker";
 import PageHeader from "@/components/page-header";
 import ProgressRing from "@/components/progress-ring";
-import { getActiveGoal, upsertGoal } from "@/actions/goals";
-import { getAllWorkouts } from "@/actions/workouts";
-import { exercisesList } from "@/data/dummy";
-import { calculateProgress, calculate1RM, getDaysUntilDeadline } from "@/lib/calculations";
-import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Target, Calendar as CalendarIcon, Edit3, Check, X } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { calculateProgress, getDaysUntilDeadline } from "@/lib/calculations";
+import type { ExerciseCatalogItem } from "@/lib/exercise-catalog";
 import { cn } from "@/lib/utils";
 
 interface GoalData {
   id: string;
-  exercise: string;
+  exercise: ExerciseCatalogItem;
   targetWeight: number;
   currentWeight: number;
   deadline: string | null;
@@ -33,59 +34,47 @@ export default function GoalPage() {
   const [current1RM, setCurrent1RM] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [editForm, setEditForm] = useState({
-    exercise: "",
-    targetWeight: "",
+  const [editForm, setEditForm] = useState<{
+    exercise: ExerciseCatalogItem | null;
+    targetWeight: string;
+    deadline: string;
+  }>({
+    exercise: null,
+    targetWeight: "100",
     deadline: "",
   });
 
   useEffect(() => {
     async function load() {
       try {
-        const [goalData, workouts] = await Promise.all([
-          getActiveGoal(),
-          getAllWorkouts(),
-        ]);
+        const goalData = await getGoalPageData();
 
-        if (goalData) {
-          const g: GoalData = {
-            id: goalData.id,
-            exercise: goalData.exercise,
-            targetWeight: goalData.targetWeight,
-            currentWeight: goalData.currentWeight,
-            deadline: goalData.deadline?.toISOString().split("T")[0] || null,
+        if (goalData.goal) {
+          const nextGoal: GoalData = {
+            id: goalData.goal.id,
+            exercise: goalData.goal.exercise,
+            targetWeight: goalData.goal.targetWeight,
+            currentWeight: goalData.goal.currentWeight,
+            deadline: goalData.goal.deadline?.toISOString().split("T")[0] || null,
           };
-          setGoal(g);
-          setEditForm({
-            exercise: g.exercise,
-            targetWeight: g.targetWeight.toString(),
-            deadline: g.deadline || "",
-          });
 
-          // Calculate current 1RM for this exercise
-          let best = 0;
-          for (const w of workouts) {
-            for (const ex of w.exercises) {
-              if (ex.exercise === g.exercise) {
-                const rm = calculate1RM(ex.weight, ex.reps);
-                if (rm > best) best = rm;
-              }
-            }
-          }
-          setCurrent1RM(best);
+          setGoal(nextGoal);
+          setEditForm({
+            exercise: nextGoal.exercise,
+            targetWeight: nextGoal.targetWeight.toString(),
+            deadline: nextGoal.deadline || "",
+          });
+          setCurrent1RM(goalData.current1RM);
         } else {
           setEditing(true);
-          setEditForm({
-            exercise: exercisesList[0],
-            targetWeight: "100",
-            deadline: "",
-          });
         }
       } catch {
-        // Handle error
+        // Ignore load errors and keep the page interactive.
       }
+
       setLoading(false);
     }
+
     load();
   }, []);
 
@@ -93,13 +82,16 @@ export default function GoalPage() {
   const daysLeft = goal?.deadline ? getDaysUntilDeadline(goal.deadline) : null;
 
   const handleSave = async () => {
+    if (!editForm.exercise) return;
+
     setSaving(true);
     try {
       const result = await upsertGoal({
-        exercise: editForm.exercise,
+        exerciseId: editForm.exercise.id,
         targetWeight: Number(editForm.targetWeight),
         deadline: editForm.deadline || null,
       });
+
       setGoal({
         id: result.id,
         exercise: result.exercise,
@@ -109,20 +101,20 @@ export default function GoalPage() {
       });
       setEditing(false);
     } catch {
-      // Handle error
+      // Ignore save errors and keep the form visible.
     }
     setSaving(false);
   };
 
   const handleCancel = () => {
-    if (goal) {
-      setEditForm({
-        exercise: goal.exercise,
-        targetWeight: goal.targetWeight.toString(),
-        deadline: goal.deadline || "",
-      });
-      setEditing(false);
-    }
+    if (!goal) return;
+
+    setEditForm({
+      exercise: goal.exercise,
+      targetWeight: goal.targetWeight.toString(),
+      deadline: goal.deadline || "",
+    });
+    setEditing(false);
   };
 
   if (loading) {
@@ -130,7 +122,7 @@ export default function GoalPage() {
       <div>
         <PageHeader title="Goal" subtitle="Target kekuatan yang ingin dicapai" />
         <div className="glass-card p-8 text-center">
-          <p className="text-sm text-text-muted">Memuat data...</p>
+          <p className="text-sm text-text-muted">Memuat data…</p>
         </div>
       </div>
     );
@@ -148,19 +140,19 @@ export default function GoalPage() {
               onClick={() => setEditing(true)}
               className="w-9 h-9 rounded-lg bg-surface-elevated flex items-center justify-center text-text-muted hover:text-emerald transition-colors"
               id="edit-goal-btn"
+              aria-label="Edit goal aktif"
             >
-              <Edit3 className="w-4 h-4" />
+              <Edit3 className="w-4 h-4" aria-hidden="true" />
             </button>
           )
         }
       />
 
-      {/* Active Goal Card */}
       {goal && (
         <div className="glass-card p-6 mb-6 animate-fade-in-up" id="active-goal-card">
           <div className="flex items-center gap-2 mb-5">
             <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center">
-              <Target className="w-4 h-4 text-emerald" />
+              <Target className="w-4 h-4 text-emerald" aria-hidden="true" />
             </div>
             <span className="text-xs font-semibold text-emerald uppercase tracking-wider">
               Target Aktif
@@ -182,7 +174,7 @@ export default function GoalPage() {
               <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">
                 Exercise
               </p>
-              <p className="text-sm font-bold text-foreground">{goal.exercise}</p>
+              <p className="text-sm font-bold text-foreground">{goal.exercise.name}</p>
             </div>
             <div className="glass-card p-4 text-center">
               <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">
@@ -207,7 +199,7 @@ export default function GoalPage() {
                 Sisa Waktu
               </p>
               <div className="flex items-center justify-center gap-1">
-                <Calendar className="w-3 h-3 text-text-muted" />
+                <CalendarIcon className="w-3 h-3 text-text-muted" aria-hidden="true" />
                 <p className="font-data text-lg font-bold text-foreground">
                   {daysLeft !== null ? daysLeft : "—"}{" "}
                   <span className="text-xs text-text-muted font-normal">hari</span>
@@ -218,7 +210,6 @@ export default function GoalPage() {
         </div>
       )}
 
-      {/* Edit Goal Form */}
       {editing && (
         <div className="glass-card p-5 space-y-4 animate-fade-in-up" id="edit-goal-form">
           <h3
@@ -228,31 +219,30 @@ export default function GoalPage() {
             {goal ? "Edit Goal" : "Buat Goal Baru"}
           </h3>
 
-          <div>
-            <label className="text-xs text-text-muted font-medium mb-1.5 block">
-              Exercise
-            </label>
-            <select
-              value={editForm.exercise}
-              onChange={(e) => setEditForm({ ...editForm, exercise: e.target.value })}
-              className="w-full h-10 px-3 rounded-lg bg-surface-elevated border border-border-subtle text-foreground text-sm focus:ring-2 focus:ring-emerald/30 focus:border-emerald/50 transition-all appearance-none"
-            >
-              {exercisesList.map((ex) => (
-                <option key={ex} value={ex} className="bg-surface">
-                  {ex}
-                </option>
-              ))}
-            </select>
-          </div>
+          <ExercisePicker
+            inputId="goal-exercise"
+            label="Exercise"
+            value={editForm.exercise}
+            onChange={(exercise) => setEditForm((current) => ({ ...current, exercise }))}
+            helperText="Cari exercise langsung dari katalog Gym Fit."
+          />
 
           <div>
-            <label className="text-xs text-text-muted font-medium mb-1.5 block">
+            <label
+              htmlFor="goal-target-weight"
+              className="text-xs text-text-muted font-medium mb-1.5 block"
+            >
               Target Weight (kg)
             </label>
             <Input
+              id="goal-target-weight"
+              name="goal-target-weight"
               type="number"
+              inputMode="decimal"
               value={editForm.targetWeight}
-              onChange={(e) => setEditForm({ ...editForm, targetWeight: e.target.value })}
+              onChange={(event) =>
+                setEditForm({ ...editForm, targetWeight: event.target.value })
+              }
               className="bg-surface-elevated border-border-subtle text-foreground font-data"
             />
           </div>
@@ -269,7 +259,7 @@ export default function GoalPage() {
                   !editForm.deadline && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4 text-emerald" />
+                <CalendarIcon className="mr-2 h-4 w-4 text-emerald" aria-hidden="true" />
                 {editForm.deadline ? (
                   format(new Date(editForm.deadline), "PPP")
                 ) : (
@@ -321,23 +311,22 @@ export default function GoalPage() {
                 variant="outline"
                 className="flex-1 h-11 border-border-subtle text-text-muted hover:text-foreground rounded-xl"
               >
-                <X className="w-4 h-4 mr-1.5" />
+                <X className="w-4 h-4 mr-1.5" aria-hidden="true" />
                 Batal
               </Button>
             )}
             <Button
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || !editForm.exercise}
               className="flex-1 h-11 bg-emerald hover:bg-emerald-dark text-[#0A0A0F] font-semibold rounded-xl disabled:opacity-50"
             >
-              <Check className="w-4 h-4 mr-1.5" />
-              {saving ? "Menyimpan..." : "Simpan"}
+              <Check className="w-4 h-4 mr-1.5" aria-hidden="true" />
+              {saving ? "Menyimpan…" : "Simpan"}
             </Button>
           </div>
         </div>
       )}
 
-      {/* Motivational section */}
       {goal && (
         <div
           className="glass-card p-5 mt-6 text-center animate-fade-in-up"
@@ -351,7 +340,7 @@ export default function GoalPage() {
           </p>
           <div className="mt-3 h-2 rounded-full bg-surface-elevated overflow-hidden">
             <div
-              className="h-full rounded-full bg-linear-to-r from-emerald-dark to-emerald-light transition-all duration-1000"
+              className="h-full rounded-full bg-linear-to-r from-emerald-dark to-emerald-light transition-[width] duration-1000"
               style={{ width: `${progress}%` }}
             />
           </div>

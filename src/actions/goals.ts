@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { fetchExerciseById } from "@/lib/gymfit";
+import { calculate1RM } from "@/lib/calculations";
 
 async function getUserId(): Promise<string> {
   const session = await auth();
@@ -15,11 +17,67 @@ export async function getActiveGoal() {
     where: { userId },
     orderBy: { createdAt: "desc" },
   });
-  return goal;
+
+  if (!goal?.exerciseId) return null;
+
+  const exercise = await fetchExerciseById(goal.exerciseId);
+  if (!exercise) return null;
+
+  return {
+    ...goal,
+    exercise,
+  };
+}
+
+export async function getGoalPageData() {
+  const userId = await getUserId();
+  const [goal, workouts] = await Promise.all([
+    prisma.goal.findFirst({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.workout.findMany({
+      where: { userId },
+      orderBy: { date: "desc" },
+      include: { exercises: true },
+    }),
+  ]);
+
+  if (!goal?.exerciseId) {
+    return {
+      goal: null,
+      current1RM: 0,
+    };
+  }
+
+  const exercise = await fetchExerciseById(goal.exerciseId);
+  if (!exercise) {
+    return {
+      goal: null,
+      current1RM: 0,
+    };
+  }
+
+  let current1RM = 0;
+  for (const workout of workouts) {
+    for (const entry of workout.exercises) {
+      if (entry.exerciseId !== goal.exerciseId) continue;
+      const rm = calculate1RM(entry.weight, entry.reps);
+      if (rm > current1RM) current1RM = rm;
+    }
+  }
+
+  return {
+    goal: {
+      ...goal,
+      exercise,
+    },
+    current1RM,
+  };
 }
 
 export async function upsertGoal(data: {
-  exercise: string;
+  exerciseId: string;
   targetWeight: number;
   currentWeight?: number;
   deadline?: string | null;
@@ -37,24 +95,38 @@ export async function upsertGoal(data: {
     const updated = await prisma.goal.update({
       where: { id: existing.id },
       data: {
-        exercise: data.exercise,
+        exerciseId: data.exerciseId,
         targetWeight: data.targetWeight,
         currentWeight: data.currentWeight ?? existing.currentWeight,
         deadline: data.deadline ? new Date(data.deadline) : null,
       },
     });
-    return updated;
+
+    const exercise = await fetchExerciseById(updated.exerciseId ?? data.exerciseId);
+    if (!exercise) throw new Error("Exercise not found in Gym Fit");
+
+    return {
+      ...updated,
+      exercise,
+    };
   } else {
     // Create new
     const created = await prisma.goal.create({
       data: {
         userId,
-        exercise: data.exercise,
+        exerciseId: data.exerciseId,
         targetWeight: data.targetWeight,
         currentWeight: data.currentWeight ?? 0,
         deadline: data.deadline ? new Date(data.deadline) : null,
       },
     });
-    return created;
+
+    const exercise = await fetchExerciseById(created.exerciseId ?? data.exerciseId);
+    if (!exercise) throw new Error("Exercise not found in Gym Fit");
+
+    return {
+      ...created,
+      exercise,
+    };
   }
 }

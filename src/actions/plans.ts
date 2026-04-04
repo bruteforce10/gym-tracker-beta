@@ -2,7 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { getUpperExercises, getLowerExercises } from "@/data/exercises";
+import {
+  type ExercisePlanBucket,
+  type ExerciseCatalogItem,
+} from "@/lib/exercise-catalog";
+import { fetchExerciseCatalog, fetchExercisesByIds } from "@/lib/gymfit";
 
 async function getUserId(): Promise<string> {
   const session = await auth();
@@ -12,21 +16,41 @@ async function getUserId(): Promise<string> {
 
 export async function getWorkoutPlans() {
   const userId = await getUserId();
-  return prisma.workoutPlan.findMany({
+  const plans = await prisma.workoutPlan.findMany({
     where: { userId },
-    include: { exercises: { orderBy: { order: "asc" } } },
+    include: {
+      exercises: {
+        orderBy: { order: "asc" },
+      },
+    },
     orderBy: { createdAt: "asc" },
   });
+
+  return serializePlanCollection(plans);
 }
 
 export async function createDefaultPlans() {
   const userId = await getUserId();
 
-  const existing = await prisma.workoutPlan.findMany({ where: { userId } });
-  if (existing.length > 0) return existing;
+  const existing = await prisma.workoutPlan.findMany({
+    where: { userId },
+    include: {
+      exercises: {
+        orderBy: { order: "asc" },
+      },
+    },
+  });
+  if (existing.length > 0) return serializePlanCollection(existing);
 
-  const upperExercises = getUpperExercises().slice(0, 8);
-  const lowerExercises = getLowerExercises().slice(0, 8);
+  const serialized = await fetchExerciseCatalog({
+    limit: 120,
+  });
+  const upperExercises = pickDefaultExercises(serialized, "upper").slice(0, 8);
+  const lowerExercises = pickDefaultExercises(serialized, "lower").slice(0, 8);
+
+  if (upperExercises.length === 0 && lowerExercises.length === 0) {
+    return [];
+  }
 
   const upper = await prisma.workoutPlan.create({
     data: {
@@ -36,14 +60,18 @@ export async function createDefaultPlans() {
       exercises: {
         create: upperExercises.map((ex, i) => ({
           exerciseId: ex.id,
-          defaultSets: ex.type === "compound" ? 4 : 3,
-          defaultReps: ex.type === "compound" ? 8 : 12,
+          defaultSets: ex.defaultSets,
+          defaultReps: ex.defaultReps,
           restTime: ex.defaultRestTime,
           order: i,
         })),
       },
     },
-    include: { exercises: { orderBy: { order: "asc" } } },
+    include: {
+      exercises: {
+        orderBy: { order: "asc" },
+      },
+    },
   });
 
   const lower = await prisma.workoutPlan.create({
@@ -54,17 +82,21 @@ export async function createDefaultPlans() {
       exercises: {
         create: lowerExercises.map((ex, i) => ({
           exerciseId: ex.id,
-          defaultSets: ex.type === "compound" ? 4 : 3,
-          defaultReps: ex.type === "compound" ? 8 : 12,
+          defaultSets: ex.defaultSets,
+          defaultReps: ex.defaultReps,
           restTime: ex.defaultRestTime,
           order: i,
         })),
       },
     },
-    include: { exercises: { orderBy: { order: "asc" } } },
+    include: {
+      exercises: {
+        orderBy: { order: "asc" },
+      },
+    },
   });
 
-  return [upper, lower];
+  return serializePlanCollection([upper, lower]);
 }
 
 export async function createWorkoutPlan(
@@ -73,35 +105,57 @@ export async function createWorkoutPlan(
   exerciseItems: { exerciseId: string; defaultSets: number; defaultReps: number; restTime: number; order: number }[]
 ) {
   const userId = await getUserId();
-  return prisma.workoutPlan.create({
+  const plan = await prisma.workoutPlan.create({
     data: {
       userId,
       name,
       type,
       exercises: { create: exerciseItems },
     },
-    include: { exercises: { orderBy: { order: "asc" } } },
+    include: {
+      exercises: {
+        orderBy: { order: "asc" },
+      },
+    },
   });
+
+  const [serialized] = await serializePlanCollection([plan]);
+  return serialized;
 }
 
 export async function updateWorkoutPlanExercises(
   planId: string,
+  name: string,
   exerciseItems: { exerciseId: string; defaultSets: number; defaultReps: number; restTime: number; order: number }[]
 ) {
   const userId = await getUserId();
   const plan = await prisma.workoutPlan.findFirst({ where: { id: planId, userId } });
   if (!plan) throw new Error("Plan not found");
 
-  // Delete existing and recreate
-  await prisma.workoutPlanExercise.deleteMany({ where: { planId } });
-  await prisma.workoutPlanExercise.createMany({
-    data: exerciseItems.map((ex) => ({ ...ex, planId })),
+  await prisma.$transaction(async (tx) => {
+    await tx.workoutPlan.update({
+      where: { id: planId },
+      data: { name },
+    });
+    await tx.workoutPlanExercise.deleteMany({ where: { planId } });
+    await tx.workoutPlanExercise.createMany({
+      data: exerciseItems.map((ex) => ({ ...ex, planId })),
+    });
   });
 
-  return prisma.workoutPlan.findUnique({
+  const updatedPlan = await prisma.workoutPlan.findUnique({
     where: { id: planId },
-    include: { exercises: { orderBy: { order: "asc" } } },
+    include: {
+      exercises: {
+        orderBy: { order: "asc" },
+      },
+    },
   });
+
+  if (!updatedPlan) return null;
+
+  const [serialized] = await serializePlanCollection([updatedPlan]);
+  return serialized;
 }
 
 export async function deleteWorkoutPlan(planId: string) {
@@ -109,4 +163,48 @@ export async function deleteWorkoutPlan(planId: string) {
   const plan = await prisma.workoutPlan.findFirst({ where: { id: planId, userId } });
   if (!plan) throw new Error("Plan not found");
   await prisma.workoutPlan.delete({ where: { id: planId } });
+}
+
+type PlanWithExercises = {
+  id: string;
+  name: string;
+  type: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  exercises: Array<{
+    id: string;
+    planId: string;
+    exerciseId: string;
+    defaultSets: number;
+    defaultReps: number;
+    restTime: number;
+    order: number;
+  }>;
+};
+
+async function serializePlanCollection(plans: PlanWithExercises[]) {
+  const catalogItems = await fetchExercisesByIds(
+    Array.from(
+      new Set(plans.flatMap((plan) => plan.exercises.map((entry) => entry.exerciseId)))
+    )
+  );
+  const catalogMap = new Map(catalogItems.map((item) => [item.id, item]));
+
+  return plans.map((plan) => ({
+    ...plan,
+    exercises: plan.exercises
+      .filter((entry) => catalogMap.has(entry.exerciseId))
+      .map((entry) => ({
+        ...entry,
+        exercise: catalogMap.get(entry.exerciseId)!,
+      })),
+  }));
+}
+
+function pickDefaultExercises(
+  exercises: ExerciseCatalogItem[],
+  bucket: ExercisePlanBucket
+) {
+  return exercises.filter((exercise) => exercise.planBucket === bucket);
 }

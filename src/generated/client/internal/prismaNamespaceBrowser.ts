@@ -122,7 +122,7 @@ export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeo
 export const GoalScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  exercise: 'exercise',
+  exerciseId: 'exerciseId',
   targetWeight: 'targetWeight',
   currentWeight: 'currentWeight',
   deadline: 'deadline',
@@ -146,7 +146,7 @@ export type WorkoutScalarFieldEnum = (typeof WorkoutScalarFieldEnum)[keyof typeo
 export const ExerciseLogScalarFieldEnum = {
   id: 'id',
   workoutId: 'workoutId',
-  exercise: 'exercise',
+  exerciseId: 'exerciseId',
   weight: 'weight',
   reps: 'reps',
   sets: 'sets'

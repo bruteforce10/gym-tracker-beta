@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "gym-fit.s3.fr-par.scw.cloud",
+      },
+      {
+        protocol: "https",
+        hostname: "ucarecdn.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

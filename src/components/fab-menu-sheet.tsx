@@ -44,7 +44,7 @@ export default function FabMenuSheet({ open, onOpenChange, onManualLog }: FabMen
             id="fab-guided-plan"
           >
             <div className="w-12 h-12 rounded-xl bg-linear-to-br from-emerald/20 to-emerald/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <ClipboardList className="w-6 h-6 text-emerald" />
+              <ClipboardList className="w-6 h-6 text-emerald" aria-hidden="true" />
             </div>
             <div>
               <p className="text-foreground font-semibold text-sm">Mulai Plan</p>
@@ -67,7 +67,7 @@ export default function FabMenuSheet({ open, onOpenChange, onManualLog }: FabMen
             id="fab-manual-log"
           >
             <div className="w-12 h-12 rounded-xl bg-linear-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <Dumbbell className="w-6 h-6 text-blue-400" />
+              <Dumbbell className="w-6 h-6 text-blue-400" aria-hidden="true" />
             </div>
             <div>
               <p className="text-foreground font-semibold text-sm">Log Manual</p>

@@ -56,14 +56,14 @@ model Session {
 model Goal {
   id            String    @id @default(cuid())
   userId        String
-  exercise      String
+  exerciseId    String?
   targetWeight  Float
   currentWeight Float     @default(0)
   deadline      DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Workout {
@@ -77,14 +77,14 @@ model Workout {
 }
 
 model ExerciseLog {
-  id        String  @id @default(cuid())
-  workoutId String
-  exercise  String
-  weight    Float
-  reps      Int
-  sets      Int
+  id         String   @id @default(cuid())
+  workoutId  String
+  exerciseId String?
+  weight     Float
+  reps       Int
+  sets       Int
 
-  workout Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  workout  Workout   @relation(fields: [workoutId], references: [id], onDelete: Cascade)
 }
 
 model WorkoutPlan {
