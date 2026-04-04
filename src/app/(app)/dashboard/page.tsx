@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Activity, Calendar, Flame, Trophy } from "lucide-react";
-
 import { getDashboardData } from "@/actions/dashboard";
 import PageHeader from "@/components/page-header";
 import ProgressRing from "@/components/progress-ring";
@@ -32,8 +31,19 @@ export default async function DashboardPage() {
       <PageHeader title={`Halo, ${userName} 👋`} subtitle={today} />
 
       <div className="grid grid-cols-3 gap-3 mb-6">
-        <StatCard icon={<Activity className="w-4 h-4" />} label="Workouts" value={stats.totalWorkouts} delay={100} />
-        <StatCard icon={<Flame className="w-4 h-4" />} label="Streak" value={stats.streak} suffix="hari" delay={200} />
+        <StatCard
+          icon={<Activity className="w-4 h-4" />}
+          label="Workouts"
+          value={stats.totalWorkouts}
+          delay={100}
+        />
+        <StatCard
+          icon={<Flame className="w-4 h-4" />}
+          label="Streak"
+          value={stats.streak}
+          suffix="hari"
+          delay={200}
+        />
         <StatCard
           icon={<Trophy className="w-4 h-4" />}
           label="Best 1RM"
@@ -63,12 +73,19 @@ export default async function DashboardPage() {
               {daysLeft !== null && (
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald/10 text-emerald">
                   <Calendar className="w-3 h-3" aria-hidden="true" />
-                  <span className="text-xs font-semibold font-data">{daysLeft} hari</span>
+                  <span className="text-xs font-semibold font-data">
+                    {daysLeft} hari
+                  </span>
                 </div>
               )}
             </div>
             <div className="flex items-center gap-6">
-              <ProgressRing percentage={progress} size={130} strokeWidth={8} label="progress" />
+              <ProgressRing
+                percentage={progress}
+                size={130}
+                strokeWidth={8}
+                label="progress"
+              />
               <div className="flex-1 space-y-3">
                 <div className="glass-card p-3">
                   <p className="text-[10px] text-text-muted uppercase tracking-wider mb-0.5">
@@ -76,7 +93,9 @@ export default async function DashboardPage() {
                   </p>
                   <p className="font-data text-xl font-bold text-foreground">
                     {current1RM.toFixed(1)}{" "}
-                    <span className="text-sm text-text-muted font-normal">kg</span>
+                    <span className="text-sm text-text-muted font-normal">
+                      kg
+                    </span>
                   </p>
                 </div>
                 <div className="glass-card p-3">
@@ -85,7 +104,9 @@ export default async function DashboardPage() {
                   </p>
                   <p className="font-data text-xl font-bold text-emerald">
                     {goal.targetWeight}{" "}
-                    <span className="text-sm text-text-muted font-normal">kg</span>
+                    <span className="text-sm text-text-muted font-normal">
+                      kg
+                    </span>
                   </p>
                 </div>
               </div>
@@ -111,14 +132,21 @@ export default async function DashboardPage() {
           >
             Latihan Terakhir
           </h2>
-          <Link href="/progress" className="text-xs text-emerald font-medium hover:underline">
+          <Link
+            href="/progress"
+            className="text-xs text-emerald font-medium hover:underline"
+          >
             Lihat semua
           </Link>
         </div>
         {recentWorkouts.length > 0 ? (
           <div className="space-y-3">
             {recentWorkouts.map((workout, index) => (
-              <WorkoutCard key={workout.id} workout={workout} delay={600 + index * 100} />
+              <WorkoutCard
+                key={workout.id}
+                workout={workout}
+                delay={600 + index * 100}
+              />
             ))}
           </div>
         ) : (

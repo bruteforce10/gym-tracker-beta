@@ -6,7 +6,11 @@ import {
   type ExercisePlanBucket,
   type ExerciseCatalogItem,
 } from "@/lib/exercise-catalog";
-import { fetchExerciseCatalog, fetchExercisesByIds } from "@/lib/gymfit";
+import {
+  fetchExerciseCatalog,
+  fetchExercisesByIds,
+  isGymFitQuotaExceededError,
+} from "@/lib/gymfit";
 
 async function getUserId(): Promise<string> {
   const session = await auth();
@@ -42,9 +46,16 @@ export async function createDefaultPlans() {
   });
   if (existing.length > 0) return serializePlanCollection(existing);
 
-  const serialized = await fetchExerciseCatalog({
-    limit: 120,
-  });
+  let serialized: ExerciseCatalogItem[] = [];
+  try {
+    serialized = await fetchExerciseCatalog({
+      limit: 120,
+    });
+  } catch (error) {
+    if (!isGymFitQuotaExceededError(error)) {
+      throw error;
+    }
+  }
   const upperExercises = pickDefaultExercises(serialized, "upper").slice(0, 8);
   const lowerExercises = pickDefaultExercises(serialized, "lower").slice(0, 8);
 

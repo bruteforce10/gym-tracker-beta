@@ -1,22 +1,43 @@
-import { Search } from "lucide-react";
-
 import { getExerciseCatalog } from "@/actions/exercises";
+import ExerciseFilterForm from "@/components/exercise-filter-form";
 import ExercisesFeed from "@/components/exercises-feed";
+import ProviderWarningCard from "@/components/provider-warning-card";
+import {
+  BODY_PART_FILTER_OPTIONS,
+  EQUIPMENT_FILTER_OPTIONS,
+  TRAINING_TYPE_FILTER_OPTIONS,
+  normalizeExerciseFilterValue,
+} from "@/lib/exercise-filters";
 
 type ExercisePageProps = {
   searchParams: Promise<{
     q?: string;
-    bucket?: "upper" | "lower" | "all";
+    bodyPart?: string;
+    equipment?: string;
+    type?: string;
   }>;
 };
 
 export default async function ExercisesPage({ searchParams }: ExercisePageProps) {
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
-  const bucket = params.bucket ?? "all";
-  const exercises = await getExerciseCatalog({
+  const bodyPart = normalizeExerciseFilterValue(
+    params.bodyPart,
+    BODY_PART_FILTER_OPTIONS,
+  );
+  const equipment = normalizeExerciseFilterValue(
+    params.equipment,
+    EQUIPMENT_FILTER_OPTIONS,
+  );
+  const type = normalizeExerciseFilterValue(
+    params.type,
+    TRAINING_TYPE_FILTER_OPTIONS,
+  );
+  const { exercises, providerWarning } = await getExerciseCatalog({
     query,
-    planBucket: bucket,
+    bodyPart,
+    equipment,
+    type,
     limit: 300,
   });
 
@@ -34,53 +55,22 @@ export default async function ExercisesPage({ searchParams }: ExercisePageProps)
         </p>
       </div>
 
-      <form className="glass-card p-4 space-y-3" action="/exercises">
-        <label htmlFor="exercise-search" className="text-xs font-medium text-text-muted block">
-          Cari exercise
-        </label>
-        <div className="flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-elevated px-3">
-          <Search className="w-4 h-4 text-text-muted" aria-hidden="true" />
-          <input
-            id="exercise-search"
-            name="q"
-            type="search"
-            defaultValue={query}
-            placeholder="Cari exercise…"
-            autoComplete="off"
-            className="w-full h-11 bg-transparent text-sm text-foreground placeholder:text-text-muted/70 outline-none"
-          />
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { value: "all", label: "Semua" },
-            { value: "upper", label: "Upper" },
-            { value: "lower", label: "Lower" },
-          ].map((option) => (
-            <label
-              key={option.value}
-              className={`flex items-center justify-center rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
-                bucket === option.value
-                  ? "border-emerald/40 bg-emerald text-[#0A0A0F]"
-                  : "border-border-subtle bg-surface-elevated text-text-muted"
-              }`}
-            >
-              <input
-                type="radio"
-                name="bucket"
-                value={option.value}
-                defaultChecked={bucket === option.value}
-                className="sr-only"
-              />
-              {option.label}
-            </label>
-          ))}
-        </div>
-        <button className="w-full h-11 rounded-xl bg-emerald hover:bg-emerald-dark text-[#0A0A0F] text-sm font-semibold transition-colors">
-          Terapkan Filter
-        </button>
-      </form>
+      <ExerciseFilterForm
+        key={`${query}:${bodyPart}:${equipment}:${type}`}
+        query={query}
+        bodyPart={bodyPart}
+        equipment={equipment}
+        type={type}
+        bodyPartOptions={BODY_PART_FILTER_OPTIONS}
+        equipmentOptions={EQUIPMENT_FILTER_OPTIONS}
+        typeOptions={TRAINING_TYPE_FILTER_OPTIONS}
+      />
 
-      <ExercisesFeed exercises={exercises} />
+      {providerWarning ? (
+        <ProviderWarningCard message={providerWarning} />
+      ) : (
+        <ExercisesFeed exercises={exercises} />
+      )}
     </div>
   );
 }

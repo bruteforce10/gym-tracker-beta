@@ -45,10 +45,24 @@ type GymFitDetailResponse = {
 type FetchCatalogParams = {
   query?: string;
   planBucket?: ExercisePlanBucket | "all";
+  bodyPart?: string;
+  equipment?: string;
+  type?: string;
   limit?: number;
 };
 
 const DEFAULT_API_BASE_URL = "https://gym-fit.p.rapidapi.com";
+const GYMFIT_QUOTA_EXCEEDED_MESSAGE =
+  "Kuota Gym Fit bulan ini sudah habis. Coba lagi setelah quota reset atau gunakan plan yang lebih tinggi.";
+
+export class GymFitQuotaExceededError extends Error {
+  readonly status = 429;
+
+  constructor(message = GYMFIT_QUOTA_EXCEEDED_MESSAGE) {
+    super(message);
+    this.name = "GymFitQuotaExceededError";
+  }
+}
 
 function getGymFitBaseUrl() {
   return (process.env.GYMFIT_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/+$/, "");
@@ -99,6 +113,9 @@ async function requestGymFit(pathname: string, params?: Record<string, string | 
 
   if (!response.ok) {
     const details = await response.text();
+    if (response.status === 429) {
+      throw new GymFitQuotaExceededError();
+    }
     throw new Error(`Gym Fit request failed: ${response.status} ${response.statusText} - ${details}`);
   }
 
@@ -152,12 +169,22 @@ const fetchExerciseByIdCached = cache(async (externalId: string) => {
 });
 
 export async function fetchExerciseById(externalId: string) {
-  return fetchExerciseByIdCached(externalId);
+  try {
+    return await fetchExerciseByIdCached(externalId);
+  } catch (error) {
+    if (error instanceof GymFitQuotaExceededError) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function fetchExerciseCatalog(params?: FetchCatalogParams) {
   const query = params?.query?.trim() ?? "";
   const planBucket = params?.planBucket ?? "all";
+  const bodyPart = params?.bodyPart?.trim() ?? "";
+  const equipment = params?.equipment?.trim() ?? "";
+  const type = params?.type?.trim() ?? "";
   const requestedLimit = params?.limit ?? 24;
   const pageSize = Math.min(Math.max(requestedLimit, 25), 100);
   const collected = new Map<string, ExerciseCatalogItem>();
@@ -167,6 +194,9 @@ export async function fetchExerciseCatalog(params?: FetchCatalogParams) {
   while (collected.size < requestedLimit && offset < total) {
     const payload = (await requestGymFit("/v1/exercises/search", {
       query: query || undefined,
+      bodyPart: bodyPart || undefined,
+      equipment: equipment || undefined,
+      type: type || undefined,
       limit: pageSize,
       offset,
     })) as GymFitSearchResponse;
@@ -209,4 +239,12 @@ export async function fetchExercisesByIds(ids: string[]) {
   );
 
   return ids.map((id) => map.get(id)).filter(Boolean) as ExerciseCatalogItem[];
+}
+
+export function isGymFitQuotaExceededError(error: unknown): error is GymFitQuotaExceededError {
+  return error instanceof GymFitQuotaExceededError;
+}
+
+export function getGymFitQuotaExceededMessage() {
+  return GYMFIT_QUOTA_EXCEEDED_MESSAGE;
 }
