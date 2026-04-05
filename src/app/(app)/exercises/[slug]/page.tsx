@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { ChevronLeft, ExternalLink, PlayCircle } from "lucide-react";
 
 import { getExerciseBySlug } from "@/actions/exercises";
+import { getWorkoutPlans } from "@/actions/plans";
+import AddToPlanSheet from "@/components/add-to-plan-sheet";
 import ExerciseImage from "@/components/exercise-image";
 import { CATEGORY_GRADIENTS, CATEGORY_LABELS } from "@/lib/exercise-catalog";
 
@@ -49,6 +51,7 @@ export default async function ExerciseDetailPage({
 }: ExerciseDetailPageProps) {
   const { slug } = await params;
   const exercise = await getExerciseBySlug(slug);
+  const plans = await getWorkoutPlans();
 
   if (!exercise) {
     notFound();
@@ -98,6 +101,14 @@ export default async function ExerciseDetailPage({
             <span className="text-xs px-2.5 py-1 rounded-full border border-white/10 bg-surface/60 text-text-muted">
               {exercise.trainingStyle === "compound" ? "Compound" : "Isolation"}
             </span>
+          </div>
+          <div className="pt-1">
+            <AddToPlanSheet
+              exercise={exercise}
+              plans={plans}
+              triggerLabel="Masuk ke Plan"
+              triggerClassName="h-11 rounded-xl border border-emerald/20 bg-emerald/10 px-4 text-sm font-semibold text-emerald hover:bg-emerald/20"
+            />
           </div>
         </div>
 

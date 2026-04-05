@@ -9,6 +9,11 @@ import {
   type ExerciseTrainingStyle,
 } from "@/lib/exercise-catalog";
 
+type ViewerContext = {
+  userId?: string | null;
+  isAdmin?: boolean;
+};
+
 type FetchCatalogParams = {
   query?: string;
   planBucket?: ExercisePlanBucket | "all";
@@ -16,6 +21,7 @@ type FetchCatalogParams = {
   equipment?: string;
   type?: string;
   limit?: number;
+  viewer?: ViewerContext;
 };
 
 type StoredExerciseRecord = {
@@ -30,6 +36,11 @@ type StoredExerciseRecord = {
   secondaryMuscles: string[];
   imageUrl: string | null;
   videoUrl: string | null;
+  notes: string | null;
+  source: string;
+  visibility: string;
+  status: string;
+  createdByUserId: string | null;
   trainingStyle: string;
 };
 
@@ -51,6 +62,16 @@ function serializeStoredExercise(record: StoredExerciseRecord): ExerciseCatalogI
     secondaryMuscles: record.secondaryMuscles,
     imageUrl: record.imageUrl,
     videoUrl: record.videoUrl,
+    notes: record.notes,
+    source: record.source === "user" ? "user" : "system",
+    visibility: record.visibility === "private" ? "private" : "global",
+    status:
+      record.status === "flagged"
+        ? "flagged"
+        : record.status === "archived"
+          ? "archived"
+          : "published",
+    createdByUserId: record.createdByUserId,
     trainingStyle: normalizeTrainingStyle(record.trainingStyle),
   });
 }
@@ -63,15 +84,40 @@ function filterByPlanBucket(
   return items.filter((item) => item.planBucket === planBucket);
 }
 
-export async function fetchExerciseById(externalId: string) {
-  const exercise = await prisma.exercise.findUnique({
-    where: { id: externalId },
+function buildExerciseVisibilityWhere(viewer?: ViewerContext) {
+  if (viewer?.isAdmin) {
+    return {};
+  }
+
+  const branches: Array<Record<string, unknown>> = [
+    { source: "system" },
+    { visibility: "global" },
+  ];
+
+  if (viewer?.userId) {
+    branches.push({ createdByUserId: viewer.userId });
+  }
+
+  return {
+    OR: branches,
+  };
+}
+
+export async function fetchExerciseById(
+  externalId: string,
+  viewer?: ViewerContext,
+) {
+  const exercise = await prisma.exercise.findFirst({
+    where: {
+      id: externalId,
+      ...buildExerciseVisibilityWhere(viewer),
+    },
   });
 
   return exercise ? serializeStoredExercise(exercise) : null;
 }
 
-export async function fetchExercisesByIds(ids: string[]) {
+export async function fetchExercisesByIds(ids: string[], viewer?: ViewerContext) {
   const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
   if (uniqueIds.length === 0) return [];
 
@@ -80,6 +126,7 @@ export async function fetchExercisesByIds(ids: string[]) {
       id: {
         in: uniqueIds,
       },
+      ...buildExerciseVisibilityWhere(viewer),
     },
   });
 
@@ -94,9 +141,11 @@ export async function fetchExerciseCatalog(params?: FetchCatalogParams) {
   const type = params?.type?.trim().toLowerCase() ?? "";
   const planBucket = params?.planBucket ?? "all";
   const requestedLimit = params?.limit ?? 24;
+  const viewer = params?.viewer;
 
   const exercises = await prisma.exercise.findMany({
     where: {
+      ...buildExerciseVisibilityWhere(viewer),
       ...(query
         ? {
             name: {
@@ -124,6 +173,9 @@ export async function fetchExerciseCatalog(params?: FetchCatalogParams) {
             trainingStyle: type,
           }
         : {}),
+      status: {
+        not: "archived",
+      },
     },
   });
 

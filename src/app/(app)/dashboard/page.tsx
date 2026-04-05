@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, Calendar, Flame, Trophy } from "lucide-react";
+import { Activity, Calendar, Flame, Shield, Trophy } from "lucide-react";
 import { getDashboardData } from "@/actions/dashboard";
 import PageHeader from "@/components/page-header";
 import ProgressRing from "@/components/progress-ring";
@@ -11,6 +11,7 @@ import { calculateProgress, getDaysUntilDeadline } from "@/lib/calculations";
 export default async function DashboardPage() {
   const session = await auth();
   const userName = session?.user?.name || "User";
+  const isAdmin = session?.user?.role === "admin";
 
   const { goal, current1RM, recentWorkouts, stats } = await getDashboardData();
 
@@ -52,6 +53,24 @@ export default async function DashboardPage() {
           delay={300}
         />
       </div>
+
+      {isAdmin ? (
+        <Link href="/admin/exercises" className="mb-6 block">
+          <div className="glass-card flex items-center gap-4 border border-emerald/20 p-4 transition-colors hover:border-emerald/40">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald/10 text-emerald">
+              <Shield className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground">
+                Dashboard Custom Exercise
+              </p>
+              <p className="mt-0.5 text-xs text-text-muted">
+                Pantau submission user, edit datanya, dan promote ke semua user.
+              </p>
+            </div>
+          </div>
+        </Link>
+      ) : null}
 
       {goal ? (
         <Link href="/goal" className="block">

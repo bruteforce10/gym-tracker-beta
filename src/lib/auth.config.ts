@@ -14,14 +14,21 @@ export const authConfig = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
+      if (typeof user?.id === "string") {
         token.id = user.id;
       }
+
+      if (typeof user?.role === "string") {
+        token.role = user.role;
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string;
+        session.user.role =
+          typeof token.role === "string" ? token.role : "user";
       }
       return session;
     },

@@ -90,6 +90,7 @@ export default function WorkoutStartClient() {
         .map((exercise) => ({
           exerciseId: exercise.exercise.id,
           name: exercise.exercise.name,
+          imageUrl: exercise.exercise.imageUrl,
           category: exercise.exercise.category,
           primaryLabel: exercise.exercise.primaryLabel,
           trainingStyle: exercise.exercise.trainingStyle,

@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import {
@@ -159,6 +161,65 @@ export async function updateWorkoutPlanExercises(
 
   const [serialized] = await serializePlanCollection([updatedPlan]);
   return serialized;
+}
+
+export async function addExerciseToPlan(
+  planId: string,
+  exerciseId: string,
+  defaults: {
+    defaultSets: number;
+    defaultReps: number;
+    restTime: number;
+  },
+) {
+  const userId = await getUserId();
+  const plan = await prisma.workoutPlan.findFirst({
+    where: { id: planId, userId },
+    include: {
+      exercises: {
+        orderBy: { order: "asc" },
+      },
+    },
+  });
+
+  if (!plan) {
+    return {
+      success: false,
+      error: "Plan tidak ditemukan.",
+    };
+  }
+
+  const exists = plan.exercises.some((entry) => entry.exerciseId === exerciseId);
+  if (exists) {
+    return {
+      success: false,
+      error: "Exercise ini sudah ada di plan tersebut.",
+    };
+  }
+
+  const nextOrder =
+    plan.exercises.length > 0
+      ? Math.max(...plan.exercises.map((entry) => entry.order)) + 1
+      : 0;
+
+  await prisma.workoutPlanExercise.create({
+    data: {
+      planId,
+      exerciseId,
+      defaultSets: defaults.defaultSets,
+      defaultReps: defaults.defaultReps,
+      restTime: defaults.restTime,
+      order: nextOrder,
+    },
+  });
+
+  revalidatePath("/plan");
+  revalidatePath("/workout/start");
+
+  return {
+    success: true,
+    error: null,
+  };
 }
 
 export async function deleteWorkoutPlan(planId: string) {

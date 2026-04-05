@@ -1,4 +1,8 @@
+import Link from "next/link";
+import { Plus } from "lucide-react";
+
 import { getExerciseCatalog } from "@/actions/exercises";
+import { getWorkoutPlans } from "@/actions/plans";
 import ExerciseFilterForm from "@/components/exercise-filter-form";
 import ExercisesFeed from "@/components/exercises-feed";
 import {
@@ -39,19 +43,29 @@ export default async function ExercisesPage({ searchParams }: ExercisePageProps)
     type,
     limit: 300,
   });
+  const plans = await getWorkoutPlans();
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1
-          className="text-2xl font-bold text-foreground"
-          style={{ fontFamily: "Outfit, sans-serif" }}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1
+            className="text-2xl font-bold text-foreground"
+            style={{ fontFamily: "Outfit, sans-serif" }}
+          >
+            Exercise Catalog
+          </h1>
+          <p className="text-text-muted text-sm mt-1">
+            Jelajahi katalog exercise yang tersimpan di local database.
+          </p>
+        </div>
+        <Link
+          href="/exercises/new"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald px-4 text-sm font-semibold text-[#0A0A0F] transition-colors hover:bg-emerald-dark"
         >
-          Exercise Catalog
-        </h1>
-        <p className="text-text-muted text-sm mt-1">
-          Jelajahi katalog exercise yang tersimpan di local database.
-        </p>
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Tambah Exercise
+        </Link>
       </div>
 
       <ExerciseFilterForm
@@ -65,7 +79,7 @@ export default async function ExercisesPage({ searchParams }: ExercisePageProps)
         typeOptions={TRAINING_TYPE_FILTER_OPTIONS}
       />
 
-      <ExercisesFeed exercises={exercises} />
+      <ExercisesFeed exercises={exercises} plans={plans} />
     </div>
   );
 }

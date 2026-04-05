@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
+import AddToPlanSheet from "@/components/add-to-plan-sheet";
 import ExerciseImage from "@/components/exercise-image";
 import {
   CATEGORY_GRADIENTS,
@@ -12,6 +14,15 @@ import {
 
 type ExercisesFeedProps = {
   exercises: ExerciseCatalogItem[];
+  plans: Array<{
+    id: string;
+    name: string;
+    type: string;
+    exercises: Array<{
+      id: string;
+      exerciseId: string;
+    }>;
+  }>;
 };
 
 const INITIAL_BATCH_SIZE = 18;
@@ -29,7 +40,10 @@ function getExerciseMonogram(name: string) {
   return `${tokens[0][0] ?? ""}${tokens[1][0] ?? ""}`.toUpperCase();
 }
 
-export default function ExercisesFeed({ exercises }: ExercisesFeedProps) {
+export default function ExercisesFeed({
+  exercises,
+  plans,
+}: ExercisesFeedProps) {
   const [visibleCount, setVisibleCount] = useState(
     Math.min(INITIAL_BATCH_SIZE, exercises.length),
   );
@@ -88,19 +102,19 @@ export default function ExercisesFeed({ exercises }: ExercisesFeedProps) {
           const monogram = getExerciseMonogram(exercise.name);
 
           return (
-            <Link
+            <div
               key={exercise.id}
-              href={`/exercises/${exercise.slug}`}
-              className={`glass-card block bg-linear-to-br p-3 transition-colors duration-200 hover:border-emerald/20 hover:shadow-[0_18px_40px_rgba(10,14,22,0.18)] focus-visible:ring-2 focus-visible:ring-emerald/30 ${gradient}`}
+              className={`glass-card overflow-hidden bg-linear-to-br transition-colors duration-200 hover:border-emerald/20 hover:shadow-[0_18px_40px_rgba(10,14,22,0.18)] ${gradient}`}
             >
-              <div className="flex items-start gap-3 sm:gap-4">
-                <div className="relative h-10 w-18 shrink-0 overflow-hidden rounded-2xl border border-white/8  sm:h-20 sm:w-30">
+              <div className="flex flex-col">
+                <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-white/8 bg-white/95">
                   <ExerciseImage
                     src={exercise.imageUrl}
                     alt={exercise.name}
-                    fill
-                    sizes="(max-width: 640px) 72px, 80px"
-                    className="object-cover object-center bg-white"
+                    width={1200}
+                    height={900}
+                    className="w-full h-auto object-cover"
+                    sizes="(max-width: 768px) 100vw, 768px"
                     fallback={
                       <div
                         className={`flex h-full w-full items-center justify-center bg-linear-to-br ${gradient}`}
@@ -116,37 +130,61 @@ export default function ExercisesFeed({ exercises }: ExercisesFeedProps) {
                   />
                 </div>
 
-                <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
-                  <div className="min-w-0 pt-0.5">
-                    <p className="truncate text-sm font-semibold text-foreground sm:text-[15px]">
-                      {exercise.name}
-                    </p>
-                    <p className="mt-1 text-xs text-text-muted">
-                      {exercise.primaryLabel}
-                      {exercise.category
-                        ? ` · ${CATEGORY_LABELS[exercise.category]}`
-                        : ""}
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      {exercise.bodyParts.slice(0, 2).map((part) => (
-                        <span
-                          key={`${exercise.id}-${part}`}
-                          className="rounded-full border border-white/8 bg-[#0B0E14]/45 px-2 py-0.5 text-[10px] font-medium text-text-muted"
-                        >
-                          {part}
-                        </span>
-                      ))}
+                <div className="space-y-4 p-4">
+                  <div className="flex min-w-0 items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-base font-semibold text-foreground sm:text-[17px]">
+                        {exercise.name}
+                      </p>
+                      <p className="mt-1 text-xs text-text-muted">
+                        {exercise.primaryLabel}
+                        {exercise.category
+                          ? ` · ${CATEGORY_LABELS[exercise.category]}`
+                          : ""}
+                      </p>
                     </div>
+
+                    <span className="shrink-0 rounded-full border border-white/10 px-2.5 py-1 text-[10px] text-text-muted">
+                      {exercise.trainingStyle === "compound"
+                        ? "Compound"
+                        : "Isolation"}
+                    </span>
                   </div>
 
-                  <span className="shrink-0 rounded-full border border-white/10 px-2 py-1 text-[10px] text-text-muted">
-                    {exercise.trainingStyle === "compound"
-                      ? "Compound"
-                      : "Isolation"}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {exercise.source === "user" ? (
+                      <span className="rounded-full border border-emerald/20 bg-emerald/10 px-2 py-0.5 text-[10px] font-medium text-emerald-100">
+                        Custom
+                      </span>
+                    ) : null}
+                    {exercise.bodyParts.slice(0, 2).map((part) => (
+                      <span
+                        key={`${exercise.id}-${part}`}
+                        className="rounded-full border border-white/8 bg-[#0B0E14]/45 px-2 py-0.5 text-[10px] font-medium text-text-muted"
+                      >
+                        {part}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <AddToPlanSheet
+                      exercise={exercise}
+                      plans={plans}
+                      triggerLabel="Masuk Plan"
+                      triggerClassName="h-11 w-full rounded-xl border-border-subtle bg-surface-elevated text-foreground hover:bg-surface"
+                    />
+                    <Link
+                      href={`/exercises/${exercise.slug}`}
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-emerald/20 bg-emerald/10 px-4 text-sm font-semibold text-emerald transition-colors hover:bg-emerald/20 focus-visible:ring-2 focus-visible:ring-emerald/30"
+                    >
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      Detail
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </Link>
+            </div>
           );
         })}
       </div>

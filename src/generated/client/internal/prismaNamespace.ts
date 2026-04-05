@@ -1123,6 +1123,7 @@ export const UserScalarFieldEnum = {
   name: 'name',
   password: 'password',
   image: 'image',
+  role: 'role',
   emailVerified: 'emailVerified',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1185,7 +1186,12 @@ export const ExerciseScalarFieldEnum = {
   secondaryMuscles: 'secondaryMuscles',
   imageUrl: 'imageUrl',
   videoUrl: 'videoUrl',
+  notes: 'notes',
   trainingStyle: 'trainingStyle',
+  source: 'source',
+  visibility: 'visibility',
+  status: 'status',
+  createdByUserId: 'createdByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

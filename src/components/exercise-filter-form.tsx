@@ -38,7 +38,9 @@ function FilterSelect({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-medium text-text-muted">{label}</label>
+      <label className="block text-xs font-medium text-text-muted">
+        {label}
+      </label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
           className="h-11 w-full cursor-pointer rounded-xl border-border-subtle bg-surface-elevated px-3 text-sm text-foreground touch-manipulation"
@@ -73,7 +75,9 @@ export default function ExerciseFilterForm({
   const [isPending, startTransition] = useTransition();
   const [searchQuery, setSearchQuery] = useState(query);
   const [selectedBodyPart, setSelectedBodyPart] = useState(bodyPart || "all");
-  const [selectedEquipment, setSelectedEquipment] = useState(equipment || "all");
+  const [selectedEquipment, setSelectedEquipment] = useState(
+    equipment || "all",
+  );
   const [selectedType, setSelectedType] = useState(type || "all");
 
   const applyFilters = (nextValues?: {
@@ -89,11 +93,15 @@ export default function ExerciseFilterForm({
     const nextType = nextValues?.type ?? selectedType;
 
     if (nextQuery.trim()) params.set("q", nextQuery.trim());
-    if (nextBodyPart && nextBodyPart !== "all") params.set("bodyPart", nextBodyPart);
-    if (nextEquipment && nextEquipment !== "all") params.set("equipment", nextEquipment);
+    if (nextBodyPart && nextBodyPart !== "all")
+      params.set("bodyPart", nextBodyPart);
+    if (nextEquipment && nextEquipment !== "all")
+      params.set("equipment", nextEquipment);
     if (nextType && nextType !== "all") params.set("type", nextType);
 
-    const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    const nextUrl = params.toString()
+      ? `${pathname}?${params.toString()}`
+      : pathname;
     router.push(nextUrl);
   };
 
@@ -112,26 +120,18 @@ export default function ExerciseFilterForm({
         Filter Katalog
       </div>
 
-      <div className="space-y-1.5">
-        <label
-          htmlFor="exercise-search"
-          className="block text-xs font-medium text-text-muted"
-        >
-          Cari exercise
-        </label>
-        <div className="flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-elevated px-3 focus-within:border-emerald/30 focus-within:ring-2 focus-within:ring-emerald/15">
-          <Search className="h-4 w-4 text-text-muted" aria-hidden="true" />
-          <input
-            id="exercise-search"
-            name="q"
-            type="search"
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Cari exercise…"
-            autoComplete="off"
-            className="h-11 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-text-muted/70"
-          />
-        </div>
+      <div className="flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-elevated px-3 focus-within:border-emerald/30 focus-within:ring-2 focus-within:ring-emerald/15">
+        <Search className="h-4 w-4 text-text-muted" aria-hidden="true" />
+        <input
+          id="exercise-search"
+          name="q"
+          type="search"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Cari exercise…"
+          autoComplete="off"
+          className="h-11 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-text-muted/70"
+        />
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">

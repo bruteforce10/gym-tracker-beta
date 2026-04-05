@@ -2,14 +2,24 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronLeft, SkipForward, Timer, Trophy, Zap } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  SkipForward,
+  Timer,
+  Trophy,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 
 import { createWorkout } from "@/actions/workouts";
+import ExerciseImage from "@/components/exercise-image";
 import { CATEGORY_GRADIENTS, type ExerciseDisplayCategory } from "@/lib/exercise-catalog";
 
 type SessionExercise = {
   exerciseId: string;
   name: string;
+  imageUrl?: string | null;
   category: ExerciseDisplayCategory | null;
   primaryLabel: string;
   trainingStyle: "compound" | "isolation";
@@ -26,6 +36,7 @@ type SessionData = {
 
 type SetEntry = { weight: number; reps: number; done: boolean };
 type WorkoutState = "input" | "resting" | "done";
+const REST_ALARM_STORAGE_KEY = "gym-rest-alarm-enabled";
 
 function RestTimer({
   seconds,
@@ -100,7 +111,10 @@ export default function WorkoutSessionPage() {
   const [restLeft, setRestLeft] = useState(0);
   const [restTotal, setRestTotal] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [alarmEnabled, setAlarmEnabled] = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const alarmRef = useRef<HTMLAudioElement | null>(null);
+  const alarmEnabledRef = useRef(true);
 
   useEffect(() => {
     const rawSession = sessionStorage.getItem("gym-session");
@@ -130,6 +144,47 @@ export default function WorkoutSessionPage() {
     }
   }, []);
 
+  const playRestFinishedAlarm = useCallback(() => {
+    if (!alarmEnabledRef.current) return;
+
+    const alarm = alarmRef.current;
+    if (!alarm) return;
+
+    alarm.currentTime = 0;
+    void alarm.play().catch(() => {
+      // Ignore autoplay/playback errors to keep workout flow uninterrupted.
+    });
+  }, []);
+
+  useEffect(() => {
+    const alarm = new Audio("/alarms/alarm.mp3");
+    alarm.preload = "auto";
+    alarmRef.current = alarm;
+
+    return () => {
+      alarm.pause();
+      alarmRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(REST_ALARM_STORAGE_KEY);
+    if (saved === "0") {
+      setAlarmEnabled(false);
+      alarmEnabledRef.current = false;
+      return;
+    }
+    if (saved === "1") {
+      setAlarmEnabled(true);
+      alarmEnabledRef.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    alarmEnabledRef.current = alarmEnabled;
+    localStorage.setItem(REST_ALARM_STORAGE_KEY, alarmEnabled ? "1" : "0");
+  }, [alarmEnabled]);
+
   const startRest = useCallback(
     (seconds: number) => {
       stopTimer();
@@ -141,13 +196,14 @@ export default function WorkoutSessionPage() {
           if (current <= 1) {
             stopTimer();
             setState("input");
+            playRestFinishedAlarm();
             return 0;
           }
           return current - 1;
         });
       }, 1000);
     },
-    [stopTimer]
+    [playRestFinishedAlarm, stopTimer]
   );
 
   useEffect(() => () => stopTimer(), [stopTimer]);
@@ -302,9 +358,25 @@ export default function WorkoutSessionPage() {
               Exercise {exerciseIndex + 1}/{totalExercises} · Set {setIndex + 1}/{totalSets}
             </p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-surface-elevated border border-border-subtle flex items-center justify-center">
-            <Zap className="w-4 h-4 text-emerald" aria-hidden="true" />
-          </div>
+          <button
+            type="button"
+            onClick={() => setAlarmEnabled((current) => !current)}
+            className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-colors ${
+              alarmEnabled
+                ? "bg-emerald/10 border-emerald/30 text-emerald"
+                : "bg-surface-elevated border-border-subtle text-text-muted"
+            }`}
+            id="toggle-session-alarm"
+            aria-pressed={alarmEnabled}
+            aria-label={alarmEnabled ? "Matikan suara alarm" : "Nyalakan suara alarm"}
+            title={alarmEnabled ? "Suara alarm aktif" : "Suara alarm nonaktif"}
+          >
+            {alarmEnabled ? (
+              <Volume2 className="w-4 h-4" aria-hidden="true" />
+            ) : (
+              <VolumeX className="w-4 h-4" aria-hidden="true" />
+            )}
+          </button>
         </div>
 
         <div className={`glass-card p-5 bg-linear-to-br ${gradient} space-y-3`}>
@@ -331,6 +403,20 @@ export default function WorkoutSessionPage() {
               Rest {currentExercise.restTime}s
             </span>
           </div>
+
+          {currentExercise.imageUrl ? (
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/90">
+              <ExerciseImage
+                src={currentExercise.imageUrl}
+                alt={currentExercise.name}
+                width={1200}
+                height={750}
+                className="h-44 w-full object-cover object-center"
+                sizes="(max-width: 768px) 100vw, 420px"
+                fallback={null}
+              />
+            </div>
+          ) : null}
 
           <div className="flex gap-2 pt-1">
             {Array.from({ length: totalSets }).map((_, index) => (

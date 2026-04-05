@@ -13,6 +13,7 @@ model User {
   name          String?
   password      String?
   image         String?
+  role          String    @default("user")
   emailVerified DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -22,6 +23,7 @@ model User {
   goals        Goal[]
   workouts     Workout[]
   workoutPlans WorkoutPlan[]
+  customExercises Exercise[]
 }
 
 
@@ -67,7 +69,7 @@ model Goal {
 }
 
 model Exercise {
-  id               String   @id
+  id               String   @id @default(cuid())
   slug             String   @unique
   name             String
   bodyParts        String[]
@@ -78,9 +80,19 @@ model Exercise {
   secondaryMuscles String[]
   imageUrl         String?
   videoUrl         String?
+  notes            String?
   trainingStyle    String
+  source           String   @default("system")
+  visibility       String   @default("global")
+  status           String   @default("published")
+  createdByUserId  String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  createdByUser    User?    @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@index([source, visibility, status])
+  @@index([createdByUserId, source, visibility])
 }
 
 model Workout {

@@ -23,6 +23,7 @@ export async function registerUser(
       email,
       name,
       password: hashedPassword,
+      role: "user",
     },
   });
 

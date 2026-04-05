@@ -4,7 +4,7 @@
 
 Users should be able to add their own custom exercises directly from the exercise catalog page. Newly created custom exercises should appear immediately in the creating user's exercise list, without being visible to other users by default. Admins need a dedicated dashboard to monitor these user-created exercises, edit them, delete them, and optionally promote them to global visibility for all users.
 
-The feature also needs protection against bot submissions. Anti-bot verification should be applied at submission time, while normal users remain allowed to create custom exercises.
+The feature should allow a normal authenticated user to upload one custom exercise image directly from the form using UploadThing, while keeping new custom exercises private to the creator until an admin promotes them.
 
 ## Goals
 
@@ -13,7 +13,6 @@ The feature also needs protection against bot submissions. Anti-bot verification
 - Make newly created custom exercises visible immediately to the creating user.
 - Keep newly created custom exercises hidden from other users until promoted by admin.
 - Add an admin-only exercise monitoring dashboard with edit, update, delete, and promote actions.
-- Protect the submission flow against automated spam and bot abuse.
 - Seed one admin account for `audifirdi@gmail.com`.
 
 ## Non-Goals
@@ -28,10 +27,11 @@ The feature also needs protection against bot submissions. Anti-bot verification
 Use a direct private publish model:
 
 1. User submits a custom exercise form from `/exercises`.
-2. Server validates the anti-bot token and the exercise payload.
-3. The exercise is stored immediately as a custom exercise.
-4. The new exercise becomes visible to the creator right away in the exercise list.
-5. Admins can later review the record in a dedicated dashboard and optionally promote it to global visibility.
+2. User may upload one image directly from the form using UploadThing.
+3. Server validates the exercise payload.
+4. The exercise is stored immediately as a custom exercise.
+5. The new exercise becomes visible to the creator right away in the exercise list.
+6. Admins can later review the record in a dedicated dashboard and optionally promote it to global visibility.
 
 This gives the best UX for creators while still preserving administrative control.
 
@@ -46,7 +46,7 @@ When tapped:
 - open a form sheet or modal
 - allow the user to fill in exercise data
 - validate required fields
-- require anti-bot verification before final submit
+- optionally upload one exercise image with UploadThing before final submit
 
 After successful submit:
 
@@ -142,16 +142,6 @@ This ensures:
 
 ## Security
 
-### Anti-Bot Protection
-
-Use `Cloudflare Turnstile` on the custom exercise form.
-
-Validation rules:
-
-- token must be submitted with the form
-- token must be verified server-side before insert
-- failed verification blocks creation
-
 ### Auth
 
 Custom exercise creation requires authentication.
@@ -187,6 +177,17 @@ Recommended additional safeguards:
 - request throttling per authenticated user
 - maximum exercise count per user over a given window
 
+### Upload Security
+
+Use UploadThing for one custom exercise image per submission.
+
+Rules:
+
+- only authenticated users may upload
+- only image files are allowed
+- maximum file count is 1
+- file size is capped by the UploadThing route config
+
 ## Form Fields
 
 Recommended fields for the first version:
@@ -197,7 +198,7 @@ Recommended fields for the first version:
 - training type
 - target muscles
 - secondary muscles
-- optional image URL
+- optional uploaded image
 - optional notes or short description
 
 The form should stay smaller than the full admin schema and focus on fields already supported by the catalog.
@@ -254,7 +255,6 @@ Admin seeding should happen safely:
 ### Security
 
 - unauthenticated submit is rejected
-- invalid Turnstile token is rejected
 - normal user cannot access admin dashboard
 - normal user cannot call admin actions directly
 
@@ -265,7 +265,7 @@ Admin seeding should happen safely:
 
 ## Risks
 
-- Turnstile integration adds one more external dependency to the submit flow
+- UploadThing integration adds one more external dependency to the submit flow
 - admin moderation UI can grow in scope if too many bulk tools are added now
 - custom exercises may need stronger deduplication rules later
 
@@ -275,7 +275,7 @@ Admin seeding should happen safely:
 2. Extend `Exercise` model for custom ownership and visibility.
 3. Add creator-aware catalog queries.
 4. Add custom exercise submission flow on `/exercises`.
-5. Add Turnstile validation.
+5. Add UploadThing single-image upload to the custom exercise form.
 6. Add `/admin/exercises` dashboard and admin actions.
 7. Verify private visibility and global promotion flow.
 
@@ -286,4 +286,4 @@ Admin seeding should happen safely:
 - Private custom exercises are hidden from other normal users.
 - Admin can monitor and moderate user-created exercises from a dedicated dashboard.
 - Admin can promote selected custom exercises to all users.
-- Bot submissions are reduced through server-verified anti-bot protection.
+- Users can upload one custom exercise image directly from the form.

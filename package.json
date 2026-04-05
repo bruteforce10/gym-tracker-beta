@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "exercise:import": "node scripts/import-gymfit-catalog.mjs"
+    "exercise:import": "node scripts/import-gymfit-catalog.mjs",
+    "admin:seed": "node scripts/seed-admin.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -18,6 +19,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@prisma/adapter-pg": "^7.6.0",
     "@prisma/client": "^7.6.0",
+    "@uploadthing/react": "^7.3.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

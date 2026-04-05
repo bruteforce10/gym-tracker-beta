@@ -10,6 +10,9 @@ export type ExerciseDisplayCategory =
 
 export type ExercisePlanBucket = "upper" | "lower";
 export type ExerciseTrainingStyle = "compound" | "isolation";
+export type ExerciseSource = "system" | "user";
+export type ExerciseVisibility = "private" | "global";
+export type ExerciseStatus = "published" | "flagged" | "archived";
 
 export const CATEGORY_LABELS: Record<ExerciseDisplayCategory, string> = {
   chest: "Chest",
@@ -60,6 +63,11 @@ export interface ExerciseCatalogItem {
   secondaryMuscles: string[];
   imageUrl: string | null;
   videoUrl: string | null;
+  notes: string | null;
+  source: ExerciseSource;
+  visibility: ExerciseVisibility;
+  status: ExerciseStatus;
+  createdByUserId: string | null;
   category: ExerciseDisplayCategory | null;
   planBucket: ExercisePlanBucket | null;
   trainingStyle: ExerciseTrainingStyle;
@@ -82,6 +90,11 @@ interface ExerciseCatalogRecord {
   secondaryMuscles: unknown;
   imageUrl: string | null;
   videoUrl: string | null;
+  notes?: string | null;
+  source?: ExerciseSource | null;
+  visibility?: ExerciseVisibility | null;
+  status?: ExerciseStatus | null;
+  createdByUserId?: string | null;
   trainingStyle?: ExerciseTrainingStyle | null;
 }
 
@@ -234,6 +247,11 @@ export function serializeExercise(record: ExerciseCatalogRecord): ExerciseCatalo
     secondaryMuscles,
     imageUrl: resolveExerciseMediaUrl(record.imageUrl),
     videoUrl: resolveExerciseMediaUrl(record.videoUrl),
+    notes: record.notes ?? null,
+    source: record.source ?? "system",
+    visibility: record.visibility ?? "global",
+    status: record.status ?? "published",
+    createdByUserId: record.createdByUserId ?? null,
     category,
     planBucket: derivePlanBucket(category),
     trainingStyle,
