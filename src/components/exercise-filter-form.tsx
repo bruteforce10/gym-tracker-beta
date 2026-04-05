@@ -109,7 +109,7 @@ export default function ExerciseFilterForm({
     >
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald/80">
         <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
-        Filter Gym Fit
+        Filter Katalog
       </div>
 
       <div className="space-y-1.5">

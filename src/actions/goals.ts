@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { fetchExerciseById } from "@/lib/gymfit";
+import { fetchExerciseById } from "@/lib/exercise-store";
 import { calculate1RM } from "@/lib/calculations";
 
 async function getUserId(): Promise<string> {
@@ -103,7 +103,7 @@ export async function upsertGoal(data: {
     });
 
     const exercise = await fetchExerciseById(updated.exerciseId ?? data.exerciseId);
-    if (!exercise) throw new Error("Exercise not found in Gym Fit");
+    if (!exercise) throw new Error("Exercise not found in local catalog");
 
     return {
       ...updated,
@@ -122,7 +122,7 @@ export async function upsertGoal(data: {
     });
 
     const exercise = await fetchExerciseById(created.exerciseId ?? data.exerciseId);
-    if (!exercise) throw new Error("Exercise not found in Gym Fit");
+    if (!exercise) throw new Error("Exercise not found in local catalog");
 
     return {
       ...created,

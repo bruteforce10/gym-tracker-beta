@@ -1,7 +1,6 @@
 import { getExerciseCatalog } from "@/actions/exercises";
 import ExerciseFilterForm from "@/components/exercise-filter-form";
 import ExercisesFeed from "@/components/exercises-feed";
-import ProviderWarningCard from "@/components/provider-warning-card";
 import {
   BODY_PART_FILTER_OPTIONS,
   EQUIPMENT_FILTER_OPTIONS,
@@ -33,7 +32,7 @@ export default async function ExercisesPage({ searchParams }: ExercisePageProps)
     params.type,
     TRAINING_TYPE_FILTER_OPTIONS,
   );
-  const { exercises, providerWarning } = await getExerciseCatalog({
+  const exercises = await getExerciseCatalog({
     query,
     bodyPart,
     equipment,
@@ -51,7 +50,7 @@ export default async function ExercisesPage({ searchParams }: ExercisePageProps)
           Exercise Catalog
         </h1>
         <p className="text-text-muted text-sm mt-1">
-          Jelajahi katalog live dari Gym Fit.
+          Jelajahi katalog exercise yang tersimpan di local database.
         </p>
       </div>
 
@@ -66,11 +65,7 @@ export default async function ExercisesPage({ searchParams }: ExercisePageProps)
         typeOptions={TRAINING_TYPE_FILTER_OPTIONS}
       />
 
-      {providerWarning ? (
-        <ProviderWarningCard message={providerWarning} />
-      ) : (
-        <ExercisesFeed exercises={exercises} />
-      )}
+      <ExercisesFeed exercises={exercises} />
     </div>
   );
 }

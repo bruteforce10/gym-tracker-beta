@@ -8,9 +8,7 @@ import {
   fetchExerciseById,
   fetchExerciseCatalog,
   fetchExercisesByIds,
-  getGymFitQuotaExceededMessage,
-  isGymFitQuotaExceededError,
-} from "@/lib/gymfit";
+} from "@/lib/exercise-store";
 
 export async function getExerciseCatalog(params?: {
   query?: string;
@@ -20,21 +18,7 @@ export async function getExerciseCatalog(params?: {
   type?: string;
   limit?: number;
 }) {
-  try {
-    return {
-      exercises: await fetchExerciseCatalog(params),
-      providerWarning: null as string | null,
-    };
-  } catch (error) {
-    if (isGymFitQuotaExceededError(error)) {
-      return {
-        exercises: [],
-        providerWarning: getGymFitQuotaExceededMessage(),
-      };
-    }
-
-    throw error;
-  }
+  return fetchExerciseCatalog(params);
 }
 
 export async function searchExercises(params?: {
@@ -45,22 +29,14 @@ export async function searchExercises(params?: {
   type?: string;
   limit?: number;
 }) {
-  try {
-    return await fetchExerciseCatalog({
-      query: params?.query,
-      planBucket: params?.planBucket,
-      bodyPart: params?.bodyPart,
-      equipment: params?.equipment,
-      type: params?.type,
-      limit: params?.limit ?? 24,
-    });
-  } catch (error) {
-    if (isGymFitQuotaExceededError(error)) {
-      return [];
-    }
-
-    throw error;
-  }
+  return fetchExerciseCatalog({
+    query: params?.query,
+    planBucket: params?.planBucket,
+    bodyPart: params?.bodyPart,
+    equipment: params?.equipment,
+    type: params?.type,
+    limit: params?.limit ?? 24,
+  });
 }
 
 export async function getExerciseBySlug(slug: string) {

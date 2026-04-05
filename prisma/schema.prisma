@@ -66,6 +66,23 @@ model Goal {
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Exercise {
+  id               String   @id
+  slug             String   @unique
+  name             String
+  bodyParts        String[]
+  equipments       String[]
+  gender           String?
+  exerciseType     String?
+  targetMuscles    String[]
+  secondaryMuscles String[]
+  imageUrl         String?
+  videoUrl         String?
+  trainingStyle    String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
 model Workout {
   id        String        @id @default(cuid())
   userId    String

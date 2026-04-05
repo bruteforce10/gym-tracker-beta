@@ -54,6 +54,21 @@ const TYPE_CONFIG: Record<string, { label: string; color: string }> = {
   },
 };
 
+const CATALOG_CATEGORY_LINKS: Array<{
+  category: ExerciseDisplayCategory;
+  label: string;
+  bodyPart: string;
+}> = [
+  { category: "chest", label: CATEGORY_LABELS.chest, bodyPart: "Chest" },
+  { category: "back", label: CATEGORY_LABELS.back, bodyPart: "Back" },
+  { category: "shoulder", label: CATEGORY_LABELS.shoulder, bodyPart: "Shoulders" },
+  { category: "arms", label: CATEGORY_LABELS.arms, bodyPart: "Arms" },
+  { category: "quads", label: CATEGORY_LABELS.quads, bodyPart: "Legs" },
+  { category: "hamstrings", label: CATEGORY_LABELS.hamstrings, bodyPart: "Legs" },
+  { category: "glutes", label: CATEGORY_LABELS.glutes, bodyPart: "Legs" },
+  { category: "calves", label: CATEGORY_LABELS.calves, bodyPart: "Legs" },
+];
+
 export default function PlanClient({ plans }: { plans: Plan[] }) {
   const router = useRouter();
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
@@ -198,17 +213,24 @@ export default function PlanClient({ plans }: { plans: Plan[] }) {
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          {Object.entries(CATEGORY_LABELS).map(([category, label]) => {
+          {CATALOG_CATEGORY_LINKS.map(({ category, label, bodyPart }) => {
             return (
-              <div
+              <Link
                 key={category}
-                className={`glass-card p-3 flex items-center gap-2 bg-linear-to-br ${CATEGORY_GRADIENTS[category as ExerciseDisplayCategory]}`}
+                href={`/exercises?bodyPart=${encodeURIComponent(bodyPart)}`}
+                className={`glass-card flex items-center gap-2 bg-linear-to-br p-3 transition-colors hover:border-emerald/20 hover:shadow-[0_18px_40px_rgba(10,14,22,0.18)] focus-visible:ring-2 focus-visible:ring-emerald/30 ${CATEGORY_GRADIENTS[category]}`}
               >
-                <div>
+                <div className="min-w-0">
                   <p className="text-foreground text-xs font-semibold">{label}</p>
-                  <p className="text-text-muted text-[10px]">Buka katalog lengkap</p>
+                  <p className="text-text-muted text-[10px]">
+                    Lihat katalog {bodyPart.toLowerCase()}
+                  </p>
                 </div>
-              </div>
+                <ChevronRight
+                  className="ml-auto h-4 w-4 shrink-0 text-foreground/60"
+                  aria-hidden="true"
+                />
+              </Link>
             );
           })}
         </div>

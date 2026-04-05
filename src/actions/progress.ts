@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { calculate1RM } from "@/lib/calculations";
-import { fetchExercisesByIds } from "@/lib/gymfit";
+import { fetchExercisesByIds } from "@/lib/exercise-store";
 
 async function getUserId(): Promise<string> {
   const session = await auth();

@@ -55,6 +55,7 @@ export const ModelName = {
   Account: 'Account',
   Session: 'Session',
   Goal: 'Goal',
+  Exercise: 'Exercise',
   Workout: 'Workout',
   ExerciseLog: 'ExerciseLog',
   WorkoutPlan: 'WorkoutPlan',
@@ -131,6 +132,26 @@ export const GoalScalarFieldEnum = {
 } as const
 
 export type GoalScalarFieldEnum = (typeof GoalScalarFieldEnum)[keyof typeof GoalScalarFieldEnum]
+
+
+export const ExerciseScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  bodyParts: 'bodyParts',
+  equipments: 'equipments',
+  gender: 'gender',
+  exerciseType: 'exerciseType',
+  targetMuscles: 'targetMuscles',
+  secondaryMuscles: 'secondaryMuscles',
+  imageUrl: 'imageUrl',
+  videoUrl: 'videoUrl',
+  trainingStyle: 'trainingStyle',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExerciseScalarFieldEnum = (typeof ExerciseScalarFieldEnum)[keyof typeof ExerciseScalarFieldEnum]
 
 
 export const WorkoutScalarFieldEnum = {

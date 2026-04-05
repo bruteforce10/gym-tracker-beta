@@ -9,8 +9,7 @@ import {
 import {
   fetchExerciseCatalog,
   fetchExercisesByIds,
-  isGymFitQuotaExceededError,
-} from "@/lib/gymfit";
+} from "@/lib/exercise-store";
 
 async function getUserId(): Promise<string> {
   const session = await auth();
@@ -46,16 +45,9 @@ export async function createDefaultPlans() {
   });
   if (existing.length > 0) return serializePlanCollection(existing);
 
-  let serialized: ExerciseCatalogItem[] = [];
-  try {
-    serialized = await fetchExerciseCatalog({
-      limit: 120,
-    });
-  } catch (error) {
-    if (!isGymFitQuotaExceededError(error)) {
-      throw error;
-    }
-  }
+  const serialized: ExerciseCatalogItem[] = await fetchExerciseCatalog({
+    limit: 120,
+  });
   const upperExercises = pickDefaultExercises(serialized, "upper").slice(0, 8);
   const lowerExercises = pickDefaultExercises(serialized, "lower").slice(0, 8);
 

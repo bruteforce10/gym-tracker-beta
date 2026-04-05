@@ -62,6 +62,11 @@ export type Session = Prisma.SessionModel
  */
 export type Goal = Prisma.GoalModel
 /**
+ * Model Exercise
+ * 
+ */
+export type Exercise = Prisma.ExerciseModel
+/**
  * Model Workout
  * 
  */

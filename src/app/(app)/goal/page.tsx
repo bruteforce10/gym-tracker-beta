@@ -224,7 +224,7 @@ export default function GoalPage() {
             label="Exercise"
             value={editForm.exercise}
             onChange={(exercise) => setEditForm((current) => ({ ...current, exercise }))}
-            helperText="Cari exercise langsung dari katalog Gym Fit."
+            helperText="Cari exercise langsung dari katalog lokal."
           />
 
           <div>

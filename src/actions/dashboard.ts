@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { calculate1RM } from "@/lib/calculations";
-import { fetchExerciseById, fetchExercisesByIds } from "@/lib/gymfit";
+import { fetchExerciseById, fetchExercisesByIds } from "@/lib/exercise-store";
 import { prisma } from "@/lib/prisma";
 
 async function getUserId(): Promise<string> {

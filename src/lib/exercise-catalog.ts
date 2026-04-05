@@ -132,6 +132,7 @@ export function parseExerciseIdFromSlug(slug: string): string | null {
 export function resolveExerciseMediaUrl(value: string | null | undefined): string | null {
   if (!value) return null;
   if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("/")) return value;
 
   const baseUrl =
     process.env.NEXT_PUBLIC_GYMFIT_MEDIA_BASE_URL ??
