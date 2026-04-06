@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { Activity, Calendar, Flame, Shield, Trophy } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  Calendar,
+  Flame,
+  Shield,
+  Trophy,
+} from "lucide-react";
 import { getDashboardData } from "@/actions/dashboard";
 import PageHeader from "@/components/page-header";
 import ProgressRing from "@/components/progress-ring";
@@ -7,6 +14,7 @@ import StatCard from "@/components/stat-card";
 import WorkoutCard from "@/components/workout-card";
 import { auth } from "@/lib/auth";
 import { calculateProgress, getDaysUntilDeadline } from "@/lib/calculations";
+import { formatDateInputValue } from "@/lib/date";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -24,8 +32,17 @@ export default async function DashboardPage() {
 
   const progress = goal ? calculateProgress(current1RM, goal.targetWeight) : 0;
   const daysLeft = goal?.deadline
-    ? getDaysUntilDeadline(goal.deadline.toISOString())
+    ? getDaysUntilDeadline(formatDateInputValue(goal.deadline))
     : null;
+  const isDeadlineWarning = daysLeft !== null && daysLeft <= 3;
+  const deadlineLabel =
+    daysLeft === null
+      ? null
+      : daysLeft < 0
+        ? `Lewat ${Math.abs(daysLeft)} hari`
+        : daysLeft === 0
+          ? "Hari Ini"
+          : `${daysLeft} hari`;
 
   return (
     <div>
@@ -79,24 +96,38 @@ export default async function DashboardPage() {
             style={{ animationDelay: "400ms" }}
             id="goal-progress-card"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div>
+            <div className="mb-4 space-y-2">
+              <div className="flex flex-wrap justify-between full items-center gap-2">
                 <h2
-                  className="text-lg font-bold text-foreground"
+                  className="min-w-0 text-balance text-lg font-bold text-foreground"
                   style={{ fontFamily: "var(--font-heading)" }}
                 >
                   {goal.exercise?.name ?? "Exercise"}
                 </h2>
-                <p className="text-xs text-text-muted mt-0.5">Target Aktif</p>
+                {deadlineLabel ? (
+                  <div
+                    className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                      isDeadlineWarning
+                        ? "bg-red-danger/12 text-danger"
+                        : "border-emerald/20 bg-emerald/10 text-emerald"
+                    }`}
+                  >
+                    {isDeadlineWarning ? (
+                      <AlertTriangle
+                        className="h-3.5 w-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <Calendar
+                        className="h-3.5 w-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span className="font-data">{deadlineLabel}</span>
+                  </div>
+                ) : null}
               </div>
-              {daysLeft !== null && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald/10 text-emerald">
-                  <Calendar className="w-3 h-3" aria-hidden="true" />
-                  <span className="text-xs font-semibold font-data">
-                    {daysLeft} hari
-                  </span>
-                </div>
-              )}
+              <p className="text-xs text-text-muted mt-0.5">Target Aktif</p>
             </div>
             <div className="flex items-center gap-6">
               <ProgressRing

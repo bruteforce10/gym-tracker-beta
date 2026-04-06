@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { fetchExerciseById } from "@/lib/exercise-store";
 import { calculate1RM } from "@/lib/calculations";
+import { parseDateInputValue } from "@/lib/date";
 
 async function getUserId(): Promise<string> {
   const session = await auth();
@@ -90,6 +91,8 @@ export async function upsertGoal(data: {
     orderBy: { createdAt: "desc" },
   });
 
+  const normalizedDeadline = parseDateInputValue(data.deadline ?? null);
+
   if (existing) {
     // Update existing
     const updated = await prisma.goal.update({
@@ -98,7 +101,7 @@ export async function upsertGoal(data: {
         exerciseId: data.exerciseId,
         targetWeight: data.targetWeight,
         currentWeight: data.currentWeight ?? existing.currentWeight,
-        deadline: data.deadline ? new Date(data.deadline) : null,
+        deadline: normalizedDeadline,
       },
     });
 
@@ -117,7 +120,7 @@ export async function upsertGoal(data: {
         exerciseId: data.exerciseId,
         targetWeight: data.targetWeight,
         currentWeight: data.currentWeight ?? 0,
-        deadline: data.deadline ? new Date(data.deadline) : null,
+        deadline: normalizedDeadline,
       },
     });
 

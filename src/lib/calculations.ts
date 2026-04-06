@@ -1,3 +1,5 @@
+import { parseDateInputValue } from "@/lib/date";
+
 // ── Core Calculations for Gym Progress Tracker ──
 
 export interface ExerciseLogLike {
@@ -160,7 +162,8 @@ export function formatDateShort(dateStr: string): string {
 export function getDaysUntilDeadline(deadline: string | null): number | null {
   if (!deadline) return null;
   const now = new Date();
-  const dl = new Date(deadline);
+  const dl = parseDateInputValue(deadline);
+  if (!dl) return null;
   const diff = dl.getTime() - now.getTime();
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }

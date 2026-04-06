@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar as CalendarIcon, Check, Edit3, Target, X } from "lucide-react";
+import {
+  Calendar as CalendarIcon,
+  Check,
+  Edit3,
+  Target,
+  X,
+  AlertTriangle,
+} from "lucide-react";
 import { format } from "date-fns";
 
 import { getGoalPageData, upsertGoal } from "@/actions/goals";
@@ -17,6 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { calculateProgress, getDaysUntilDeadline } from "@/lib/calculations";
+import { formatDateInputValue, parseDateInputValue } from "@/lib/date";
 import type { ExerciseCatalogItem } from "@/lib/exercise-catalog";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +63,8 @@ export default function GoalPage() {
             exercise: goalData.goal.exercise,
             targetWeight: goalData.goal.targetWeight,
             currentWeight: goalData.goal.currentWeight,
-            deadline: goalData.goal.deadline?.toISOString().split("T")[0] || null,
+            deadline:
+              goalData.goal.deadline?.toISOString().split("T")[0] || null,
           };
 
           setGoal(nextGoal);
@@ -80,6 +89,7 @@ export default function GoalPage() {
 
   const progress = goal ? calculateProgress(current1RM, goal.targetWeight) : 0;
   const daysLeft = goal?.deadline ? getDaysUntilDeadline(goal.deadline) : null;
+  const isDeadlineWarning = daysLeft !== null && daysLeft <= 3;
 
   const handleSave = async () => {
     if (!editForm.exercise) return;
@@ -120,7 +130,10 @@ export default function GoalPage() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Goal" subtitle="Target kekuatan yang ingin dicapai" />
+        <PageHeader
+          title="Goal"
+          subtitle="Target kekuatan yang ingin dicapai"
+        />
         <div className="glass-card p-8 text-center">
           <p className="text-sm text-text-muted">Memuat data…</p>
         </div>
@@ -149,7 +162,10 @@ export default function GoalPage() {
       />
 
       {goal && (
-        <div className="glass-card p-6 mb-6 animate-fade-in-up" id="active-goal-card">
+        <div
+          className="glass-card p-6 mb-6 animate-fade-in-up"
+          id="active-goal-card"
+        >
           <div className="flex items-center gap-2 mb-5">
             <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center">
               <Target className="w-4 h-4 text-emerald" aria-hidden="true" />
@@ -174,7 +190,9 @@ export default function GoalPage() {
               <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">
                 Exercise
               </p>
-              <p className="text-sm font-bold text-foreground">{goal.exercise.name}</p>
+              <p className="text-sm font-bold text-foreground">
+                {goal.exercise.name}
+              </p>
             </div>
             <div className="glass-card p-4 text-center">
               <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">
@@ -198,12 +216,34 @@ export default function GoalPage() {
               <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">
                 Sisa Waktu
               </p>
-              <div className="flex items-center justify-center gap-1">
-                <CalendarIcon className="w-3 h-3 text-text-muted" aria-hidden="true" />
-                <p className="font-data text-lg font-bold text-foreground">
-                  {daysLeft !== null ? daysLeft : "—"}{" "}
-                  <span className="text-xs text-text-muted font-normal">hari</span>
-                </p>
+              <div className="flex items-center justify-center gap-2">
+                {daysLeft !== null ? (
+                  <>
+                    {isDeadlineWarning && (
+                      <AlertTriangle
+                        className="h-4 w-4  text-danger"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <p
+                      className={`font-data text-lg font-bold ${
+                        isDeadlineWarning ? "text-danger" : "text-foreground"
+                      }`}
+                    >
+                      {daysLeft}{" "}
+                      <span className="text-xs text-text-muted font-normal">
+                        hari
+                      </span>
+                    </p>
+                  </>
+                ) : (
+                  <p className="font-data text-lg font-bold text-foreground">
+                    —{" "}
+                    <span className="text-xs text-text-muted font-normal">
+                      hari
+                    </span>
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -211,7 +251,10 @@ export default function GoalPage() {
       )}
 
       {editing && (
-        <div className="glass-card p-5 space-y-4 animate-fade-in-up" id="edit-goal-form">
+        <div
+          className="glass-card p-5 space-y-4 animate-fade-in-up"
+          id="edit-goal-form"
+        >
           <h3
             className="text-base font-bold text-foreground"
             style={{ fontFamily: "var(--font-heading)" }}
@@ -223,7 +266,9 @@ export default function GoalPage() {
             inputId="goal-exercise"
             label="Exercise"
             value={editForm.exercise}
-            onChange={(exercise) => setEditForm((current) => ({ ...current, exercise }))}
+            onChange={(exercise) =>
+              setEditForm((current) => ({ ...current, exercise }))
+            }
             helperText="Cari exercise langsung dari katalog lokal."
           />
 
@@ -256,24 +301,33 @@ export default function GoalPage() {
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "w-full justify-start text-left font-normal bg-surface-elevated border-border-subtle text-foreground h-10 px-3 hover:bg-surface transition-colors",
-                  !editForm.deadline && "text-muted-foreground"
+                  !editForm.deadline && "text-muted-foreground",
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4 text-emerald" aria-hidden="true" />
+                <CalendarIcon
+                  className="mr-2 h-4 w-4 text-emerald"
+                  aria-hidden="true"
+                />
                 {editForm.deadline ? (
-                  format(new Date(editForm.deadline), "PPP")
+                  format(
+                    parseDateInputValue(editForm.deadline) ?? new Date(),
+                    "PPP",
+                  )
                 ) : (
                   <span>Pilih deadline</span>
                 )}
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-surface border-border-subtle" align="start">
+              <PopoverContent
+                className="w-auto p-0 bg-surface border-border-subtle"
+                align="start"
+              >
                 <Calendar
                   mode="single"
-                  selected={editForm.deadline ? new Date(editForm.deadline) : undefined}
+                  selected={parseDateInputValue(editForm.deadline) ?? undefined}
                   onSelect={(date) =>
                     setEditForm({
                       ...editForm,
-                      deadline: date ? date.toISOString().split("T")[0] : "",
+                      deadline: date ? formatDateInputValue(date) : "",
                     })
                   }
                   initialFocus
@@ -286,7 +340,7 @@ export default function GoalPage() {
                     onClick={() =>
                       setEditForm({
                         ...editForm,
-                        deadline: new Date().toISOString().split("T")[0],
+                        deadline: formatDateInputValue(new Date()),
                       })
                     }
                   >
@@ -335,8 +389,10 @@ export default function GoalPage() {
           <p className="text-2xl mb-2">💪</p>
           <p className="text-sm text-text-muted">
             Kamu sudah mencapai{" "}
-            <span className="font-data font-bold text-emerald">{progress}%</span> dari
-            target. Tetap konsisten!
+            <span className="font-data font-bold text-emerald">
+              {progress}%
+            </span>{" "}
+            dari target. Tetap konsisten!
           </p>
           <div className="mt-3 h-2 rounded-full bg-surface-elevated overflow-hidden">
             <div
