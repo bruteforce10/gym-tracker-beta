@@ -48,7 +48,8 @@ export default function ProgressRing({
   const normalizedPercentage = Math.max(0, Math.min(percentage, 100));
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const dashOffset = circumference - (normalizedPercentage / 100) * circumference;
+  const dashOffset =
+    circumference - (normalizedPercentage / 100) * circumference;
   const palette = resolveProgressPalette(normalizedPercentage);
   const gradientId = `progress-gradient-${size}-${strokeWidth}-${Math.round(normalizedPercentage)}`;
 
@@ -65,7 +66,7 @@ export default function ProgressRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="rgba(42, 42, 58, 0.6)"
+          stroke="rgba(0, 0, 0, 0.4)"
           strokeWidth={strokeWidth}
         />
         <circle
@@ -105,8 +106,12 @@ export default function ProgressRing({
         <span className="font-data text-3xl font-bold text-foreground tracking-tight">
           {percentage}%
         </span>
-        {label && <span className="text-xs text-text-muted mt-0.5 font-medium">{label}</span>}
-        {sublabel && <span className="text-[10px] text-text-muted/60 mt-0.5">{sublabel}</span>}
+        {label && (
+          <span className="text-xs text-white mt-0.5 font-medium">{label}</span>
+        )}
+        {sublabel && (
+          <span className="text-[10px] text-white mt-0.5">{sublabel}</span>
+        )}
       </div>
     </div>
   );

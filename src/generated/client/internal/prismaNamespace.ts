@@ -1164,9 +1164,12 @@ export const GoalScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   exerciseId: 'exerciseId',
+  status: 'status',
   targetWeight: 'targetWeight',
   currentWeight: 'currentWeight',
   deadline: 'deadline',
+  completedAt: 'completedAt',
+  expiredAt: 'expiredAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1203,6 +1206,8 @@ export const WorkoutScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   date: 'date',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
   createdAt: 'createdAt'
 } as const
 

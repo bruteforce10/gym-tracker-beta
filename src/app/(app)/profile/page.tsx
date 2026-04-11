@@ -273,7 +273,7 @@ export default function ProfilePage() {
 
       {/* Logout */}
       <Button
-        onClick={() => signOut({ callbackUrl: "/login" })}
+        onClick={() => signOut({ redirectTo: "/login" })}
         variant="outline"
         className="w-full h-12 border-danger/30 text-danger hover:bg-danger/10 rounded-xl"
         id="logout-btn"

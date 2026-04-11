@@ -31,6 +31,7 @@ type SessionExercise = {
 type SessionData = {
   planId: string;
   planName: string;
+  startedAt: string;
   exercises: SessionExercise[];
 };
 
@@ -111,6 +112,7 @@ export default function WorkoutSessionPage() {
   const [restLeft, setRestLeft] = useState(0);
   const [restTotal, setRestTotal] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [alarmEnabled, setAlarmEnabled] = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const alarmRef = useRef<HTMLAudioElement | null>(null);
@@ -124,6 +126,12 @@ export default function WorkoutSessionPage() {
     }
 
     const nextSession: SessionData = JSON.parse(rawSession);
+    const startedAtValue = new Date(nextSession.startedAt);
+    if (Number.isNaN(startedAtValue.getTime())) {
+      sessionStorage.removeItem("gym-session");
+      router.replace("/workout/start");
+      return;
+    }
     setSession(nextSession);
     setAllSets(
       nextSession.exercises.map((exercise) =>
@@ -135,7 +143,27 @@ export default function WorkoutSessionPage() {
       )
     );
     setReps(String(nextSession.exercises[0]?.defaultReps ?? 0));
+    setElapsedSeconds(
+      Math.max(0, Math.floor((Date.now() - startedAtValue.getTime()) / 1000))
+    );
   }, [router]);
+
+  useEffect(() => {
+    if (!session) return;
+
+    const startedAtValue = new Date(session.startedAt);
+    if (Number.isNaN(startedAtValue.getTime())) return;
+
+    const updateElapsed = () => {
+      setElapsedSeconds(
+        Math.max(0, Math.floor((Date.now() - startedAtValue.getTime()) / 1000))
+      );
+    };
+
+    updateElapsed();
+    const interval = setInterval(updateElapsed, 1000);
+    return () => clearInterval(interval);
+  }, [session]);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -208,6 +236,20 @@ export default function WorkoutSessionPage() {
 
   useEffect(() => () => stopTimer(), [stopTimer]);
 
+  const formatElapsedTime = useCallback((totalSeconds: number) => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const hoursLabel = String(hours).padStart(2, "0");
+    const minutesLabel = String(minutes).padStart(2, "0");
+    const secondsLabel = String(seconds).padStart(2, "0");
+
+    return hours > 0
+      ? `${hoursLabel}:${minutesLabel}:${secondsLabel}`
+      : `${minutesLabel}:${secondsLabel}`;
+  }, []);
+
   if (!session) {
     return (
       <div className="min-h-screen gradient-mesh flex items-center justify-center">
@@ -250,7 +292,12 @@ export default function WorkoutSessionPage() {
         };
       });
 
-      await createWorkout(new Date().toISOString().split("T")[0], exercises);
+      await createWorkout(
+        new Date(session.startedAt).toISOString().split("T")[0],
+        exercises,
+        session.startedAt,
+        new Date().toISOString()
+      );
       sessionStorage.removeItem("gym-session");
     } finally {
       setSaving(false);
@@ -357,6 +404,12 @@ export default function WorkoutSessionPage() {
             <p className="text-sm font-semibold text-foreground">
               Exercise {exerciseIndex + 1}/{totalExercises} · Set {setIndex + 1}/{totalSets}
             </p>
+          </div>
+          <div className="inline-flex min-w-[84px] items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-surface-elevated px-3 py-2">
+            <Timer className="h-4 w-4 text-emerald" aria-hidden="true" />
+            <span className="font-mono text-sm font-semibold text-foreground">
+              {formatElapsedTime(elapsedSeconds)}
+            </span>
           </div>
           <button
             type="button"

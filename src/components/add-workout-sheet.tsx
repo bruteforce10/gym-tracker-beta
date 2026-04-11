@@ -72,14 +72,19 @@ export default function AddWorkoutSheet({ open, onOpenChange }: AddWorkoutSheetP
 
     setSaving(true);
     try {
+      const selectedDateIso = date.toISOString().split("T")[0];
+      const loggedTimestamp = `${selectedDateIso}T00:00:00.000Z`;
+
       await createWorkout(
-        date.toISOString().split("T")[0],
+        selectedDateIso,
         validExercises.map((entry) => ({
           exerciseId: entry.exercise!.id,
           weight: Number(entry.weight),
           reps: Number(entry.reps),
           sets: Number(entry.sets) || 3,
-        }))
+        })),
+        loggedTimestamp,
+        loggedTimestamp
       );
 
       onOpenChange(false);

@@ -1,27 +1,18 @@
 import Link from "next/link";
-import {
-  Activity,
-  AlertTriangle,
-  Calendar,
-  Flame,
-  Shield,
-  Trophy,
-} from "lucide-react";
+import { Activity, Flame, Shield, Trophy } from "lucide-react";
 import { getDashboardData } from "@/actions/dashboard";
+import GoalSummaryCard from "@/components/goal-summary-card";
 import PageHeader from "@/components/page-header";
-import ProgressRing from "@/components/progress-ring";
 import StatCard from "@/components/stat-card";
 import WorkoutCard from "@/components/workout-card";
 import { auth } from "@/lib/auth";
-import { calculateProgress, getDaysUntilDeadline } from "@/lib/calculations";
-import { formatDateInputValue } from "@/lib/date";
 
 export default async function DashboardPage() {
   const session = await auth();
   const userName = session?.user?.name || "User";
   const isAdmin = session?.user?.role === "admin";
 
-  const { goal, current1RM, recentWorkouts, stats } = await getDashboardData();
+  const { goals, recentWorkouts, stats } = await getDashboardData();
 
   const today = new Intl.DateTimeFormat("id-ID", {
     weekday: "long",
@@ -29,20 +20,6 @@ export default async function DashboardPage() {
     month: "long",
     year: "numeric",
   }).format(new Date());
-
-  const progress = goal ? calculateProgress(current1RM, goal.targetWeight) : 0;
-  const daysLeft = goal?.deadline
-    ? getDaysUntilDeadline(formatDateInputValue(goal.deadline))
-    : null;
-  const isDeadlineWarning = daysLeft !== null && daysLeft <= 3;
-  const deadlineLabel =
-    daysLeft === null
-      ? null
-      : daysLeft < 0
-        ? `Lewat ${Math.abs(daysLeft)} hari`
-        : daysLeft === 0
-          ? "Hari Ini"
-          : `${daysLeft} hari`;
 
   return (
     <div>
@@ -89,80 +66,20 @@ export default async function DashboardPage() {
         </Link>
       ) : null}
 
-      {goal ? (
-        <Link href="/goal" className="block">
-          <div
-            className="glass-card p-6 mb-6 animate-fade-in-up"
-            style={{ animationDelay: "400ms" }}
-            id="goal-progress-card"
-          >
-            <div className="mb-4 space-y-2">
-              <div className="flex flex-wrap justify-between full items-center gap-2">
-                <h2
-                  className="min-w-0 text-balance text-lg font-bold text-foreground"
-                  style={{ fontFamily: "var(--font-heading)" }}
-                >
-                  {goal.exercise?.name ?? "Exercise"}
-                </h2>
-                {deadlineLabel ? (
-                  <div
-                    className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
-                      isDeadlineWarning
-                        ? "bg-red-danger/12 text-danger"
-                        : "border-emerald/20 bg-emerald/10 text-emerald"
-                    }`}
-                  >
-                    {isDeadlineWarning ? (
-                      <AlertTriangle
-                        className="h-3.5 w-3.5 shrink-0"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <Calendar
-                        className="h-3.5 w-3.5 shrink-0"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <span className="font-data">{deadlineLabel}</span>
-                  </div>
-                ) : null}
+      {goals.length > 0 ? (
+        <div className="mb-6 space-y-3">
+          {goals.map((goal, index) => (
+            <Link
+              key={goal.id}
+              href="/goal"
+              className="block transition-transform duration-200 hover:-translate-y-0.5"
+            >
+              <div style={{ animationDelay: `${400 + index * 80}ms` }}>
+                <GoalSummaryCard goal={goal} />
               </div>
-              <p className="text-xs text-text-muted mt-0.5">Target Aktif</p>
-            </div>
-            <div className="flex items-center gap-6">
-              <ProgressRing
-                percentage={progress}
-                size={130}
-                strokeWidth={8}
-                label="progress"
-              />
-              <div className="flex-1 space-y-3">
-                <div className="glass-card p-3">
-                  <p className="text-[10px] text-text-muted uppercase tracking-wider mb-0.5">
-                    1RM Saat Ini
-                  </p>
-                  <p className="font-data text-xl font-bold text-foreground">
-                    {current1RM.toFixed(1)}{" "}
-                    <span className="text-sm text-text-muted font-normal">
-                      kg
-                    </span>
-                  </p>
-                </div>
-                <div className="glass-card p-3">
-                  <p className="text-[10px] text-text-muted uppercase tracking-wider mb-0.5">
-                    Target
-                  </p>
-                  <p className="font-data text-xl font-bold text-emerald">
-                    {goal.targetWeight}{" "}
-                    <span className="text-sm text-text-muted font-normal">
-                      kg
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
+            </Link>
+          ))}
+        </div>
       ) : (
         <Link href="/goal" className="block">
           <div className="glass-card p-6 mb-6 text-center animate-fade-in-up">

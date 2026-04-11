@@ -80,10 +80,12 @@ export default function WorkoutStartClient() {
 
   const handleStart = () => {
     if (!selectedPlan || selected.size === 0) return;
+    const startedAt = new Date().toISOString();
 
     const sessionData = {
       planId: selectedPlan.id,
       planName: selectedPlan.name,
+      startedAt,
       exercises: selectedPlan.exercises
         .filter((exercise) => selected.has(exercise.exerciseId))
         .sort((left, right) => left.order - right.order)

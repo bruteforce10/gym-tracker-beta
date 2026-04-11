@@ -2,7 +2,8 @@
 
 import { auth } from "@/lib/auth";
 import { calculate1RM } from "@/lib/calculations";
-import { fetchExerciseById, fetchExercisesByIds } from "@/lib/exercise-store";
+import { fetchExercisesByIds } from "@/lib/exercise-store";
+import { getUserGoalCollections } from "@/lib/goal-state";
 import { prisma } from "@/lib/prisma";
 
 async function getUserId(): Promise<string> {
@@ -14,17 +15,11 @@ async function getUserId(): Promise<string> {
 export async function getDashboardData() {
   const userId = await getUserId();
 
-  const [goal, workouts] = await Promise.all([
-    prisma.goal.findFirst({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.workout.findMany({
-      where: { userId },
-      orderBy: { date: "desc" },
-      include: { exercises: true },
-    }),
-  ]);
+  const workouts = await prisma.workout.findMany({
+    where: { userId },
+    orderBy: { date: "desc" },
+    include: { exercises: true },
+  });
 
   const recentWorkouts = workouts.slice(0, 3);
   const exerciseIds = Array.from(
@@ -36,36 +31,7 @@ export async function getDashboardData() {
   ) as string[];
   const catalogItems = await fetchExercisesByIds(exerciseIds);
   const exerciseMap = new Map(catalogItems.map((item) => [item.id, item]));
-
-  let goalData: null | {
-    id: string;
-    targetWeight: number;
-    currentWeight: number;
-    deadline: Date | null;
-    exercise: Awaited<ReturnType<typeof fetchExerciseById>>;
-  } = null;
-  let current1RM = 0;
-
-  if (goal?.exerciseId) {
-    const exercise = await fetchExerciseById(goal.exerciseId);
-    if (exercise) {
-      goalData = {
-        id: goal.id,
-        targetWeight: goal.targetWeight,
-        currentWeight: goal.currentWeight,
-        deadline: goal.deadline,
-        exercise,
-      };
-
-      for (const workout of workouts) {
-        for (const exerciseLog of workout.exercises) {
-          if (exerciseLog.exerciseId !== goal.exerciseId) continue;
-          const rm = calculate1RM(exerciseLog.weight, exerciseLog.reps);
-          if (rm > current1RM) current1RM = Math.round(rm * 10) / 10;
-        }
-      }
-    }
-  }
+  const { activeGoals } = await getUserGoalCollections(userId, workouts);
 
   let best1RM = 0;
   let best1RMExercise = "";
@@ -100,8 +66,7 @@ export async function getDashboardData() {
   }
 
   return {
-    goal: goalData,
-    current1RM,
+    goals: activeGoals,
     stats: {
       totalWorkouts: workouts.length,
       totalExercises: workouts.reduce((total, workout) => total + workout.exercises.length, 0),

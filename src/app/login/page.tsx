@@ -70,7 +70,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    signIn("google", { callbackUrl: "/dashboard" });
+    signIn("google", { redirectTo: "/dashboard" });
   };
 
   return (

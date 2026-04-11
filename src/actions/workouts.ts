@@ -12,14 +12,28 @@ async function getUserId(): Promise<string> {
 
 export async function createWorkout(
   date: string,
-  exercises: { exerciseId: string; weight: number; reps: number; sets: number }[]
+  exercises: { exerciseId: string; weight: number; reps: number; sets: number }[],
+  startedAt: string,
+  endedAt?: string
 ) {
   const userId = await getUserId();
+  const normalizedStartedAt = new Date(startedAt);
+  const normalizedEndedAt = endedAt ? new Date(endedAt) : new Date();
+
+  if (Number.isNaN(normalizedStartedAt.getTime())) {
+    throw new Error("Invalid workout start timestamp");
+  }
+
+  if (Number.isNaN(normalizedEndedAt.getTime())) {
+    throw new Error("Invalid workout end timestamp");
+  }
 
   const workout = await prisma.workout.create({
     data: {
       userId,
       date: new Date(date),
+      startedAt: normalizedStartedAt,
+      endedAt: normalizedEndedAt,
       exercises: {
         create: exercises.map((ex) => ({
           exerciseId: ex.exerciseId,
@@ -100,6 +114,8 @@ type WorkoutWithExercises = {
   id: string;
   userId: string;
   date: Date;
+  startedAt: Date;
+  endedAt: Date | null;
   createdAt: Date;
   exercises: Array<{
     id: string;

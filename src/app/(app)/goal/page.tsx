@@ -1,407 +1,341 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Calendar as CalendarIcon,
-  Check,
-  Edit3,
-  Target,
-  X,
-  AlertTriangle,
-} from "lucide-react";
-import { format } from "date-fns";
+import { AlertTriangle, Edit3, Plus, Target, Trophy } from "lucide-react";
 
-import { getGoalPageData, upsertGoal } from "@/actions/goals";
-import ExercisePicker from "@/components/exercise-picker";
+import { deleteGoal, getGoalPageData, upsertGoal } from "@/actions/goals";
+import GoalEditorSheet from "@/components/goal-editor-sheet";
+import GoalHistoryCard from "@/components/goal-history-card";
+import GoalSummaryCard from "@/components/goal-summary-card";
 import PageHeader from "@/components/page-header";
-import ProgressRing from "@/components/progress-ring";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { calculateProgress, getDaysUntilDeadline } from "@/lib/calculations";
-import { formatDateInputValue, parseDateInputValue } from "@/lib/date";
+import { Button } from "@/components/ui/button";
 import type { ExerciseCatalogItem } from "@/lib/exercise-catalog";
-import { cn } from "@/lib/utils";
+import type { GoalDisplayItem } from "@/lib/goal-state";
 
-interface GoalData {
-  id: string;
-  exercise: ExerciseCatalogItem;
-  targetWeight: number;
-  currentWeight: number;
-  deadline: string | null;
-}
+type GoalCollections = Awaited<ReturnType<typeof getGoalPageData>>;
+
+const EMPTY_FORM_STATE = {
+  exercise: null as ExerciseCatalogItem | null,
+  targetWeight: "100",
+  deadline: "",
+};
 
 export default function GoalPage() {
-  const [editing, setEditing] = useState(false);
-  const [goal, setGoal] = useState<GoalData | null>(null);
-  const [current1RM, setCurrent1RM] = useState(0);
+  const [activeGoals, setActiveGoals] = useState<GoalDisplayItem[]>([]);
+  const [completedGoals, setCompletedGoals] = useState<GoalDisplayItem[]>([]);
+  const [overdueGoals, setOverdueGoals] = useState<GoalDisplayItem[]>([]);
+  const [activeGoalCount, setActiveGoalCount] = useState(0);
+  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [editForm, setEditForm] = useState<{
-    exercise: ExerciseCatalogItem | null;
-    targetWeight: string;
-    deadline: string;
-  }>({
-    exercise: null,
-    targetWeight: "100",
-    deadline: "",
-  });
+  const [deletingGoalId, setDeletingGoalId] = useState<string | null>(null);
+  const [formMessage, setFormMessage] = useState("");
+  const [editForm, setEditForm] = useState(EMPTY_FORM_STATE);
+
+  const syncPageData = (data: GoalCollections) => {
+    setActiveGoals(data.activeGoals);
+    setCompletedGoals(data.completedGoals);
+    setOverdueGoals(data.overdueGoals);
+    setActiveGoalCount(data.activeGoalCount);
+  };
+
+  const closeForm = () => {
+    setFormOpen(false);
+    setEditingGoalId(null);
+    setFormMessage("");
+    setEditForm(EMPTY_FORM_STATE);
+  };
+
+  const applyGoalToForm = (goal: GoalDisplayItem, message = "") => {
+    setEditingGoalId(goal.id);
+    setFormOpen(true);
+    setFormMessage(message);
+    setEditForm({
+      exercise: goal.exercise,
+      targetWeight: goal.targetWeight.toString(),
+      deadline: goal.deadline ?? "",
+    });
+  };
 
   useEffect(() => {
     async function load() {
       try {
-        const goalData = await getGoalPageData();
-
-        if (goalData.goal) {
-          const nextGoal: GoalData = {
-            id: goalData.goal.id,
-            exercise: goalData.goal.exercise,
-            targetWeight: goalData.goal.targetWeight,
-            currentWeight: goalData.goal.currentWeight,
-            deadline:
-              goalData.goal.deadline?.toISOString().split("T")[0] || null,
-          };
-
-          setGoal(nextGoal);
-          setEditForm({
-            exercise: nextGoal.exercise,
-            targetWeight: nextGoal.targetWeight.toString(),
-            deadline: nextGoal.deadline || "",
-          });
-          setCurrent1RM(goalData.current1RM);
-        } else {
-          setEditing(true);
-        }
+        const data = await getGoalPageData();
+        syncPageData(data);
       } catch {
-        // Ignore load errors and keep the page interactive.
+        // Keep the page interactive even if loading fails.
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     }
 
-    load();
+    void load();
   }, []);
 
-  const progress = goal ? calculateProgress(current1RM, goal.targetWeight) : 0;
-  const daysLeft = goal?.deadline ? getDaysUntilDeadline(goal.deadline) : null;
-  const isDeadlineWarning = daysLeft !== null && daysLeft <= 3;
-
-  const handleSave = async () => {
-    if (!editForm.exercise) return;
-
-    setSaving(true);
-    try {
-      const result = await upsertGoal({
-        exerciseId: editForm.exercise.id,
-        targetWeight: Number(editForm.targetWeight),
-        deadline: editForm.deadline || null,
-      });
-
-      setGoal({
-        id: result.id,
-        exercise: result.exercise,
-        targetWeight: result.targetWeight,
-        currentWeight: result.currentWeight,
-        deadline: result.deadline?.toISOString().split("T")[0] || null,
-      });
-      setEditing(false);
-    } catch {
-      // Ignore save errors and keep the form visible.
-    }
-    setSaving(false);
+  const reloadGoalData = async () => {
+    const data = await getGoalPageData();
+    syncPageData(data);
+    return data;
   };
 
-  const handleCancel = () => {
-    if (!goal) return;
+  const openCreateForm = () => {
+    if (activeGoalCount >= 3) {
+      setFormMessage(
+        "Maksimal 3 goal aktif. Tunggu salah satu selesai terlebih dahulu.",
+      );
+      setFormOpen(true);
+      setEditingGoalId(null);
+      return;
+    }
 
-    setEditForm({
-      exercise: goal.exercise,
-      targetWeight: goal.targetWeight.toString(),
-      deadline: goal.deadline || "",
-    });
-    setEditing(false);
+    setFormMessage("");
+    setEditingGoalId(null);
+    setEditForm(EMPTY_FORM_STATE);
+    setFormOpen(true);
+  };
+
+  const handleExerciseSelection = (exercise: ExerciseCatalogItem) => {
+    const duplicateGoal = activeGoals.find(
+      (goal) => goal.exercise.id === exercise.id && goal.id !== editingGoalId,
+    );
+
+    if (duplicateGoal) {
+      applyGoalToForm(
+        duplicateGoal,
+        "Goal untuk exercise ini sudah ada. Kami buka mode edit.",
+      );
+      return;
+    }
+
+    setFormMessage("");
+    setEditForm((current) => ({ ...current, exercise }));
+  };
+
+  const handleSave = async () => {
+    if (!editForm.exercise) {
+      setFormMessage("Pilih exercise terlebih dahulu.");
+      return;
+    }
+
+    setSaving(true);
+    setFormMessage("");
+
+    try {
+      const result = await upsertGoal({
+        goalId: editingGoalId,
+        exerciseId: editForm.exercise.id,
+        targetWeight: Number(editForm.targetWeight),
+        deadline: editForm.deadline,
+      });
+
+      if (!result.success) {
+        if (result.code === "duplicate_active" && result.goalId) {
+          const duplicateGoal = activeGoals.find((goal) => goal.id === result.goalId);
+          if (duplicateGoal) {
+            applyGoalToForm(
+              duplicateGoal,
+              result.error ?? "Goal untuk exercise ini sudah ada. Kami buka mode edit.",
+            );
+            return;
+          }
+        }
+
+        setFormMessage(result.error ?? "Gagal menyimpan goal.");
+        return;
+      }
+
+      await reloadGoalData();
+      closeForm();
+    } catch {
+      setFormMessage("Terjadi kesalahan saat menyimpan goal.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteGoal = async () => {
+    if (!editingGoalId) return;
+
+    setDeletingGoalId(editingGoalId);
+    setFormMessage("");
+
+    try {
+      const result = await deleteGoal(editingGoalId);
+
+      if (!result.success) {
+        setFormMessage(result.error ?? "Goal gagal dihapus.");
+        return;
+      }
+
+      await reloadGoalData();
+      closeForm();
+    } catch {
+      setFormMessage("Terjadi kesalahan saat menghapus goal.");
+    } finally {
+      setDeletingGoalId(null);
+    }
   };
 
   if (loading) {
     return (
       <div>
-        <PageHeader
-          title="Goal"
-          subtitle="Target kekuatan yang ingin dicapai"
-        />
+        <PageHeader title="Goal" subtitle="Kelola sampai 3 target aktif sekaligus" />
         <div className="glass-card p-8 text-center">
-          <p className="text-sm text-text-muted">Memuat data…</p>
+          <p className="text-sm text-text-muted">Memuat goal...</p>
         </div>
       </div>
     );
   }
 
+  const hasAnyGoal =
+    activeGoals.length > 0 || completedGoals.length > 0 || overdueGoals.length > 0;
+
   return (
-    <div>
-      <PageHeader
-        title="Goal"
-        subtitle="Target kekuatan yang ingin dicapai"
-        rightContent={
-          !editing &&
-          goal && (
-            <button
-              onClick={() => setEditing(true)}
-              className="w-9 h-9 rounded-lg bg-surface-elevated flex items-center justify-center text-text-muted hover:text-emerald transition-colors"
-              id="edit-goal-btn"
-              aria-label="Edit goal aktif"
-            >
-              <Edit3 className="w-4 h-4" aria-hidden="true" />
-            </button>
-          )
-        }
-      />
-
-      {goal && (
-        <div
-          className="glass-card p-6 mb-6 animate-fade-in-up"
-          id="active-goal-card"
-        >
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center">
-              <Target className="w-4 h-4 text-emerald" aria-hidden="true" />
-            </div>
-            <span className="text-xs font-semibold text-emerald uppercase tracking-wider">
-              Target Aktif
-            </span>
-          </div>
-
-          <div className="flex flex-col items-center mb-6">
-            <ProgressRing
-              percentage={progress}
-              size={180}
-              strokeWidth={12}
-              label="progress"
-              sublabel={`${current1RM.toFixed(1)} / ${goal.targetWeight} kg`}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="glass-card p-4 text-center">
-              <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">
-                Exercise
-              </p>
-              <p className="text-sm font-bold text-foreground">
-                {goal.exercise.name}
-              </p>
-            </div>
-            <div className="glass-card p-4 text-center">
-              <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">
-                Target
-              </p>
-              <p className="font-data text-lg font-bold text-emerald">
-                {goal.targetWeight}{" "}
-                <span className="text-xs text-text-muted font-normal">kg</span>
-              </p>
-            </div>
-            <div className="glass-card p-4 text-center">
-              <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">
-                1RM Saat Ini
-              </p>
-              <p className="font-data text-lg font-bold text-foreground">
-                {current1RM.toFixed(1)}{" "}
-                <span className="text-xs text-text-muted font-normal">kg</span>
-              </p>
-            </div>
-            <div className="glass-card p-4 text-center">
-              <p className="text-[10px] text-text-muted uppercase tracking-wider mb-1">
-                Sisa Waktu
-              </p>
-              <div className="flex items-center justify-center gap-2">
-                {daysLeft !== null ? (
-                  <>
-                    {isDeadlineWarning && (
-                      <AlertTriangle
-                        className="h-4 w-4  text-danger"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <p
-                      className={`font-data text-lg font-bold ${
-                        isDeadlineWarning ? "text-danger" : "text-foreground"
-                      }`}
-                    >
-                      {daysLeft}{" "}
-                      <span className="text-xs text-text-muted font-normal">
-                        hari
-                      </span>
-                    </p>
-                  </>
-                ) : (
-                  <p className="font-data text-lg font-bold text-foreground">
-                    —{" "}
-                    <span className="text-xs text-text-muted font-normal">
-                      hari
-                    </span>
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {editing && (
-        <div
-          className="glass-card p-5 space-y-4 animate-fade-in-up"
-          id="edit-goal-form"
-        >
-          <h3
-            className="text-base font-bold text-foreground"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            {goal ? "Edit Goal" : "Buat Goal Baru"}
-          </h3>
-
-          <ExercisePicker
-            inputId="goal-exercise"
-            label="Exercise"
-            value={editForm.exercise}
-            onChange={(exercise) =>
-              setEditForm((current) => ({ ...current, exercise }))
-            }
-            helperText="Cari exercise langsung dari katalog lokal."
-          />
-
-          <div>
-            <label
-              htmlFor="goal-target-weight"
-              className="text-xs text-text-muted font-medium mb-1.5 block"
-            >
-              Target Weight (kg)
-            </label>
-            <Input
-              id="goal-target-weight"
-              name="goal-target-weight"
-              type="number"
-              inputMode="decimal"
-              value={editForm.targetWeight}
-              onChange={(event) =>
-                setEditForm({ ...editForm, targetWeight: event.target.value })
-              }
-              className="bg-surface-elevated border-border-subtle text-foreground font-data"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs text-text-muted font-medium mb-1.5 block">
-              Deadline (opsional)
-            </label>
-            <Popover>
-              <PopoverTrigger
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "w-full justify-start text-left font-normal bg-surface-elevated border-border-subtle text-foreground h-10 px-3 hover:bg-surface transition-colors",
-                  !editForm.deadline && "text-muted-foreground",
-                )}
-              >
-                <CalendarIcon
-                  className="mr-2 h-4 w-4 text-emerald"
-                  aria-hidden="true"
-                />
-                {editForm.deadline ? (
-                  format(
-                    parseDateInputValue(editForm.deadline) ?? new Date(),
-                    "PPP",
-                  )
-                ) : (
-                  <span>Pilih deadline</span>
-                )}
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-auto p-0 bg-surface border-border-subtle"
-                align="start"
-              >
-                <Calendar
-                  mode="single"
-                  selected={parseDateInputValue(editForm.deadline) ?? undefined}
-                  onSelect={(date) =>
-                    setEditForm({
-                      ...editForm,
-                      deadline: date ? formatDateInputValue(date) : "",
-                    })
-                  }
-                  initialFocus
-                  className="bg-surface"
-                />
-                <div className="p-3 border-t border-border-subtle flex gap-2">
-                  <Button
-                    variant="ghost"
-                    className="flex-1 text-xs h-8 text-emerald hover:bg-emerald/10"
-                    onClick={() =>
-                      setEditForm({
-                        ...editForm,
-                        deadline: formatDateInputValue(new Date()),
-                      })
-                    }
-                  >
-                    Hari Ini
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="flex-1 text-xs h-8 text-text-muted hover:bg-white/5"
-                    onClick={() => setEditForm({ ...editForm, deadline: "" })}
-                  >
-                    Hapus
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="flex gap-3 pt-2">
-            {goal && (
-              <Button
-                onClick={handleCancel}
-                variant="outline"
-                className="flex-1 h-11 border-border-subtle text-text-muted hover:text-foreground rounded-xl"
-              >
-                <X className="w-4 h-4 mr-1.5" aria-hidden="true" />
-                Batal
-              </Button>
-            )}
+    <>
+      <div className="space-y-6">
+        <PageHeader
+          title="Goal"
+          subtitle="Kelola sampai 3 target aktif sekaligus"
+          rightContent={
             <Button
-              onClick={handleSave}
-              disabled={saving || !editForm.exercise}
-              className="flex-1 h-11 bg-emerald hover:bg-emerald-dark text-[#0A0A0F] font-semibold rounded-xl disabled:opacity-50"
+              type="button"
+              onClick={openCreateForm}
+              disabled={activeGoalCount >= 3}
+              className="h-10 rounded-xl bg-emerald px-4 text-sm font-semibold text-[#0A0A0F] hover:bg-emerald-dark disabled:opacity-50"
             >
-              <Check className="w-4 h-4 mr-1.5" aria-hidden="true" />
-              {saving ? "Menyimpan…" : "Simpan"}
+              <Plus className="mr-1.5 h-4 w-4" aria-hidden="true" />
+              Tambah Goal
             </Button>
-          </div>
-        </div>
-      )}
+          }
+        />
 
-      {goal && (
-        <div
-          className="glass-card p-5 mt-6 text-center animate-fade-in-up"
-          style={{ animationDelay: "200ms" }}
-        >
-          <p className="text-2xl mb-2">💪</p>
-          <p className="text-sm text-text-muted">
-            Kamu sudah mencapai{" "}
-            <span className="font-data font-bold text-emerald">
-              {progress}%
-            </span>{" "}
-            dari target. Tetap konsisten!
-          </p>
-          <div className="mt-3 h-2 rounded-full bg-surface-elevated overflow-hidden">
-            <div
-              className="h-full rounded-full bg-linear-to-r from-emerald-dark to-emerald-light transition-[width] duration-1000"
-              style={{ width: `${progress}%` }}
-            />
+        <section className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald/20 bg-emerald/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald">
+                <Target className="h-3.5 w-3.5" aria-hidden="true" />
+                Goal Aktif
+              </div>
+              <p className="mt-2 text-sm text-text-muted">
+                Diurutkan dari deadline paling dekat. Maksimal 3 goal aktif.
+              </p>
+            </div>
+            <p className="text-xs text-text-muted">{activeGoalCount}/3 goal aktif</p>
           </div>
-        </div>
-      )}
-    </div>
+
+          {activeGoalCount >= 3 ? (
+            <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-text-muted">
+              Maksimal 3 goal aktif. Selesaikan satu goal atau tunggu deadline lewat
+              untuk membuka slot baru.
+            </div>
+          ) : null}
+
+          {activeGoals.length > 0 ? (
+            <div className="space-y-4">
+              {activeGoals.map((goal) => (
+                <GoalSummaryCard
+                  key={goal.id}
+                  goal={goal}
+                  action={
+                    <button
+                      type="button"
+                      onClick={() => applyGoalToForm(goal)}
+                      className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-[#0F1218]/90 text-text-muted transition-colors hover:border-emerald/20 hover:bg-white/[0.06] hover:text-emerald"
+                      aria-label={`Edit goal ${goal.exercise.name}`}
+                    >
+                      <Edit3 className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="glass-card p-8 text-center">
+              <Target className="mx-auto h-10 w-10 text-emerald/80" aria-hidden="true" />
+              <p className="mt-4 text-base font-semibold text-foreground">
+                Belum ada goal aktif
+              </p>
+              <p className="mt-2 text-sm text-text-muted">
+                Buat sampai 3 target kekuatan untuk exercise yang berbeda.
+              </p>
+              <Button
+                type="button"
+                onClick={openCreateForm}
+                className="mt-5 h-11 rounded-xl bg-emerald px-4 text-sm font-semibold text-[#0A0A0F] hover:bg-emerald-dark"
+              >
+                <Plus className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                Buat Goal Pertama
+              </Button>
+            </div>
+          )}
+        </section>
+
+        {completedGoals.length > 0 ? (
+          <section className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Trophy className="h-4 w-4 text-emerald" aria-hidden="true" />
+              <h2
+                className="text-base font-bold text-foreground"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                Riwayat Selesai
+              </h2>
+            </div>
+            <div className="space-y-3">
+              {completedGoals.map((goal) => (
+                <GoalHistoryCard key={goal.id} goal={goal} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {overdueGoals.length > 0 ? (
+          <section className="space-y-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-danger" aria-hidden="true" />
+              <h2
+                className="text-base font-bold text-foreground"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                Terlambat
+              </h2>
+            </div>
+            <div className="space-y-3">
+              {overdueGoals.map((goal) => (
+                <GoalHistoryCard key={goal.id} goal={goal} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {!hasAnyGoal ? (
+          <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-3 text-sm text-text-muted">
+            Goal selesai dan goal terlambat akan muncul di halaman ini sebagai
+            riwayat read-only.
+          </div>
+        ) : null}
+      </div>
+
+      <GoalEditorSheet
+        open={formOpen}
+        editingGoalId={editingGoalId}
+        activeGoalCount={activeGoalCount}
+        saving={saving}
+        deleting={Boolean(deletingGoalId)}
+        formMessage={formMessage}
+        value={editForm}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeForm();
+          }
+        }}
+        onValueChange={setEditForm}
+        onSubmit={handleSave}
+        onDelete={handleDeleteGoal}
+        onReset={closeForm}
+        onDuplicateGoalSelected={handleExerciseSelection}
+      />
+    </>
   );
 }

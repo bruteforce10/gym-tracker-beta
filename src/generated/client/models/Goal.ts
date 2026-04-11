@@ -40,9 +40,12 @@ export type GoalMinAggregateOutputType = {
   id: string | null
   userId: string | null
   exerciseId: string | null
+  status: string | null
   targetWeight: number | null
   currentWeight: number | null
   deadline: Date | null
+  completedAt: Date | null
+  expiredAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -51,9 +54,12 @@ export type GoalMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   exerciseId: string | null
+  status: string | null
   targetWeight: number | null
   currentWeight: number | null
   deadline: Date | null
+  completedAt: Date | null
+  expiredAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,9 +68,12 @@ export type GoalCountAggregateOutputType = {
   id: number
   userId: number
   exerciseId: number
+  status: number
   targetWeight: number
   currentWeight: number
   deadline: number
+  completedAt: number
+  expiredAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -85,9 +94,12 @@ export type GoalMinAggregateInputType = {
   id?: true
   userId?: true
   exerciseId?: true
+  status?: true
   targetWeight?: true
   currentWeight?: true
   deadline?: true
+  completedAt?: true
+  expiredAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -96,9 +108,12 @@ export type GoalMaxAggregateInputType = {
   id?: true
   userId?: true
   exerciseId?: true
+  status?: true
   targetWeight?: true
   currentWeight?: true
   deadline?: true
+  completedAt?: true
+  expiredAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -107,9 +122,12 @@ export type GoalCountAggregateInputType = {
   id?: true
   userId?: true
   exerciseId?: true
+  status?: true
   targetWeight?: true
   currentWeight?: true
   deadline?: true
+  completedAt?: true
+  expiredAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -205,9 +223,12 @@ export type GoalGroupByOutputType = {
   id: string
   userId: string
   exerciseId: string | null
+  status: string
   targetWeight: number
   currentWeight: number
   deadline: Date | null
+  completedAt: Date | null
+  expiredAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: GoalCountAggregateOutputType | null
@@ -239,9 +260,12 @@ export type GoalWhereInput = {
   id?: Prisma.StringFilter<"Goal"> | string
   userId?: Prisma.StringFilter<"Goal"> | string
   exerciseId?: Prisma.StringNullableFilter<"Goal"> | string | null
+  status?: Prisma.StringFilter<"Goal"> | string
   targetWeight?: Prisma.FloatFilter<"Goal"> | number
   currentWeight?: Prisma.FloatFilter<"Goal"> | number
   deadline?: Prisma.DateTimeNullableFilter<"Goal"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Goal"> | Date | string | null
+  expiredAt?: Prisma.DateTimeNullableFilter<"Goal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Goal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Goal"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -251,9 +275,12 @@ export type GoalOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   exerciseId?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   targetWeight?: Prisma.SortOrder
   currentWeight?: Prisma.SortOrder
   deadline?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -266,9 +293,12 @@ export type GoalWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.GoalWhereInput | Prisma.GoalWhereInput[]
   userId?: Prisma.StringFilter<"Goal"> | string
   exerciseId?: Prisma.StringNullableFilter<"Goal"> | string | null
+  status?: Prisma.StringFilter<"Goal"> | string
   targetWeight?: Prisma.FloatFilter<"Goal"> | number
   currentWeight?: Prisma.FloatFilter<"Goal"> | number
   deadline?: Prisma.DateTimeNullableFilter<"Goal"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Goal"> | Date | string | null
+  expiredAt?: Prisma.DateTimeNullableFilter<"Goal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Goal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Goal"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -278,9 +308,12 @@ export type GoalOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   exerciseId?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   targetWeight?: Prisma.SortOrder
   currentWeight?: Prisma.SortOrder
   deadline?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.GoalCountOrderByAggregateInput
@@ -297,9 +330,12 @@ export type GoalScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Goal"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Goal"> | string
   exerciseId?: Prisma.StringNullableWithAggregatesFilter<"Goal"> | string | null
+  status?: Prisma.StringWithAggregatesFilter<"Goal"> | string
   targetWeight?: Prisma.FloatWithAggregatesFilter<"Goal"> | number
   currentWeight?: Prisma.FloatWithAggregatesFilter<"Goal"> | number
   deadline?: Prisma.DateTimeNullableWithAggregatesFilter<"Goal"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Goal"> | Date | string | null
+  expiredAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Goal"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Goal"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Goal"> | Date | string
 }
@@ -307,9 +343,12 @@ export type GoalScalarWhereWithAggregatesInput = {
 export type GoalCreateInput = {
   id?: string
   exerciseId?: string | null
+  status?: string
   targetWeight: number
   currentWeight?: number
   deadline?: Date | string | null
+  completedAt?: Date | string | null
+  expiredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutGoalsInput
@@ -319,9 +358,12 @@ export type GoalUncheckedCreateInput = {
   id?: string
   userId: string
   exerciseId?: string | null
+  status?: string
   targetWeight: number
   currentWeight?: number
   deadline?: Date | string | null
+  completedAt?: Date | string | null
+  expiredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -329,9 +371,12 @@ export type GoalUncheckedCreateInput = {
 export type GoalUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   targetWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   currentWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutGoalsNestedInput
@@ -341,9 +386,12 @@ export type GoalUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   targetWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   currentWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -352,9 +400,12 @@ export type GoalCreateManyInput = {
   id?: string
   userId: string
   exerciseId?: string | null
+  status?: string
   targetWeight: number
   currentWeight?: number
   deadline?: Date | string | null
+  completedAt?: Date | string | null
+  expiredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -362,9 +413,12 @@ export type GoalCreateManyInput = {
 export type GoalUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   targetWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   currentWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -373,9 +427,12 @@ export type GoalUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   targetWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   currentWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -394,9 +451,12 @@ export type GoalCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   exerciseId?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   targetWeight?: Prisma.SortOrder
   currentWeight?: Prisma.SortOrder
   deadline?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  expiredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -410,9 +470,12 @@ export type GoalMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   exerciseId?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   targetWeight?: Prisma.SortOrder
   currentWeight?: Prisma.SortOrder
   deadline?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  expiredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -421,9 +484,12 @@ export type GoalMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   exerciseId?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   targetWeight?: Prisma.SortOrder
   currentWeight?: Prisma.SortOrder
   deadline?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  expiredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -486,9 +552,12 @@ export type FloatFieldUpdateOperationsInput = {
 export type GoalCreateWithoutUserInput = {
   id?: string
   exerciseId?: string | null
+  status?: string
   targetWeight: number
   currentWeight?: number
   deadline?: Date | string | null
+  completedAt?: Date | string | null
+  expiredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -496,9 +565,12 @@ export type GoalCreateWithoutUserInput = {
 export type GoalUncheckedCreateWithoutUserInput = {
   id?: string
   exerciseId?: string | null
+  status?: string
   targetWeight: number
   currentWeight?: number
   deadline?: Date | string | null
+  completedAt?: Date | string | null
+  expiredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -536,9 +608,12 @@ export type GoalScalarWhereInput = {
   id?: Prisma.StringFilter<"Goal"> | string
   userId?: Prisma.StringFilter<"Goal"> | string
   exerciseId?: Prisma.StringNullableFilter<"Goal"> | string | null
+  status?: Prisma.StringFilter<"Goal"> | string
   targetWeight?: Prisma.FloatFilter<"Goal"> | number
   currentWeight?: Prisma.FloatFilter<"Goal"> | number
   deadline?: Prisma.DateTimeNullableFilter<"Goal"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Goal"> | Date | string | null
+  expiredAt?: Prisma.DateTimeNullableFilter<"Goal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Goal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Goal"> | Date | string
 }
@@ -546,9 +621,12 @@ export type GoalScalarWhereInput = {
 export type GoalCreateManyUserInput = {
   id?: string
   exerciseId?: string | null
+  status?: string
   targetWeight: number
   currentWeight?: number
   deadline?: Date | string | null
+  completedAt?: Date | string | null
+  expiredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -556,9 +634,12 @@ export type GoalCreateManyUserInput = {
 export type GoalUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   targetWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   currentWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -566,9 +647,12 @@ export type GoalUpdateWithoutUserInput = {
 export type GoalUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   targetWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   currentWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -576,9 +660,12 @@ export type GoalUncheckedUpdateWithoutUserInput = {
 export type GoalUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   targetWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   currentWeight?: Prisma.FloatFieldUpdateOperationsInput | number
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -589,9 +676,12 @@ export type GoalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   userId?: boolean
   exerciseId?: boolean
+  status?: boolean
   targetWeight?: boolean
   currentWeight?: boolean
   deadline?: boolean
+  completedAt?: boolean
+  expiredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -601,9 +691,12 @@ export type GoalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   userId?: boolean
   exerciseId?: boolean
+  status?: boolean
   targetWeight?: boolean
   currentWeight?: boolean
   deadline?: boolean
+  completedAt?: boolean
+  expiredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -613,9 +706,12 @@ export type GoalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   userId?: boolean
   exerciseId?: boolean
+  status?: boolean
   targetWeight?: boolean
   currentWeight?: boolean
   deadline?: boolean
+  completedAt?: boolean
+  expiredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -625,14 +721,17 @@ export type GoalSelectScalar = {
   id?: boolean
   userId?: boolean
   exerciseId?: boolean
+  status?: boolean
   targetWeight?: boolean
   currentWeight?: boolean
   deadline?: boolean
+  completedAt?: boolean
+  expiredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type GoalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "exerciseId" | "targetWeight" | "currentWeight" | "deadline" | "createdAt" | "updatedAt", ExtArgs["result"]["goal"]>
+export type GoalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "exerciseId" | "status" | "targetWeight" | "currentWeight" | "deadline" | "completedAt" | "expiredAt" | "createdAt" | "updatedAt", ExtArgs["result"]["goal"]>
 export type GoalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -652,9 +751,12 @@ export type $GoalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     userId: string
     exerciseId: string | null
+    status: string
     targetWeight: number
     currentWeight: number
     deadline: Date | null
+    completedAt: Date | null
+    expiredAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["goal"]>
@@ -1084,9 +1186,12 @@ export interface GoalFieldRefs {
   readonly id: Prisma.FieldRef<"Goal", 'String'>
   readonly userId: Prisma.FieldRef<"Goal", 'String'>
   readonly exerciseId: Prisma.FieldRef<"Goal", 'String'>
+  readonly status: Prisma.FieldRef<"Goal", 'String'>
   readonly targetWeight: Prisma.FieldRef<"Goal", 'Float'>
   readonly currentWeight: Prisma.FieldRef<"Goal", 'Float'>
   readonly deadline: Prisma.FieldRef<"Goal", 'DateTime'>
+  readonly completedAt: Prisma.FieldRef<"Goal", 'DateTime'>
+  readonly expiredAt: Prisma.FieldRef<"Goal", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Goal", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Goal", 'DateTime'>
 }

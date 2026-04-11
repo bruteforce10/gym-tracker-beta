@@ -12,7 +12,7 @@ export default async function AppLayout({
   if (!session) redirect("/login");
 
   return (
-    <SessionProvider session={session}>
+    <SessionProvider session={session} basePath="/api/auth">
       <AppShell>{children}</AppShell>
     </SessionProvider>
   );
