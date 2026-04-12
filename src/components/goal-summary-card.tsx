@@ -125,7 +125,7 @@ export default function GoalSummaryCard({
               {exerciseBackgroundStyle ? (
                 <div className="pointer-events-none absolute inset-0">
                   <div
-                    className="absolute inset-0 bg-center bg-cover opacity-20"
+                    className="absolute inset-0 bg-center bg-cover opacity-80"
                     style={exerciseBackgroundStyle}
                   />
                   <div className="absolute inset-0 bg-black/50" />

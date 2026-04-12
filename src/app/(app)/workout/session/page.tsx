@@ -274,22 +274,27 @@ export default function WorkoutSessionPage() {
   ) => {
     setSaving(true);
     try {
-      const exercises = session.exercises.map((exercise, index) => {
+      const exercises = session.exercises.flatMap((exercise, index) => {
         const sets = nextAllSets[index] ?? [];
         const doneSets = sets.filter((item) => item.done);
-        const fallback = doneSets[0] ?? { weight: lastWeight, reps: lastReps, done: true };
-        const best = doneSets.reduce(
-          (currentBest, item) =>
-            item.weight > currentBest.weight ? item : currentBest,
-          fallback
-        );
 
-        return {
+        if (doneSets.length === 0) {
+          return [
+            {
+              exerciseId: exercise.exerciseId,
+              weight: lastWeight,
+              reps: lastReps,
+              sets: 1,
+            },
+          ];
+        }
+
+        return doneSets.map((set) => ({
           exerciseId: exercise.exerciseId,
-          weight: best.weight || lastWeight,
-          reps: best.reps || lastReps,
-          sets: doneSets.length || exercise.defaultSets,
-        };
+          weight: set.weight || lastWeight,
+          reps: set.reps || lastReps,
+          sets: 1,
+        }));
       });
 
       await createWorkout(

@@ -22,6 +22,7 @@ model User {
   sessions Session[]
   goals        Goal[]
   workouts     Workout[]
+  weightLogs   WeightLog[]
   workoutPlans WorkoutPlan[]
   customExercises Exercise[]
 }
@@ -111,6 +112,21 @@ model Workout {
 
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   exercises ExerciseLog[]
+}
+
+model WeightLog {
+  id        String   @id @default(cuid())
+  userId    String
+  valueKg   Float
+  loggedOn  String
+  loggedAt  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, loggedOn])
+  @@index([userId, loggedAt])
 }
 
 model ExerciseLog {

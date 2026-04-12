@@ -57,6 +57,7 @@ export const ModelName = {
   Goal: 'Goal',
   Exercise: 'Exercise',
   Workout: 'Workout',
+  WeightLog: 'WeightLog',
   ExerciseLog: 'ExerciseLog',
   WorkoutPlan: 'WorkoutPlan',
   WorkoutPlanExercise: 'WorkoutPlanExercise'
@@ -173,6 +174,19 @@ export const WorkoutScalarFieldEnum = {
 } as const
 
 export type WorkoutScalarFieldEnum = (typeof WorkoutScalarFieldEnum)[keyof typeof WorkoutScalarFieldEnum]
+
+
+export const WeightLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  valueKg: 'valueKg',
+  loggedOn: 'loggedOn',
+  loggedAt: 'loggedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WeightLogScalarFieldEnum = (typeof WeightLogScalarFieldEnum)[keyof typeof WeightLogScalarFieldEnum]
 
 
 export const ExerciseLogScalarFieldEnum = {

@@ -47,7 +47,10 @@ export default function BottomNav({ onFabClick }: BottomNavProps) {
             );
           }
 
-          const isActive = pathname === item.href;
+          const isActive =
+            item.href === "/progress"
+              ? pathname === item.href || pathname.startsWith("/progress/")
+              : pathname === item.href;
           const Icon = item.icon;
 
           return (

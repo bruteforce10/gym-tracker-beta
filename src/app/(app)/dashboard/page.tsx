@@ -3,6 +3,7 @@ import { Activity, Flame, Shield, Trophy } from "lucide-react";
 import { getDashboardData } from "@/actions/dashboard";
 import GoalSummaryCard from "@/components/goal-summary-card";
 import PageHeader from "@/components/page-header";
+import ProviderWarningCard from "@/components/provider-warning-card";
 import StatCard from "@/components/stat-card";
 import WorkoutCard from "@/components/workout-card";
 import { auth } from "@/lib/auth";
@@ -12,7 +13,7 @@ export default async function DashboardPage() {
   const userName = session?.user?.name || "User";
   const isAdmin = session?.user?.role === "admin";
 
-  const { goals, recentWorkouts, stats } = await getDashboardData();
+  const { goals, recentWorkouts, stats, databaseUnavailable } = await getDashboardData();
 
   const today = new Intl.DateTimeFormat("id-ID", {
     weekday: "long",
@@ -48,6 +49,14 @@ export default async function DashboardPage() {
         />
       </div>
 
+      {databaseUnavailable ? (
+        <div className="mb-6">
+          <ProviderWarningCard
+            message="Dashboard tetap terbuka, tetapi data belum bisa dimuat karena koneksi ke database sedang gagal. Cek DATABASE_URL, status Neon, atau koneksi internet lalu refresh halaman ini."
+          />
+        </div>
+      ) : null}
+
       {isAdmin ? (
         <Link href="/admin/exercises" className="mb-6 block">
           <div className="glass-card flex items-center gap-4 border border-emerald/20 p-4 transition-colors hover:border-emerald/40">
@@ -66,7 +75,13 @@ export default async function DashboardPage() {
         </Link>
       ) : null}
 
-      {goals.length > 0 ? (
+      {databaseUnavailable ? (
+        <div className="glass-card mb-6 p-6 text-center">
+          <p className="text-sm text-text-muted">
+            Goal dan riwayat latihan akan muncul lagi setelah database bisa diakses.
+          </p>
+        </div>
+      ) : goals.length > 0 ? (
         <div className="mb-6 space-y-3">
           {goals.map((goal, index) => (
             <Link
@@ -99,14 +114,22 @@ export default async function DashboardPage() {
           >
             Latihan Terakhir
           </h2>
-          <Link
-            href="/progress"
-            className="text-xs text-emerald font-medium hover:underline"
-          >
-            Lihat semua
-          </Link>
+          {!databaseUnavailable ? (
+            <Link
+              href="/progress"
+              className="text-xs text-emerald font-medium hover:underline"
+            >
+              Lihat semua
+            </Link>
+          ) : null}
         </div>
-        {recentWorkouts.length > 0 ? (
+        {databaseUnavailable ? (
+          <div className="glass-card p-8 text-center">
+            <p className="text-sm text-text-muted">
+              Riwayat latihan belum bisa dimuat sampai koneksi database pulih.
+            </p>
+          </div>
+        ) : recentWorkouts.length > 0 ? (
           <div className="space-y-3">
             {recentWorkouts.map((workout, index) => (
               <WorkoutCard

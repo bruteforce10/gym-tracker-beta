@@ -390,6 +390,7 @@ export const ModelName = {
   Goal: 'Goal',
   Exercise: 'Exercise',
   Workout: 'Workout',
+  WeightLog: 'WeightLog',
   ExerciseLog: 'ExerciseLog',
   WorkoutPlan: 'WorkoutPlan',
   WorkoutPlanExercise: 'WorkoutPlanExercise'
@@ -408,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "goal" | "exercise" | "workout" | "exerciseLog" | "workoutPlan" | "workoutPlanExercise"
+    modelProps: "user" | "account" | "session" | "goal" | "exercise" | "workout" | "weightLog" | "exerciseLog" | "workoutPlan" | "workoutPlanExercise"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -856,6 +857,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    WeightLog: {
+      payload: Prisma.$WeightLogPayload<ExtArgs>
+      fields: Prisma.WeightLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WeightLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WeightLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload>
+        }
+        findFirst: {
+          args: Prisma.WeightLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WeightLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload>
+        }
+        findMany: {
+          args: Prisma.WeightLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload>[]
+        }
+        create: {
+          args: Prisma.WeightLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload>
+        }
+        createMany: {
+          args: Prisma.WeightLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WeightLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload>[]
+        }
+        delete: {
+          args: Prisma.WeightLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload>
+        }
+        update: {
+          args: Prisma.WeightLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.WeightLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WeightLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WeightLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.WeightLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WeightLogPayload>
+        }
+        aggregate: {
+          args: Prisma.WeightLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWeightLog>
+        }
+        groupBy: {
+          args: Prisma.WeightLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WeightLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WeightLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WeightLogCountAggregateOutputType> | number
+        }
+      }
+    }
     ExerciseLog: {
       payload: Prisma.$ExerciseLogPayload<ExtArgs>
       fields: Prisma.ExerciseLogFieldRefs
@@ -1214,6 +1289,19 @@ export const WorkoutScalarFieldEnum = {
 export type WorkoutScalarFieldEnum = (typeof WorkoutScalarFieldEnum)[keyof typeof WorkoutScalarFieldEnum]
 
 
+export const WeightLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  valueKg: 'valueKg',
+  loggedOn: 'loggedOn',
+  loggedAt: 'loggedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WeightLogScalarFieldEnum = (typeof WeightLogScalarFieldEnum)[keyof typeof WeightLogScalarFieldEnum]
+
+
 export const ExerciseLogScalarFieldEnum = {
   id: 'id',
   workoutId: 'workoutId',
@@ -1437,6 +1525,7 @@ export type GlobalOmitConfig = {
   goal?: Prisma.GoalOmit
   exercise?: Prisma.ExerciseOmit
   workout?: Prisma.WorkoutOmit
+  weightLog?: Prisma.WeightLogOmit
   exerciseLog?: Prisma.ExerciseLogOmit
   workoutPlan?: Prisma.WorkoutPlanOmit
   workoutPlanExercise?: Prisma.WorkoutPlanExerciseOmit

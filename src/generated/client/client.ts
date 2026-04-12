@@ -72,6 +72,11 @@ export type Exercise = Prisma.ExerciseModel
  */
 export type Workout = Prisma.WorkoutModel
 /**
+ * Model WeightLog
+ * 
+ */
+export type WeightLog = Prisma.WeightLogModel
+/**
  * Model ExerciseLog
  * 
  */
