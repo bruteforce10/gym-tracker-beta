@@ -44,6 +44,7 @@ export interface ProgressWorkoutRecord {
   monthKey: string;
   startedAt: string;
   endedAt: string | null;
+  durationSeconds: number;
   durationMinutes: number;
   totalVolume: number;
   exerciseCount: number;
@@ -67,11 +68,12 @@ export interface ProgressDashboardData {
       label: string;
       shortLabel: string;
       workouts: number;
+      durationSeconds: number;
       durationMinutes: number;
       isToday: boolean;
     }>;
-    todayMinutes: number;
-    averageMinutes: number;
+    todaySeconds: number;
+    averageSeconds: number;
   };
   weeklySummary: WeeklyExerciseSummaryResult[];
   historyPreview: ProgressWorkoutRecord[];
@@ -96,9 +98,13 @@ function roundToSingleDecimal(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
-function getDurationMinutes(startedAt: Date, endedAt: Date | null): number {
+function getDurationSeconds(startedAt: Date, endedAt: Date | null): number {
   if (!endedAt) return 0;
-  return Math.max(0, Math.round((endedAt.getTime() - startedAt.getTime()) / 60000));
+  return Math.max(0, Math.round((endedAt.getTime() - startedAt.getTime()) / 1000));
+}
+
+function getDurationMinutes(durationSeconds: number): number {
+  return Math.round(durationSeconds / 60);
 }
 
 function buildWorkoutTitle(exercises: ProgressExerciseEntry[]): string {
@@ -144,6 +150,7 @@ async function getSerializedWorkouts(userId: string): Promise<ProgressWorkoutRec
       });
 
     const totalVolume = exercises.reduce((sum, entry) => sum + entry.volume, 0);
+    const durationSeconds = getDurationSeconds(workout.startedAt, workout.endedAt);
 
     return {
       id: workout.id,
@@ -152,7 +159,8 @@ async function getSerializedWorkouts(userId: string): Promise<ProgressWorkoutRec
       monthKey: getMonthKey(workout.date),
       startedAt: workout.startedAt.toISOString(),
       endedAt: workout.endedAt?.toISOString() ?? null,
-      durationMinutes: getDurationMinutes(workout.startedAt, workout.endedAt),
+      durationSeconds,
+      durationMinutes: getDurationMinutes(durationSeconds),
       totalVolume: roundToSingleDecimal(totalVolume),
       exerciseCount: exercises.length,
       exercises,
@@ -304,6 +312,7 @@ export async function getProgressDashboardData(): Promise<ProgressDashboardData>
 
   const workoutCountsByWeek = new Map<string, number>();
   const workoutCountsByDay = new Map<string, number>();
+  const durationSecondsByDay = new Map<string, number>();
   const durationByDay = new Map<string, number>();
 
   for (const workout of workouts) {
@@ -311,25 +320,15 @@ export async function getProgressDashboardData(): Promise<ProgressDashboardData>
     const weekKey = toDateKey(getWeekStartDate(workoutDate));
     workoutCountsByWeek.set(weekKey, (workoutCountsByWeek.get(weekKey) ?? 0) + 1);
     workoutCountsByDay.set(workout.date, (workoutCountsByDay.get(workout.date) ?? 0) + 1);
+    durationSecondsByDay.set(
+      workout.date,
+      (durationSecondsByDay.get(workout.date) ?? 0) + workout.durationSeconds,
+    );
     durationByDay.set(
       workout.date,
       (durationByDay.get(workout.date) ?? 0) + workout.durationMinutes,
     );
   }
-
-  const weekLabelFormatter = new Intl.DateTimeFormat("id-ID", {
-    day: "numeric",
-    month: "short",
-  });
-  const frequency = Array.from({ length: 8 }, (_, index) => {
-    const weekStart = addDays(currentWeekStart, (index - 7) * 7);
-    const weekKey = toDateKey(weekStart);
-    return {
-      weekStart: weekKey,
-      label: weekLabelFormatter.format(weekStart),
-      workouts: workoutCountsByWeek.get(weekKey) ?? 0,
-    };
-  });
 
   const dayLabelFormatter = new Intl.DateTimeFormat("en-US", { weekday: "short" });
   const thisWeekDays = Array.from({ length: 7 }, (_, index) => {
@@ -340,12 +339,32 @@ export async function getProgressDashboardData(): Promise<ProgressDashboardData>
       label: dayLabelFormatter.format(date),
       shortLabel: dayLabelFormatter.format(date).slice(0, 1),
       workouts: workoutCountsByDay.get(dateKey) ?? 0,
+      durationSeconds: durationSecondsByDay.get(dateKey) ?? 0,
       durationMinutes: durationByDay.get(dateKey) ?? 0,
       isToday: dateKey === toDateKey(today),
     };
   });
-  const totalWeekMinutes = thisWeekDays.reduce((sum, day) => sum + day.durationMinutes, 0);
-  const todayMinutes = thisWeekDays.find((day) => day.isToday)?.durationMinutes ?? 0;
+  const thisWeekTotalWorkouts = thisWeekDays.reduce((sum, day) => sum + day.workouts, 0);
+
+  const weekLabelFormatter = new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "short",
+  });
+  const frequency = Array.from({ length: 8 }, (_, index) => {
+    // Start chart from current week, then go backwards week by week.
+    const weekStart = addDays(currentWeekStart, -index * 7);
+    const weekKey = toDateKey(weekStart);
+    const workoutsInWeek = workoutCountsByWeek.get(weekKey) ?? 0;
+
+    return {
+      weekStart: weekKey,
+      label: weekLabelFormatter.format(weekStart),
+      workouts: index === 0 ? Math.max(workoutsInWeek, thisWeekTotalWorkouts) : workoutsInWeek,
+    };
+  });
+
+  const totalWeekSeconds = thisWeekDays.reduce((sum, day) => sum + day.durationSeconds, 0);
+  const todaySeconds = thisWeekDays.find((day) => day.isToday)?.durationSeconds ?? 0;
 
   const latestWeight = weightLogs.at(-1) ?? null;
   const weightWindowStart = addDays(today, -29);
@@ -371,8 +390,8 @@ export async function getProgressDashboardData(): Promise<ProgressDashboardData>
     frequency,
     thisWeek: {
       days: thisWeekDays,
-      todayMinutes,
-      averageMinutes: roundToSingleDecimal(totalWeekMinutes / 7),
+      todaySeconds,
+      averageSeconds: Math.round(totalWeekSeconds / 7),
     },
     weeklySummary: weeklySummary.slice(0, 4),
     historyPreview: workouts.slice(0, 3),

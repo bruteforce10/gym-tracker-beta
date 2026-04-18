@@ -15,7 +15,7 @@ import {
 import type { ProgressDashboardData, ProgressWorkoutRecord } from "@/actions/progress";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import WeightLogSheet from "@/components/weight-log-sheet";
-import { formatDurationClock } from "@/lib/progress";
+import { formatDurationStopwatch } from "@/lib/progress";
 
 type ProgressReportViewProps = {
   data: ProgressDashboardData;
@@ -165,7 +165,7 @@ function FrequencyChart({
             <div className="relative flex flex-1 items-end justify-center">
               <div className="absolute inset-x-0 bottom-0 top-0 rounded-full bg-white/[0.03]" />
               <div
-                className="relative w-6 rounded-full bg-[linear-gradient(180deg,#34D399_0%,#059669_100%)] shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
+                className="relative w-6 rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.88)_0%,rgba(203,213,225,0.72)_100%)] shadow-[0_10px_30px_rgba(148,163,184,0.22)]"
                 style={{
                   height: `${Math.max(14, (item.workouts / max) * 100)}%`,
                 }}
@@ -410,7 +410,7 @@ function WorkoutPreviewCard({
         <div className="mt-4 grid grid-cols-3 gap-3 text-left">
           <div className="border-r border-white/6 pr-3">
             <p className="font-data text-lg font-semibold text-white">
-              {workout.endedAt ? formatDurationClock(workout.durationMinutes) : "--:--"}
+              {workout.endedAt ? formatDurationStopwatch(workout.durationSeconds) : "--:--"}
             </p>
             <p className="text-xs text-text-muted">Duration</p>
           </div>
@@ -546,18 +546,18 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
           <div className="mt-5 grid grid-cols-2 gap-4 rounded-[24px] border border-white/6 bg-black/20 px-4 py-4">
             <div className="border-r border-white/6 pr-4">
               <p className="text-xs uppercase tracking-[0.14em] text-text-muted">
-                Today(min)
+                Today(mm:ss)
               </p>
               <p className="mt-2 font-data text-[2rem] font-semibold text-emerald">
-                {data.thisWeek.todayMinutes}
+                {formatDurationStopwatch(data.thisWeek.todaySeconds)}
               </p>
             </div>
             <div className="pl-1">
               <p className="text-xs uppercase tracking-[0.14em] text-text-muted">
-                Weekly average(min)
+                Weekly average(mm:ss)
               </p>
               <p className="mt-2 font-data text-[2rem] font-semibold text-emerald">
-                {data.thisWeek.averageMinutes}
+                {formatDurationStopwatch(data.thisWeek.averageSeconds)}
               </p>
             </div>
           </div>
