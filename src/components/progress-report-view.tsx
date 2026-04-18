@@ -15,6 +15,7 @@ import {
 import type { ProgressDashboardData, ProgressWorkoutRecord } from "@/actions/progress";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import WeightLogSheet from "@/components/weight-log-sheet";
+import WorkoutCard from "@/components/workout-card";
 import { formatDurationStopwatch } from "@/lib/progress";
 
 type ProgressReportViewProps = {
@@ -386,49 +387,14 @@ function WeightTrend({
   );
 }
 
-function WorkoutPreviewCard({
-  workout,
-}: {
-  workout: ProgressWorkoutRecord;
-}) {
-  const topExercise = workout.exercises[0];
-
-  return (
-    <div className="rounded-[26px] border border-white/6 bg-[#1B1F29] px-4 py-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-lg font-semibold text-white">{workout.title}</p>
-          <p className="mt-1 text-sm text-text-muted">
-            {topExercise
-              ? `${topExercise.exercise} • ${workout.exerciseCount} exercise`
-              : "Workout selesai"}
-          </p>
-        </div>
-        <span className="text-sm text-text-muted">{getWorkoutDateLabel(workout.date)}</span>
-      </div>
-
-        <div className="mt-4 grid grid-cols-3 gap-3 text-left">
-          <div className="border-r border-white/6 pr-3">
-            <p className="font-data text-lg font-semibold text-white">
-              {workout.endedAt ? formatDurationStopwatch(workout.durationSeconds) : "--:--"}
-            </p>
-            <p className="text-xs text-text-muted">Duration</p>
-          </div>
-        <div className="border-r border-white/6 px-3">
-          <p className="font-data text-lg font-semibold text-white">
-            {formatVolume(workout.totalVolume)}
-          </p>
-          <p className="text-xs text-text-muted">Volume</p>
-        </div>
-        <div className="pl-3">
-          <p className="font-data text-lg font-semibold text-white">
-            {workout.exerciseCount}
-          </p>
-          <p className="text-xs text-text-muted">Exercises</p>
-        </div>
-      </div>
-    </div>
-  );
+function getWorkoutCardData(workout: ProgressWorkoutRecord) {
+  return {
+    id: workout.id,
+    title: workout.title,
+    date: workout.date,
+    exercises: workout.exercises,
+    duration: workout.endedAt ? formatDurationStopwatch(workout.durationSeconds) : "--:--",
+  };
 }
 
 export default function ProgressReportView({ data }: ProgressReportViewProps) {
@@ -652,8 +618,12 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
           </div>
 
           {data.historyPreview.length > 0 ? (
-            data.historyPreview.map((workout) => (
-              <WorkoutPreviewCard key={workout.id} workout={workout} />
+            data.historyPreview.map((workout, index) => (
+              <WorkoutCard
+                key={workout.id}
+                workout={getWorkoutCardData(workout)}
+                delay={index * 80}
+              />
             ))
           ) : (
             <div className="rounded-[28px] border border-dashed border-white/8 bg-white/[0.03] px-4 py-6 text-sm text-text-muted">

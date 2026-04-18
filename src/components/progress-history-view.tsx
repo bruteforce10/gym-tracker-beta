@@ -21,7 +21,8 @@ import {
   parseDateKey,
   toDateKey,
 } from "@/lib/progress";
-import { formatDurationClock } from "@/lib/progress";
+import WorkoutCard from "@/components/workout-card";
+import { formatDurationStopwatch } from "@/lib/progress";
 
 type ProgressHistoryViewProps = {
   data: ProgressHistoryData;
@@ -82,50 +83,17 @@ function isSameWeek(dateKey: string, weekStartKey: string) {
   return toDateKey(getWeekStartDate(parseDateKey(dateKey))) === weekStartKey;
 }
 
-function WorkoutHistoryRow({
-  workout,
-}: {
-  workout: ProgressWorkoutRecord;
-}) {
-  return (
-    <div className="rounded-[26px] border border-white/6 bg-[#1B1F29] px-4 py-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-lg font-semibold text-white">{workout.title}</p>
-          <p className="mt-1 text-sm text-text-muted">
-            {workout.exercises[0]?.exercise ?? "Workout selesai"}
-          </p>
-        </div>
-        <span className="text-text-muted">…</span>
-      </div>
-
-      <div className="mt-4 grid grid-cols-3 gap-3">
-        <div className="border-r border-white/6 pr-3">
-          <p className="text-xs text-text-muted">
-            {timeFormatter.format(new Date(workout.startedAt))}
-          </p>
-          <p className="mt-2 font-data text-xl font-semibold text-white">
-            {workout.endedAt ? formatDurationClock(workout.durationMinutes) : "--:--"}
-          </p>
-          <p className="text-xs text-text-muted">Duration</p>
-        </div>
-        <div className="border-r border-white/6 px-3">
-          <p className="text-xs text-text-muted">{dateLabelFormatter.format(new Date(workout.date))}</p>
-          <p className="mt-2 font-data text-xl font-semibold text-white">
-            {workout.exerciseCount}
-          </p>
-          <p className="text-xs text-text-muted">Exercises</p>
-        </div>
-        <div className="pl-3">
-          <p className="text-xs text-text-muted">Volume</p>
-          <p className="mt-2 font-data text-xl font-semibold text-white">
-            {formatVolume(workout.totalVolume)}
-          </p>
-          <p className="text-xs text-text-muted">kg</p>
-        </div>
-      </div>
-    </div>
-  );
+function getWorkoutCardData(workout: ProgressWorkoutRecord) {
+  return {
+    id: workout.id,
+    title: workout.title,
+    date: workout.date,
+    dateLabel: `${dateLabelFormatter.format(new Date(workout.date))} • ${timeFormatter.format(
+      new Date(workout.startedAt),
+    )}`,
+    exercises: workout.exercises,
+    duration: workout.endedAt ? formatDurationStopwatch(workout.durationSeconds) : "--:--",
+  };
 }
 
 export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) {
@@ -383,8 +351,12 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
         </div>
 
         {selectedWeekWorkouts.length > 0 ? (
-          selectedWeekWorkouts.map((workout) => (
-            <WorkoutHistoryRow key={workout.id} workout={workout} />
+          selectedWeekWorkouts.map((workout, index) => (
+            <WorkoutCard
+              key={workout.id}
+              workout={getWorkoutCardData(workout)}
+              delay={index * 80}
+            />
           ))
         ) : (
           <div className="rounded-[28px] border border-dashed border-white/8 bg-white/[0.03] px-4 py-6 text-sm text-text-muted">
