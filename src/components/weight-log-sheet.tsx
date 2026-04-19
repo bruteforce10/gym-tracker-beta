@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/popover";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -44,6 +45,10 @@ function getTodayKey(): string {
   return formatDateInputValue(new Date());
 }
 
+function formatDisplayValue(value: number): string {
+  return value.toFixed(1);
+}
+
 export default function WeightLogSheet({
   open,
   onOpenChange,
@@ -54,6 +59,7 @@ export default function WeightLogSheet({
   const [isPending, startTransition] = useTransition();
   const [unit, setUnit] = useState<"kg" | "lbs">("kg");
   const [draftKg, setDraftKg] = useState(currentKg ?? 70);
+  const [draftInput, setDraftInput] = useState(formatDisplayValue(currentKg ?? 70));
   const [loggedOn, setLoggedOn] = useState(getTodayKey());
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -62,7 +68,11 @@ export default function WeightLogSheet({
 
     const todayKey = getTodayKey();
     const defaultLoggedOn = latestLoggedOn === todayKey ? latestLoggedOn : todayKey;
-    setDraftKg(currentKg ?? 70);
+    const nextDraftKg = currentKg ?? 70;
+    // Reset the sheet draft each time it opens with the latest server-backed values.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDraftKg(nextDraftKg);
+    setDraftInput(formatDisplayValue(nextDraftKg));
     setLoggedOn(defaultLoggedOn);
     setUnit("kg");
     setErrorMessage("");
@@ -75,7 +85,34 @@ export default function WeightLogSheet({
 
   const handleValueChange = (nextValue: number) => {
     const normalized = unit === "kg" ? nextValue : lbsToKg(nextValue);
+    const clampedValue = clampNumber(normalized, 35, 180);
+    setDraftKg(clampedValue);
+    setDraftInput(
+      formatDisplayValue(unit === "kg" ? clampedValue : kgToLbs(clampedValue)),
+    );
+  };
+
+  const handleInputChange = (nextValue: string) => {
+    setDraftInput(nextValue);
+
+    if (nextValue.trim() === "") return;
+
+    const parsed = Number(nextValue);
+    if (!Number.isFinite(parsed)) return;
+
+    const normalized = unit === "kg" ? parsed : lbsToKg(parsed);
     setDraftKg(clampNumber(normalized, 35, 180));
+  };
+
+  const handleInputBlur = () => {
+    setDraftInput(formatDisplayValue(displayValue));
+  };
+
+  const handleUnitChange = (nextUnit: "kg" | "lbs") => {
+    setUnit(nextUnit);
+    setDraftInput(
+      formatDisplayValue(nextUnit === "kg" ? draftKg : kgToLbs(draftKg)),
+    );
   };
 
   const handleSave = () => {
@@ -99,13 +136,14 @@ export default function WeightLogSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
+        showCloseButton={false}
         className="max-h-[92vh] rounded-t-[30px] border-t border-white/8 bg-[#11131A] px-0 data-[side=bottom]:mx-auto data-[side=bottom]:w-full data-[side=bottom]:max-w-2xl"
       >
         <SheetHeader className="border-b border-white/6 px-5 py-4">
           <div className="flex items-start justify-between gap-3">
-            <div>
+            <div className="min-w-0 flex-1 pr-2">
               <SheetTitle className="flex items-center gap-2 text-left">
-                <Scale className="h-4 w-4 text-[#5E7CFF]" aria-hidden="true" />
+                <Scale className="h-4 w-4 text-emerald" aria-hidden="true" />
                 Current Weight
               </SheetTitle>
               <SheetDescription className="mt-1 text-left text-xs text-text-muted">
@@ -113,29 +151,38 @@ export default function WeightLogSheet({
                 kebaca.
               </SheetDescription>
             </div>
-            <Popover>
-              <PopoverTrigger
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "h-9 rounded-full border-white/8 bg-white/[0.04] px-3 text-xs text-foreground hover:bg-white/[0.08] focus-visible:ring-[#5E7CFF]/60",
-                )}
+            <div className="flex shrink-0 items-center gap-2">
+              <Popover>
+                <PopoverTrigger
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    "h-9 rounded-full border-white/8 bg-white/[0.04] px-3 text-xs text-foreground hover:bg-white/[0.08] focus-visible:ring-emerald/40",
+                  )}
+                >
+                  <CalendarIcon className="mr-1.5 h-3.5 w-3.5 text-emerald" />
+                  {format(parseDateInputValue(loggedOn) ?? new Date(), "dd MMM")}
+                </PopoverTrigger>
+                <PopoverContent
+                  align="end"
+                  className="w-auto border-border-subtle bg-surface p-0"
+                >
+                  <Calendar
+                    mode="single"
+                    selected={parseDateInputValue(loggedOn) ?? undefined}
+                    onSelect={(date) => date && setLoggedOn(formatDateInputValue(date))}
+                    initialFocus
+                    className="bg-surface"
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <SheetClose
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/8 bg-white/[0.04] text-text-muted transition-colors hover:bg-white/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40"
+                aria-label="Close"
               >
-                <CalendarIcon className="mr-1.5 h-3.5 w-3.5 text-[#5E7CFF]" />
-                {format(parseDateInputValue(loggedOn) ?? new Date(), "dd MMM")}
-              </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                className="w-auto border-border-subtle bg-surface p-0"
-              >
-                <Calendar
-                  mode="single"
-                  selected={parseDateInputValue(loggedOn) ?? undefined}
-                  onSelect={(date) => date && setLoggedOn(formatDateInputValue(date))}
-                  initialFocus
-                  className="bg-surface"
-                />
-              </PopoverContent>
-            </Popover>
+                <X className="h-4 w-4" aria-hidden="true" />
+              </SheetClose>
+            </div>
           </div>
         </SheetHeader>
 
@@ -143,11 +190,11 @@ export default function WeightLogSheet({
           <div className="flex items-center gap-2 rounded-full bg-white/[0.04] p-1">
             <button
               type="button"
-              onClick={() => setUnit("kg")}
+              onClick={() => handleUnitChange("kg")}
               className={cn(
-                "flex-1 rounded-full px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E7CFF]/60",
+                "flex-1 rounded-full px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40",
                 unit === "kg"
-                  ? "bg-[#5E7CFF] text-white"
+                  ? "bg-emerald text-[#0A0A0F]"
                   : "text-text-muted hover:text-foreground",
               )}
             >
@@ -155,11 +202,11 @@ export default function WeightLogSheet({
             </button>
             <button
               type="button"
-              onClick={() => setUnit("lbs")}
+              onClick={() => handleUnitChange("lbs")}
               className={cn(
-                "flex-1 rounded-full px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E7CFF]/60",
+                "flex-1 rounded-full px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40",
                 unit === "lbs"
-                  ? "bg-[#5E7CFF] text-white"
+                  ? "bg-emerald text-[#0A0A0F]"
                   : "text-text-muted hover:text-foreground",
               )}
             >
@@ -167,7 +214,7 @@ export default function WeightLogSheet({
             </button>
           </div>
 
-          <div className="rounded-[28px] border border-white/6 bg-[linear-gradient(180deg,rgba(94,124,255,0.12),rgba(255,255,255,0.02))] px-5 py-6 text-center">
+          <div className="rounded-[28px] border border-white/6 bg-[linear-gradient(180deg,rgba(16,185,129,0.12),rgba(255,255,255,0.02))] px-5 py-6 text-center">
             <p className="text-xs uppercase tracking-[0.18em] text-text-muted">
               {loggedOn === getTodayKey() ? "Today" : "Selected Day"}
             </p>
@@ -191,7 +238,7 @@ export default function WeightLogSheet({
                 step={sliderStep}
                 value={displayValue}
                 onChange={(event) => handleValueChange(Number(event.target.value))}
-                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-[#5E7CFF]"
+                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-emerald"
               />
               <label htmlFor="weight-log-value" className="sr-only">
                 Weight value
@@ -205,9 +252,10 @@ export default function WeightLogSheet({
                 min={sliderMin}
                 max={sliderMax}
                 step={sliderStep}
-                value={displayValue.toFixed(1)}
-                onChange={(event) => handleValueChange(Number(event.target.value))}
-                className="h-12 w-full rounded-2xl border border-white/8 bg-black/30 px-4 text-center font-data text-lg text-white outline-none transition-colors focus:border-[#5E7CFF]/60 focus-visible:ring-2 focus-visible:ring-[#5E7CFF]/30"
+                value={draftInput}
+                onChange={(event) => handleInputChange(event.target.value)}
+                onBlur={handleInputBlur}
+                className="h-12 w-full rounded-2xl border border-white/8 bg-black/30 px-4 text-center font-data text-lg text-white outline-none transition-colors focus:border-emerald/50 focus-visible:ring-2 focus-visible:ring-emerald/25"
               />
             </div>
           </div>
@@ -231,7 +279,7 @@ export default function WeightLogSheet({
           </Button>
           <Button
             type="button"
-            className="h-12 rounded-2xl bg-[#5E7CFF] text-white hover:bg-[#4E69E0]"
+            className="h-12 rounded-2xl bg-emerald text-[#0A0A0F] hover:bg-emerald-dark"
             onClick={handleSave}
             disabled={isPending}
           >

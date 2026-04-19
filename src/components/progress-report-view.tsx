@@ -12,8 +12,15 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-import type { ProgressDashboardData, ProgressWorkoutRecord } from "@/actions/progress";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import type {
+  ProgressDashboardData,
+  ProgressWorkoutRecord,
+} from "@/actions/progress";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import WeightLogSheet from "@/components/weight-log-sheet";
 import WorkoutCard from "@/components/workout-card";
 import { formatDurationStopwatch } from "@/lib/progress";
@@ -119,7 +126,11 @@ function getChartPath(points: ChartPoint[]) {
     .join(" ");
 }
 
-function getAreaPath(points: ChartPoint[], chartWidth: number, chartHeight: number) {
+function getAreaPath(
+  points: ChartPoint[],
+  chartWidth: number,
+  chartHeight: number,
+) {
   const linePath = getChartPath(points);
   if (!linePath) return "";
   return `${linePath} L ${chartWidth},${chartHeight} L 0,${chartHeight} Z`;
@@ -130,7 +141,7 @@ function getTickValues(bounds: ChartBounds, count = 4) {
   const step = range / count;
 
   return Array.from({ length: count + 1 }, (_, index) =>
-    Number((bounds.max - step * index).toFixed(1))
+    Number((bounds.max - step * index).toFixed(1)),
   );
 }
 
@@ -162,7 +173,10 @@ function FrequencyChart({
     <div className="mt-4">
       <div className="grid h-40 grid-cols-8 items-end gap-3">
         {data.map((item) => (
-          <div key={item.weekStart} className="flex h-full flex-col justify-end">
+          <div
+            key={item.weekStart}
+            className="flex h-full flex-col justify-end"
+          >
             <div className="relative flex flex-1 items-end justify-center">
               <div className="absolute inset-x-0 bottom-0 top-0 rounded-full bg-white/[0.03]" />
               <div
@@ -193,13 +207,14 @@ function WeightTrend({
   points: ProgressDashboardData["weight"]["points"];
 }) {
   const [selectedIndex, setSelectedIndex] = useState(
-    points.length > 0 ? points.length - 1 : 0
+    points.length > 0 ? points.length - 1 : 0,
   );
 
   if (points.length === 0) {
     return (
       <div className="mt-6 flex h-40 items-center justify-center rounded-[28px] border border-dashed border-white/8 bg-black/20 px-4 text-center text-sm text-text-muted">
-        Belum ada log berat badan. Simpan log pertama kamu untuk melihat tren 30 hari.
+        Belum ada log berat badan. Simpan log pertama kamu untuk melihat tren 30
+        hari.
       </div>
     );
   }
@@ -227,9 +242,18 @@ function WeightTrend({
         <span>{points.length} log</span>
       </div>
       <div className="mt-5 rounded-[24px] border border-white/5 bg-black/10 px-2 py-3">
-        <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="h-60 w-full overflow-visible">
+        <svg
+          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+          className="h-60 w-full overflow-visible"
+        >
           <defs>
-            <linearGradient id="weight-area-gradient" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient
+              id="weight-area-gradient"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
               <stop offset="0%" stopColor="rgba(16,185,129,0.45)" />
               <stop offset="100%" stopColor="rgba(16,185,129,0.02)" />
             </linearGradient>
@@ -378,9 +402,7 @@ function WeightTrend({
         </svg>
       </div>
       <div className="mt-3 flex items-center justify-between text-xs text-text-muted">
-        <span>
-          Dipilih: {getWorkoutDateLabel(activePoint.date)}
-        </span>
+        <span>Dipilih: {getWorkoutDateLabel(activePoint.date)}</span>
         <span>{formatWeight(activePoint.valueKg)} kg</span>
       </div>
     </div>
@@ -393,7 +415,9 @@ function getWorkoutCardData(workout: ProgressWorkoutRecord) {
     title: workout.title,
     date: workout.date,
     exercises: workout.exercises,
-    duration: workout.endedAt ? formatDurationStopwatch(workout.durationSeconds) : "--:--",
+    duration: workout.endedAt
+      ? formatDurationStopwatch(workout.durationSeconds)
+      : "--:--",
   };
 }
 
@@ -466,10 +490,93 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                   Tekan grafik untuk buka history lengkap dan kalender bulanan.
                 </p>
               </div>
-              <ChevronRight className="h-4 w-4 text-text-muted" aria-hidden="true" />
+              <ChevronRight
+                className="h-4 w-4 text-text-muted"
+                aria-hidden="true"
+              />
             </div>
             <FrequencyChart data={data.frequency} />
           </Link>
+        </section>
+
+        <section className="rounded-[30px] border border-white/6 bg-[#10141C] px-5 py-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-xl font-semibold text-white">
+                  Ringkasan Mingguan
+                </p>
+                <Popover>
+                  <PopoverTrigger
+                    aria-label="Info delta mingguan"
+                    className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/12 text-text-muted transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
+                  >
+                    <Info className="h-3.5 w-3.5" aria-hidden="true" />
+                  </PopoverTrigger>
+                  <PopoverContent
+                    side="top"
+                    align="start"
+                    sideOffset={8}
+                    className="max-w-[500px] rounded-xl border border-white/10 bg-black p-3 text-left text-[11px] leading-5 text-text-muted"
+                  >
+                    Delta = perubahan Peak 1RM. Dibandingkan minggu lalu; jika
+                    belum ada data minggu lalu, dibandingkan dari set awal
+                    minggu ini.
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <p className="mt-1 text-sm text-text-muted">
+                Tetap tampil di halaman ini buat baca progres paling cepat.
+              </p>
+            </div>
+            <TrendingUp className="h-5 w-5 text-emerald" aria-hidden="true" />
+          </div>
+
+          <div className="mt-5 space-y-3">
+            {data.weeklySummary.length > 0 ? (
+              data.weeklySummary.map((summary) => (
+                <div
+                  key={summary.exerciseId}
+                  className="flex items-center justify-between rounded-[22px] border border-white/6 bg-white/[0.03] px-4 py-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald/10">
+                      <Dumbbell
+                        className="h-4 w-4 text-emerald"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">
+                        {summary.exercise}
+                      </p>
+                      <p className="text-xs text-text-muted">
+                        Peak 1RM {summary.peak1RM.toFixed(1)} kg
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p
+                      className={`font-data text-lg font-semibold ${
+                        summary.delta >= 0 ? "text-emerald" : "text-danger"
+                      }`}
+                    >
+                      {summary.delta > 0 ? "+" : ""}
+                      {summary.delta.toFixed(1)}
+                    </p>
+                    <p className="text-[11px] uppercase tracking-[0.14em] text-text-muted">
+                      Delta
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-[24px] border border-dashed border-white/8 bg-white/[0.03] px-4 py-5 text-sm text-text-muted">
+                Belum ada latihan minggu ini. Mulai workout baru untuk melihat
+                perubahan 1RM di sini.
+              </div>
+            )}
+          </div>
         </section>
 
         <Link
@@ -491,7 +598,10 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
               const isActive = day.workouts > 0 || day.isToday;
 
               return (
-                <div key={day.date} className="flex flex-1 flex-col items-center gap-2">
+                <div
+                  key={day.date}
+                  className="flex flex-1 flex-col items-center gap-2"
+                >
                   <span className="text-xs uppercase tracking-[0.14em] text-text-muted">
                     {day.shortLabel}
                   </span>
@@ -529,78 +639,6 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
           </div>
         </Link>
 
-        <section className="rounded-[30px] border border-white/6 bg-[#10141C] px-5 py-5">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="text-xl font-semibold text-white">Ringkasan Mingguan</p>
-                <Popover>
-                  <PopoverTrigger
-                    aria-label="Info delta mingguan"
-                    className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/12 text-text-muted transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
-                  >
-                    <Info className="h-3.5 w-3.5" aria-hidden="true" />
-                  </PopoverTrigger>
-                  <PopoverContent
-                    side="top"
-                    align="start"
-                    sideOffset={8}
-                    className="max-w-[500px] rounded-xl border border-white/10 bg-black p-3 text-left text-[11px] leading-5 text-text-muted"
-                  >
-                    Delta = perubahan Peak 1RM. Dibandingkan minggu lalu; jika belum ada data minggu lalu, dibandingkan dari set awal minggu ini.
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <p className="mt-1 text-sm text-text-muted">
-                Tetap tampil di halaman ini buat baca progres paling cepat.
-              </p>
-            </div>
-            <TrendingUp className="h-5 w-5 text-emerald" aria-hidden="true" />
-          </div>
-
-          <div className="mt-5 space-y-3">
-            {data.weeklySummary.length > 0 ? (
-              data.weeklySummary.map((summary) => (
-                <div
-                  key={summary.exerciseId}
-                  className="flex items-center justify-between rounded-[22px] border border-white/6 bg-white/[0.03] px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald/10">
-                      <Dumbbell className="h-4 w-4 text-emerald" aria-hidden="true" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-white">
-                        {summary.exercise}
-                      </p>
-                      <p className="text-xs text-text-muted">
-                        Peak 1RM {summary.peak1RM.toFixed(1)} kg
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p
-                      className={`font-data text-lg font-semibold ${
-                        summary.delta >= 0 ? "text-emerald" : "text-danger"
-                      }`}
-                    >
-                      {summary.delta > 0 ? "+" : ""}
-                      {summary.delta.toFixed(1)}
-                    </p>
-                    <p className="text-[11px] uppercase tracking-[0.14em] text-text-muted">
-                      Delta
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-[24px] border border-dashed border-white/8 bg-white/[0.03] px-4 py-5 text-sm text-text-muted">
-                Belum ada latihan minggu ini. Mulai workout baru untuk melihat perubahan 1RM di sini.
-              </div>
-            )}
-          </div>
-        </section>
-
         <section className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -627,7 +665,8 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
             ))
           ) : (
             <div className="rounded-[28px] border border-dashed border-white/8 bg-white/[0.03] px-4 py-6 text-sm text-text-muted">
-              Belum ada history workout. Setelah sesi pertama selesai, preview workout bakal muncul di sini.
+              Belum ada history workout. Setelah sesi pertama selesai, preview
+              workout bakal muncul di sini.
             </div>
           )}
         </section>
@@ -655,7 +694,9 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                 Current(kg)
               </p>
               <p className="mt-2 font-data text-[3rem] font-semibold leading-none text-emerald">
-                {data.weight.currentKg ? formatWeight(data.weight.currentKg) : "--"}
+                {data.weight.currentKg
+                  ? formatWeight(data.weight.currentKg)
+                  : "--"}
               </p>
               <div className="mt-3 flex items-center gap-2 text-sm text-text-muted">
                 <Flame className="h-4 w-4 text-emerald" aria-hidden="true" />

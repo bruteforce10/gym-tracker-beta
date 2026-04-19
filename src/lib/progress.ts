@@ -57,6 +57,14 @@ export function formatDurationStopwatch(totalSeconds: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
+export function formatDurationMinutesSeconds(totalSeconds: number): string {
+  const safeSeconds = Math.max(0, Math.round(totalSeconds));
+  const totalMinutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
+
+  return `${String(totalMinutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
 export function clampNumber(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }

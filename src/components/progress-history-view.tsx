@@ -13,16 +13,20 @@ import {
   Weight,
 } from "lucide-react";
 
-import type { ProgressHistoryData, ProgressWorkoutRecord } from "@/actions/progress";
+import type {
+  ProgressHistoryData,
+  ProgressWorkoutRecord,
+} from "@/actions/progress";
 import {
   addDays,
+  formatDurationMinutesSeconds,
+  formatDurationStopwatch,
   getMonthKey,
   getWeekStartDate,
   parseDateKey,
   toDateKey,
 } from "@/lib/progress";
 import WorkoutCard from "@/components/workout-card";
-import { formatDurationStopwatch } from "@/lib/progress";
 
 type ProgressHistoryViewProps = {
   data: ProgressHistoryData;
@@ -92,11 +96,15 @@ function getWorkoutCardData(workout: ProgressWorkoutRecord) {
       new Date(workout.startedAt),
     )}`,
     exercises: workout.exercises,
-    duration: workout.endedAt ? formatDurationStopwatch(workout.durationSeconds) : "--:--",
+    duration: workout.endedAt
+      ? formatDurationStopwatch(workout.durationSeconds)
+      : "--:--",
   };
 }
 
-export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) {
+export default function ProgressHistoryView({
+  data,
+}: ProgressHistoryViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -122,12 +130,17 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
     }
   }, [data.availableMonths, searchParams]);
 
-  const workoutCountByDate = data.workouts.reduce<Record<string, number>>((accumulator, workout) => {
-    accumulator[workout.date] = (accumulator[workout.date] ?? 0) + 1;
-    return accumulator;
-  }, {});
+  const workoutCountByDate = data.workouts.reduce<Record<string, number>>(
+    (accumulator, workout) => {
+      accumulator[workout.date] = (accumulator[workout.date] ?? 0) + 1;
+      return accumulator;
+    },
+    {},
+  );
 
-  const monthWorkouts = data.workouts.filter((workout) => workout.monthKey === selectedMonth);
+  const monthWorkouts = data.workouts.filter(
+    (workout) => workout.monthKey === selectedMonth,
+  );
   const calendarDays = getMonthGrid(selectedMonth);
 
   useEffect(() => {
@@ -140,7 +153,10 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
       currentMonthCalendarDays.find((day) => day.inMonth)?.date ??
       null;
     setSelectedDate((currentDate) => {
-      if (currentDate && getMonthKey(parseDateKey(currentDate)) === selectedMonth) {
+      if (
+        currentDate &&
+        getMonthKey(parseDateKey(currentDate)) === selectedMonth
+      ) {
         return currentDate;
       }
 
@@ -185,23 +201,28 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
     (sum, workout) => sum + workout.totalVolume,
     0,
   );
+  const selectedWeekDurationSeconds = selectedWeekWorkouts.reduce(
+    (sum, workout) => sum + workout.durationSeconds,
+    0,
+  );
 
   const currentMonthIndex = data.availableMonths.indexOf(selectedMonth);
   const previousMonth = data.availableMonths[currentMonthIndex + 1] ?? null;
-  const nextMonth = currentMonthIndex > 0 ? data.availableMonths[currentMonthIndex - 1] : null;
+  const nextMonth =
+    currentMonthIndex > 0 ? data.availableMonths[currentMonthIndex - 1] : null;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Link
           href="/progress"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E7CFF]/60"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60"
           aria-label="Kembali ke progress"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </Link>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#5E7CFF]">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#10B981]">
             History
           </p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">
@@ -216,17 +237,19 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
             type="button"
             onClick={() => previousMonth && setSelectedMonth(previousMonth)}
             disabled={!previousMonth}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E7CFF]/60 disabled:opacity-30"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60 disabled:opacity-30"
             aria-label="Bulan sebelumnya"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           </button>
-          <p className="text-xl font-semibold text-white">{getMonthLabel(selectedMonth)}</p>
+          <p className="text-xl font-semibold text-white">
+            {getMonthLabel(selectedMonth)}
+          </p>
           <button
             type="button"
             onClick={() => nextMonth && setSelectedMonth(nextMonth)}
             disabled={!nextMonth}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E7CFF]/60 disabled:opacity-30"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60 disabled:opacity-30"
             aria-label="Bulan berikutnya"
           >
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
@@ -264,9 +287,9 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
 
                   setSelectedDate(day.date);
                 }}
-                className={`relative flex aspect-square items-center justify-center rounded-full border text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E7CFF]/60 ${
+                className={`relative flex aspect-square items-center justify-center rounded-full border text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60 ${
                   isSelected
-                    ? "border-[#5E7CFF]/40 bg-[#3348C8] text-white"
+                    ? "border-[#10B981]/40 bg-[#059669] text-white"
                     : day.inMonth
                       ? "border-white/6 bg-white/[0.04] text-white hover:bg-white/[0.08]"
                       : "border-transparent bg-transparent text-text-muted/30"
@@ -274,7 +297,7 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
               >
                 {new Date(day.date).getDate()}
                 {workoutCount > 0 ? (
-                  <span className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-[#82A2FF]" />
+                  <span className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-[#34D399]" />
                 ) : null}
               </button>
             );
@@ -289,11 +312,12 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
               {getWeekRangeLabel(selectedWeekKey)}
             </p>
             <p className="mt-1 text-sm text-text-muted">
-              Fokus ke workout dalam minggu yang sedang kamu pilih dari kalender.
+              Fokus ke workout dalam minggu yang sedang kamu pilih dari
+              kalender.
             </p>
           </div>
           <div className="text-right">
-            <p className="font-data text-3xl font-semibold text-[#7EA0FF]">
+            <p className="font-data text-3xl font-semibold text-[#34D399]">
               {selectedWeekWorkouts.length}
             </p>
             <p className="text-xs uppercase tracking-[0.14em] text-text-muted">
@@ -306,19 +330,20 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
           <div className="rounded-[24px] bg-white/[0.03] px-4 py-4">
             <div className="flex items-center gap-2 text-text-muted">
               <Clock3 className="h-4 w-4" aria-hidden="true" />
-              <span className="text-xs uppercase tracking-[0.14em]">Total Time</span>
+              <span className="text-xs uppercase tracking-[0.14em]">
+                Total Time
+              </span>
             </div>
             <p className="mt-3 font-data text-2xl font-semibold text-white">
-              {selectedWeekWorkouts.reduce(
-                (sum, workout) => sum + workout.durationMinutes,
-                0,
-              )}
+              {formatDurationMinutesSeconds(selectedWeekDurationSeconds)}
             </p>
           </div>
           <div className="rounded-[24px] bg-white/[0.03] px-4 py-4">
             <div className="flex items-center gap-2 text-text-muted">
               <Weight className="h-4 w-4" aria-hidden="true" />
-              <span className="text-xs uppercase tracking-[0.14em]">Volume</span>
+              <span className="text-xs uppercase tracking-[0.14em]">
+                Volume
+              </span>
             </div>
             <p className="mt-3 font-data text-2xl font-semibold text-white">
               {formatVolume(selectedWeekVolume)}
@@ -327,7 +352,9 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
           <div className="rounded-[24px] bg-white/[0.03] px-4 py-4">
             <div className="flex items-center gap-2 text-text-muted">
               <Dumbbell className="h-4 w-4" aria-hidden="true" />
-              <span className="text-xs uppercase tracking-[0.14em]">Exercises</span>
+              <span className="text-xs uppercase tracking-[0.14em]">
+                Exercises
+              </span>
             </div>
             <p className="mt-3 font-data text-2xl font-semibold text-white">
               {selectedWeekWorkouts.reduce(
@@ -344,10 +371,11 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
           <div>
             <p className="text-2xl font-semibold text-white">Workout List</p>
             <p className="mt-1 text-sm text-text-muted">
-              Semua detail history pindah ke halaman ini supaya halaman progress tetap ringkas.
+              Semua detail history pindah ke halaman ini supaya halaman progress
+              tetap ringkas.
             </p>
           </div>
-          <CalendarDays className="h-5 w-5 text-[#5E7CFF]" aria-hidden="true" />
+          <CalendarDays className="h-5 w-5 text-[#10B981]" aria-hidden="true" />
         </div>
 
         {selectedWeekWorkouts.length > 0 ? (
@@ -360,7 +388,8 @@ export default function ProgressHistoryView({ data }: ProgressHistoryViewProps) 
           ))
         ) : (
           <div className="rounded-[28px] border border-dashed border-white/8 bg-white/[0.03] px-4 py-6 text-sm text-text-muted">
-            Belum ada workout di minggu ini. Pilih tanggal lain di kalender untuk melihat history yang tersedia.
+            Belum ada workout di minggu ini. Pilih tanggal lain di kalender
+            untuk melihat history yang tersedia.
           </div>
         )}
       </section>
