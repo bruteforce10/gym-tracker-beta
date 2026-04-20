@@ -389,6 +389,7 @@ export const ModelName = {
   Session: 'Session',
   Goal: 'Goal',
   Exercise: 'Exercise',
+  FavoriteExercise: 'FavoriteExercise',
   Workout: 'Workout',
   WeightLog: 'WeightLog',
   ExerciseLog: 'ExerciseLog',
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "goal" | "exercise" | "workout" | "weightLog" | "exerciseLog" | "workoutPlan" | "workoutPlanExercise"
+    modelProps: "user" | "account" | "session" | "goal" | "exercise" | "favoriteExercise" | "workout" | "weightLog" | "exerciseLog" | "workoutPlan" | "workoutPlanExercise"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -780,6 +781,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ExerciseCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ExerciseCountAggregateOutputType> | number
+        }
+      }
+    }
+    FavoriteExercise: {
+      payload: Prisma.$FavoriteExercisePayload<ExtArgs>
+      fields: Prisma.FavoriteExerciseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FavoriteExerciseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FavoriteExerciseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload>
+        }
+        findFirst: {
+          args: Prisma.FavoriteExerciseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FavoriteExerciseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload>
+        }
+        findMany: {
+          args: Prisma.FavoriteExerciseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload>[]
+        }
+        create: {
+          args: Prisma.FavoriteExerciseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload>
+        }
+        createMany: {
+          args: Prisma.FavoriteExerciseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FavoriteExerciseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload>[]
+        }
+        delete: {
+          args: Prisma.FavoriteExerciseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload>
+        }
+        update: {
+          args: Prisma.FavoriteExerciseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload>
+        }
+        deleteMany: {
+          args: Prisma.FavoriteExerciseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FavoriteExerciseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FavoriteExerciseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload>[]
+        }
+        upsert: {
+          args: Prisma.FavoriteExerciseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteExercisePayload>
+        }
+        aggregate: {
+          args: Prisma.FavoriteExerciseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFavoriteExercise>
+        }
+        groupBy: {
+          args: Prisma.FavoriteExerciseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FavoriteExerciseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FavoriteExerciseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FavoriteExerciseCountAggregateOutputType> | number
         }
       }
     }
@@ -1277,6 +1352,16 @@ export const ExerciseScalarFieldEnum = {
 export type ExerciseScalarFieldEnum = (typeof ExerciseScalarFieldEnum)[keyof typeof ExerciseScalarFieldEnum]
 
 
+export const FavoriteExerciseScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  exerciseId: 'exerciseId',
+  createdAt: 'createdAt'
+} as const
+
+export type FavoriteExerciseScalarFieldEnum = (typeof FavoriteExerciseScalarFieldEnum)[keyof typeof FavoriteExerciseScalarFieldEnum]
+
+
 export const WorkoutScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1524,6 +1609,7 @@ export type GlobalOmitConfig = {
   session?: Prisma.SessionOmit
   goal?: Prisma.GoalOmit
   exercise?: Prisma.ExerciseOmit
+  favoriteExercise?: Prisma.FavoriteExerciseOmit
   workout?: Prisma.WorkoutOmit
   weightLog?: Prisma.WeightLogOmit
   exerciseLog?: Prisma.ExerciseLogOmit

@@ -11,6 +11,7 @@ import {
   type ExerciseCatalogItem,
   type ExerciseDisplayCategory,
 } from "@/lib/exercise-catalog";
+import { buildSessionExercise, WORKOUT_SESSION_STORAGE_KEY } from "@/lib/workout-session";
 
 type PlanExercise = {
   id: string;
@@ -90,19 +91,15 @@ export default function WorkoutStartClient() {
         .filter((exercise) => selected.has(exercise.exerciseId))
         .sort((left, right) => left.order - right.order)
         .map((exercise) => ({
-          exerciseId: exercise.exercise.id,
-          name: exercise.exercise.name,
-          imageUrl: exercise.exercise.imageUrl,
-          category: exercise.exercise.category,
-          primaryLabel: exercise.exercise.primaryLabel,
-          trainingStyle: exercise.exercise.trainingStyle,
+          ...buildSessionExercise(exercise.exercise),
           defaultSets: exercise.defaultSets,
           defaultReps: exercise.defaultReps,
           restTime: exercise.restTime,
+          source: "plan" as const,
         })),
     };
 
-    sessionStorage.setItem("gym-session", JSON.stringify(sessionData));
+    sessionStorage.setItem(WORKOUT_SESSION_STORAGE_KEY, JSON.stringify(sessionData));
     router.push("/workout/session");
   };
 

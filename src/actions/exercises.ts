@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import {
   buildExerciseSlug,
   parseExerciseIdFromSlug,
+  type ExerciseCatalogItem,
   type ExercisePlanBucket,
 } from "@/lib/exercise-catalog";
 import {
@@ -77,6 +78,166 @@ export async function getExerciseById(id: string) {
 export async function getExerciseOptionsByIds(ids: string[]) {
   const viewer = await getViewerContext();
   return fetchExercisesByIds(ids, viewer);
+}
+
+export type FavoriteAwareExerciseItem = ExerciseCatalogItem & {
+  isFavorite: boolean;
+};
+
+export async function getExerciseQuickPickerData(params?: {
+  query?: string;
+  planBucket?: ExercisePlanBucket | "all";
+  limitFavorites?: number;
+  limitRecent?: number;
+  limitResults?: number;
+}) {
+  const userId = await requireUserId();
+  const viewer = await getViewerContext();
+  const limitFavorites = params?.limitFavorites ?? 8;
+  const limitRecent = params?.limitRecent ?? 8;
+  const limitResults = params?.limitResults ?? 18;
+  const planBucket = params?.planBucket ?? "all";
+  const query = params?.query?.trim() ?? "";
+
+  const favoriteRows = await prisma.favoriteExercise.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    take: limitFavorites,
+  });
+
+  const favoriteIds = favoriteRows.map((entry) => entry.exerciseId);
+  const favoriteIdSet = new Set(favoriteIds);
+  const favorites = withFavoriteState(
+    await fetchExercisesByIds(favoriteIds, viewer),
+    favoriteIdSet
+  );
+
+  const recentWorkoutIds = collectUniqueIds(
+    (
+      await prisma.workout.findMany({
+        where: { userId },
+        orderBy: { startedAt: "desc" },
+        take: 12,
+        include: {
+          exercises: {
+            where: {
+              exerciseId: {
+                not: null,
+              },
+            },
+          },
+        },
+      })
+    ).flatMap((workout) =>
+      workout.exercises
+        .map((exercise) => exercise.exerciseId)
+        .filter(Boolean)
+    ) as string[],
+    limitRecent,
+    favoriteIdSet
+  );
+
+  let recentIds = recentWorkoutIds;
+
+  if (recentIds.length < limitRecent) {
+    const recentPlanIds = collectUniqueIds(
+      (
+        await prisma.workoutPlan.findMany({
+          where: { userId },
+          orderBy: { updatedAt: "desc" },
+          take: 8,
+          include: {
+            exercises: {
+              orderBy: { order: "asc" },
+            },
+          },
+        })
+      ).flatMap((plan) => plan.exercises.map((exercise) => exercise.exerciseId)),
+      limitRecent - recentIds.length,
+      new Set([...favoriteIdSet, ...recentIds])
+    );
+
+    recentIds = [...recentIds, ...recentPlanIds];
+  }
+
+  const recent = withFavoriteState(
+    await fetchExercisesByIds(recentIds, viewer),
+    favoriteIdSet
+  );
+
+  const excludedIds = new Set([...favoriteIds, ...recentIds]);
+  const results = withFavoriteState(
+    (
+      await fetchExerciseCatalog({
+        query,
+        planBucket,
+        limit: limitResults + excludedIds.size,
+        viewer,
+      })
+    )
+      .filter((exercise) => !excludedIds.has(exercise.id))
+      .slice(0, limitResults),
+    favoriteIdSet
+  );
+
+  return {
+    favorites,
+    recent,
+    results,
+  };
+}
+
+export async function toggleFavoriteExercise(exerciseId: string) {
+  const userId = await requireUserId();
+  const viewer = await getViewerContext();
+  const exercise = await fetchExerciseById(exerciseId, viewer);
+
+  if (!exercise) {
+    return {
+      success: false,
+      error: "Exercise tidak ditemukan.",
+      favorited: false,
+    };
+  }
+
+  const existing = await prisma.favoriteExercise.findUnique({
+    where: {
+      userId_exerciseId: {
+        userId,
+        exerciseId,
+      },
+    },
+  });
+
+  if (existing) {
+    await prisma.favoriteExercise.delete({
+      where: {
+        userId_exerciseId: {
+          userId,
+          exerciseId,
+        },
+      },
+    });
+  } else {
+    await prisma.favoriteExercise.create({
+      data: {
+        userId,
+        exerciseId,
+      },
+    });
+  }
+
+  revalidatePath("/exercises");
+  revalidatePath("/goal");
+  revalidatePath("/plan");
+  revalidatePath("/workout/start");
+  revalidatePath("/workout/session");
+
+  return {
+    success: true,
+    error: null,
+    favorited: !existing,
+  };
 }
 
 export async function createCustomExercise(input: CustomExerciseInput) {
@@ -406,4 +567,33 @@ export async function promoteCustomExerciseAdmin(id: string) {
   return {
     success: true,
   };
+}
+
+function collectUniqueIds(
+  ids: string[],
+  limit: number,
+  excludedIds: Set<string> = new Set()
+) {
+  const collected: string[] = [];
+  const seen = new Set(excludedIds);
+
+  for (const id of ids) {
+    if (!id || seen.has(id)) continue;
+    collected.push(id);
+    seen.add(id);
+
+    if (collected.length >= limit) break;
+  }
+
+  return collected;
+}
+
+function withFavoriteState(
+  items: ExerciseCatalogItem[],
+  favoriteIds: Set<string>
+): FavoriteAwareExerciseItem[] {
+  return items.map((item) => ({
+    ...item,
+    isFavorite: favoriteIds.has(item.id),
+  }));
 }

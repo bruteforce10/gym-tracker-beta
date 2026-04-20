@@ -43,6 +43,11 @@ export type Goal = Prisma.GoalModel
  */
 export type Exercise = Prisma.ExerciseModel
 /**
+ * Model FavoriteExercise
+ * 
+ */
+export type FavoriteExercise = Prisma.FavoriteExerciseModel
+/**
  * Model Workout
  * 
  */
