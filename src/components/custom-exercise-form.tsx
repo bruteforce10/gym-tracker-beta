@@ -5,10 +5,7 @@ import { ImagePlus, Upload, X } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import {
-  createCustomExercise,
-  updateExerciseAdmin,
-} from "@/actions/exercises";
+import { createCustomExercise, updateExerciseAdmin } from "@/actions/exercises";
 import CustomExerciseFields from "@/components/custom-exercise-fields";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +34,6 @@ type CustomExerciseFormProps = {
   initialVisibility?: "private" | "global";
   cancelHref?: string;
   successHref?: string;
-  title?: string;
   description?: string;
   submitLabel?: string;
 };
@@ -52,7 +48,6 @@ export default function CustomExerciseForm({
   initialVisibility = "private",
   cancelHref = "/exercises",
   successHref = "/exercises",
-  title,
   description,
   submitLabel,
 }: CustomExerciseFormProps) {
@@ -124,21 +119,13 @@ export default function CustomExerciseForm({
     setMessage("");
   };
 
-  const resolvedTitle =
-    title ??
-    (isEditMode
-      ? isSystemExercise
-        ? "Edit Exercise Sistem"
-        : "Edit Exercise Custom"
-      : "Tambah Custom Exercise");
-
   const resolvedDescription =
     description ??
     (isEditMode
       ? isSystemExercise
         ? "Perbarui detail exercise bawaan. Setelah simpan kamu akan kembali ke dashboard admin exercise."
         : "Perbarui detail, gambar, dan moderasi exercise custom dari user."
-      : "Exercise baru akan langsung muncul di katalog milikmu. Admin tetap bisa review dan mempromosikannya ke semua user bila diperlukan.");
+      : "Exercise baru akan langsung muncul di katalog milikmu.");
 
   const resolvedSubmitLabel =
     submitLabel ?? (isEditMode ? "Simpan Perubahan" : "Submit Exercise");
@@ -153,7 +140,7 @@ export default function CustomExerciseForm({
         {resolvedDescription}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-6 ">
         <div className="space-y-5">
           <CustomExerciseFields
             values={values}
@@ -198,6 +185,15 @@ export default function CustomExerciseForm({
               <div className="relative">
                 <Button
                   type="button"
+                  variant="outline"
+                  className="absolute left-3 top-3 z-10 h-10 rounded-xl border-white/10 bg-[#0F1117]/80 text-foreground backdrop-blur hover:bg-[#0F1117]"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-4 w-4" aria-hidden="true" />
+                  Ganti Gambar
+                </Button>
+                <Button
+                  type="button"
                   size="icon-sm"
                   variant="outline"
                   className="absolute right-3 top-3 z-10 border-white/10 bg-[#0F1117]/80 text-foreground backdrop-blur hover:bg-[#0F1117]"
@@ -224,92 +220,39 @@ export default function CustomExerciseForm({
                   <p className="text-sm font-semibold text-foreground">
                     Belum ada gambar
                   </p>
-                  <p className="mt-1 text-xs text-text-muted">
-                    Upload satu gambar supaya review exercise ini lebih mudah.
+                  <p className="mt-1 text-xs text-text-muted mt-2">
+                    Maksimal 1 gambar, 8MB.
+                  </p>
+                  <p className="text-xs text-text-muted mt-1">
+                    ukuran ideal 640x640px (1:1).
                   </p>
                 </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-2 h-11 rounded-xl border-border-subtle bg-surface text-foreground hover:bg-surface-elevated"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-4 w-4" aria-hidden="true" />
+                  Pilih Gambar
+                </Button>
+                {selectedImageFile ? (
+                  <p className="text-xs text-emerald-100/90">
+                    File dipilih: {selectedImageFile.name}
+                  </p>
+                ) : null}
               </div>
             )}
           </div>
-
-          <div className="glass-card h-fit space-y-3 p-4">
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                {resolvedTitle}
-              </p>
-              <p className="mt-1 text-xs text-text-muted">
-                Preview muncul begitu gambar dipilih. Upload ke UploadThing baru
-                dilakukan saat tombol simpan ditekan.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-white/8 bg-white/[0.03] px-3 py-3 text-xs text-text-muted">
-              Tips: gunakan gambar yang fokus ke gerakan utama agar katalog tetap
-              mudah dipahami.
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-text-muted">
-              Gambar Exercise
-            </p>
-            <div className="rounded-2xl border border-dashed border-border-subtle bg-surface-elevated p-4">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(event) =>
-                  handleSelectImage(event.target.files?.[0] ?? null)
-                }
-              />
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">
-                    Pilih gambar dulu, upload saat submit
-                  </p>
-                  <p className="text-xs text-text-muted">
-                    File belum dikirim ke UploadThing sampai kamu menekan tombol
-                    simpan. Maksimal 1 gambar, 8MB.
-                  </p>
-                  {selectedImageFile ? (
-                    <p className="text-xs text-emerald-100/90">
-                      File dipilih: {selectedImageFile.name}
-                    </p>
-                  ) : storedImageUrl ? (
-                    <p className="text-xs text-text-muted">
-                      Menggunakan gambar yang sudah tersimpan.
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-11 rounded-xl border-border-subtle bg-surface text-foreground hover:bg-surface-elevated"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload className="h-4 w-4" aria-hidden="true" />
-                    {selectedImageFile || storedImageUrl
-                      ? "Ganti Gambar"
-                      : "Pilih Gambar"}
-                  </Button>
-                  {selectedImageFile || storedImageUrl ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-11 rounded-xl border-border-subtle bg-surface text-text-muted hover:bg-surface-elevated hover:text-foreground"
-                      onClick={clearSelectedImage}
-                    >
-                      <X className="h-4 w-4" aria-hidden="true" />
-                      Hapus
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(event) =>
+              handleSelectImage(event.target.files?.[0] ?? null)
+            }
+          />
 
           {message ? (
             <div className="rounded-xl border border-danger/20 bg-danger/10 px-3 py-2 text-xs text-danger">
@@ -317,7 +260,7 @@ export default function CustomExerciseForm({
             </div>
           ) : null}
 
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex gap-2 flex-row">
             <Button
               type="button"
               variant="outline"
@@ -420,8 +363,13 @@ function ModerationSelect({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-medium text-text-muted">{label}</label>
-      <Select value={value} onValueChange={(nextValue) => onChange(nextValue ?? value)}>
+      <label className="block text-xs font-medium text-text-muted">
+        {label}
+      </label>
+      <Select
+        value={value}
+        onValueChange={(nextValue) => onChange(nextValue ?? value)}
+      >
         <SelectTrigger className="h-11 w-full rounded-xl border-border-subtle bg-surface-elevated px-3 text-sm text-foreground">
           <SelectValue placeholder={`Pilih ${label.toLowerCase()}`} />
         </SelectTrigger>

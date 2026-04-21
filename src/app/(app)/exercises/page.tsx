@@ -21,7 +21,9 @@ type ExercisePageProps = {
   }>;
 };
 
-export default async function ExercisesPage({ searchParams }: ExercisePageProps) {
+export default async function ExercisesPage({
+  searchParams,
+}: ExercisePageProps) {
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
   const bodyPart = normalizeExerciseFilterValue(
@@ -47,17 +49,16 @@ export default async function ExercisesPage({ searchParams }: ExercisePageProps)
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex justify-between items-center">
         <div>
           <h1
             className="text-2xl font-bold text-foreground"
             style={{ fontFamily: "Outfit, sans-serif" }}
           >
-            Exercise Catalog
+            Exercise
+            <br />
+            Catalog
           </h1>
-          <p className="text-text-muted text-sm mt-1">
-            Jelajahi katalog exercise yang tersimpan di local database.
-          </p>
         </div>
         <Link
           href="/exercises/new"

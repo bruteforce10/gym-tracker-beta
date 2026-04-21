@@ -158,7 +158,7 @@ export default function ExerciseFilterForm({
         />
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex gap-2 flex-row">
         <Button
           type="submit"
           disabled={isPending}
