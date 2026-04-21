@@ -129,11 +129,18 @@ export default function SupersetPickerSheet({
 
         <div className="flex flex-col gap-2">
           {items.map((exercise) => (
-            <button
+            <div
               key={exercise.id}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => setSelectedExercise(exercise)}
-              className={`w-full rounded-2xl border px-4 py-3 text-left transition-colors ${
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setSelectedExercise(exercise);
+                }
+              }}
+              className={`w-full rounded-2xl border px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/45 ${
                 selectedExercise?.id === exercise.id
                   ? "border-emerald/35 bg-emerald/10"
                   : "border-white/8 bg-white/[0.03] hover:border-emerald/20"
@@ -179,7 +186,7 @@ export default function SupersetPickerSheet({
                   }
                 />
               </div>
-            </button>
+            </div>
           ))}
         </div>
       </section>
