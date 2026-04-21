@@ -20,6 +20,7 @@ type FetchCatalogParams = {
   bodyPart?: string;
   equipment?: string;
   type?: string;
+  ownership?: "all" | "mine";
   limit?: number;
   viewer?: ViewerContext;
 };
@@ -139,6 +140,7 @@ export async function fetchExerciseCatalog(params?: FetchCatalogParams) {
   const bodyPart = params?.bodyPart?.trim() ?? "";
   const equipment = params?.equipment?.trim() ?? "";
   const type = params?.type?.trim().toLowerCase() ?? "";
+  const ownership = params?.ownership ?? "all";
   const planBucket = params?.planBucket ?? "all";
   const requestedLimit = params?.limit ?? 24;
   const viewer = params?.viewer;
@@ -172,6 +174,16 @@ export async function fetchExerciseCatalog(params?: FetchCatalogParams) {
         ? {
             trainingStyle: type,
           }
+        : {}),
+      ...(ownership === "mine"
+        ? viewer?.userId
+          ? {
+              source: "user",
+              createdByUserId: viewer.userId,
+            }
+          : {
+              id: "__no-visible-exercises__",
+            }
         : {}),
       status: {
         not: "archived",

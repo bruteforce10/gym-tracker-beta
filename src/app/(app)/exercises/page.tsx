@@ -18,6 +18,7 @@ type ExercisePageProps = {
     bodyPart?: string;
     equipment?: string;
     type?: string;
+    ownership?: string;
   }>;
 };
 
@@ -38,11 +39,13 @@ export default async function ExercisesPage({
     params.type,
     TRAINING_TYPE_FILTER_OPTIONS,
   );
+  const ownership = params.ownership === "mine" ? "mine" : "all";
   const exercises = await getExerciseCatalog({
     query,
     bodyPart,
     equipment,
     type,
+    ownership,
     limit: 300,
   });
   const plans = await getWorkoutPlans();
@@ -70,11 +73,12 @@ export default async function ExercisesPage({
       </div>
 
       <ExerciseFilterForm
-        key={`${query}:${bodyPart}:${equipment}:${type}`}
+        key={`${query}:${bodyPart}:${equipment}:${type}:${ownership}`}
         query={query}
         bodyPart={bodyPart}
         equipment={equipment}
         type={type}
+        ownership={ownership}
         bodyPartOptions={BODY_PART_FILTER_OPTIONS}
         equipmentOptions={EQUIPMENT_FILTER_OPTIONS}
         typeOptions={TRAINING_TYPE_FILTER_OPTIONS}

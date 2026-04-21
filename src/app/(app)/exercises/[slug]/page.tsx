@@ -5,7 +5,9 @@ import { ChevronLeft, ExternalLink, PlayCircle } from "lucide-react";
 import { getExerciseBySlug } from "@/actions/exercises";
 import { getWorkoutPlans } from "@/actions/plans";
 import AddToPlanSheet from "@/components/add-to-plan-sheet";
+import ExerciseOwnerActions from "@/components/exercise-owner-actions";
 import ExerciseImage from "@/components/exercise-image";
+import { getViewerContext } from "@/lib/auth-guards";
 import { CATEGORY_GRADIENTS, CATEGORY_LABELS } from "@/lib/exercise-catalog";
 
 type ExerciseDetailPageProps = {
@@ -49,6 +51,7 @@ function TagList({ title, values }: { title: string; values: string[] }) {
 export default async function ExerciseDetailPage({
   params,
 }: ExerciseDetailPageProps) {
+  const viewer = await getViewerContext();
   const { slug } = await params;
   const exercise = await getExerciseBySlug(slug);
   const plans = await getWorkoutPlans();
@@ -61,6 +64,8 @@ export default async function ExerciseDetailPage({
     ? CATEGORY_GRADIENTS[exercise.category]
     : "from-slate-500/20 to-slate-400/10";
   const monogram = getExerciseMonogram(exercise.name);
+  const isOwnerCustomExercise =
+    exercise.source === "user" && exercise.createdByUserId === viewer.userId;
 
   return (
     <div className="space-y-5">
@@ -110,6 +115,13 @@ export default async function ExerciseDetailPage({
               triggerClassName="h-11 rounded-xl border border-emerald/20 bg-emerald/10 px-4 text-sm font-semibold text-emerald hover:bg-emerald/20"
             />
           </div>
+          {isOwnerCustomExercise ? (
+            <ExerciseOwnerActions
+              exerciseId={exercise.id}
+              exerciseName={exercise.name}
+              editHref={`/exercises/${exercise.slug}/edit`}
+            />
+          ) : null}
         </div>
 
         <div className="space-y-3">

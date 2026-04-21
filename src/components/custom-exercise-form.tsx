@@ -5,7 +5,11 @@ import { ImagePlus, Upload, X } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import { createCustomExercise, updateExerciseAdmin } from "@/actions/exercises";
+import {
+  createCustomExercise,
+  updateCustomExerciseByOwner,
+  updateExerciseAdmin,
+} from "@/actions/exercises";
 import CustomExerciseFields from "@/components/custom-exercise-fields";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +32,7 @@ type CustomExerciseFormProps = {
   mode?: "create" | "edit";
   exerciseId?: string;
   source?: "system" | "user";
+  editorRole?: "admin" | "user";
   initialValues?: ExerciseComposerValues;
   initialImageUrl?: string | null;
   initialStatus?: "published" | "flagged" | "archived";
@@ -42,6 +47,7 @@ export default function CustomExerciseForm({
   mode = "create",
   exerciseId,
   source = "user",
+  editorRole = "user",
   initialValues = EMPTY_EXERCISE_COMPOSER_VALUES,
   initialImageUrl = null,
   initialStatus = "published",
@@ -124,7 +130,9 @@ export default function CustomExerciseForm({
     (isEditMode
       ? isSystemExercise
         ? "Perbarui detail exercise bawaan. Setelah simpan kamu akan kembali ke dashboard admin exercise."
-        : "Perbarui detail, gambar, dan moderasi exercise custom dari user."
+        : editorRole === "admin"
+          ? "Perbarui detail, gambar, dan moderasi exercise custom dari user."
+          : "Perbarui detail custom exercise milikmu. Setelah simpan kamu akan kembali ke halaman detail exercise."
       : "Exercise baru akan langsung muncul di katalog milikmu.");
 
   const resolvedSubmitLabel =
@@ -148,7 +156,7 @@ export default function CustomExerciseForm({
             showImageUrlField={false}
           />
 
-          {isEditMode ? (
+          {isEditMode && editorRole === "admin" ? (
             <div className="grid gap-3 sm:grid-cols-2">
               {isSystemExercise ? (
                 <div className="space-y-1.5">
@@ -309,19 +317,30 @@ export default function CustomExerciseForm({
                       return;
                     }
 
-                    const result = await updateExerciseAdmin(exerciseId, {
-                      ...values,
-                      imageUrl: nextImageUrl,
-                      visibility: isSystemExercise ? "global" : visibility,
-                      status,
-                    });
+                    const result =
+                      editorRole === "admin"
+                        ? await updateExerciseAdmin(exerciseId, {
+                            ...values,
+                            imageUrl: nextImageUrl,
+                            visibility: isSystemExercise ? "global" : visibility,
+                            status,
+                          })
+                        : await updateCustomExerciseByOwner(exerciseId, {
+                            ...values,
+                            imageUrl: nextImageUrl,
+                          });
 
                     if (!result.success) {
                       setMessage(result.error ?? "Gagal menyimpan perubahan.");
                       return;
                     }
 
-                    router.push(successHref);
+                    const nextHref =
+                      editorRole === "user" && result.slug
+                        ? `/exercises/${result.slug}`
+                        : successHref;
+
+                    router.push(nextHref);
                     router.refresh();
                     return;
                   }

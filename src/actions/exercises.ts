@@ -34,6 +34,7 @@ export async function getExerciseCatalog(params?: {
   bodyPart?: string;
   equipment?: string;
   type?: string;
+  ownership?: "all" | "mine";
   limit?: number;
 }) {
   const viewer = await getViewerContext();
@@ -49,6 +50,7 @@ export async function searchExercises(params?: {
   bodyPart?: string;
   equipment?: string;
   type?: string;
+  ownership?: "all" | "mine";
   limit?: number;
 }) {
   const viewer = await getViewerContext();
@@ -58,6 +60,7 @@ export async function searchExercises(params?: {
     bodyPart: params?.bodyPart,
     equipment: params?.equipment,
     type: params?.type,
+    ownership: params?.ownership,
     limit: params?.limit ?? 24,
     viewer,
   });
@@ -454,6 +457,126 @@ export async function updateExerciseAdmin(
   return {
     success: true,
     error: null,
+    slug: buildExerciseSlug(normalized.name, id),
+  };
+}
+
+export async function updateCustomExerciseByOwner(
+  id: string,
+  input: CustomExerciseInput,
+) {
+  const userId = await requireUserId();
+
+  const existingExercise = await prisma.exercise.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      slug: true,
+      source: true,
+      imageUrl: true,
+      createdByUserId: true,
+      status: true,
+    },
+  });
+
+  if (!existingExercise) {
+    return {
+      success: false,
+      error: "Exercise tidak ditemukan.",
+    };
+  }
+
+  if (
+    existingExercise.source !== "user" ||
+    existingExercise.createdByUserId !== userId
+  ) {
+    return {
+      success: false,
+      error: "Kamu tidak punya akses untuk mengubah exercise ini.",
+    };
+  }
+
+  if (existingExercise.status === "archived") {
+    return {
+      success: false,
+      error: "Exercise yang sudah dihapus tidak bisa diedit lagi.",
+    };
+  }
+
+  const normalized = normalizeCustomExerciseInput(input);
+  const validationError = validateCustomExerciseInput(normalized);
+
+  if (validationError) {
+    return {
+      success: false,
+      error: validationError,
+    };
+  }
+
+  const duplicate = await prisma.exercise.findFirst({
+    where: {
+      id: {
+        not: id,
+      },
+      createdByUserId: userId,
+      source: "user",
+      status: {
+        not: "archived",
+      },
+      name: {
+        equals: normalized.name,
+        mode: "insensitive",
+      },
+      bodyParts: {
+        has: normalized.bodyPart,
+      },
+    },
+  });
+
+  if (duplicate) {
+    return {
+      success: false,
+      error: "Exercise serupa sudah pernah kamu buat.",
+    };
+  }
+
+  const nextSlug = buildExerciseSlug(normalized.name, id);
+
+  await prisma.exercise.update({
+    where: { id },
+    data: {
+      slug: nextSlug,
+      name: normalized.name,
+      bodyParts: [normalized.bodyPart],
+      equipments: [normalized.equipment],
+      exerciseType: normalized.type,
+      targetMuscles: normalized.targetMuscles,
+      secondaryMuscles: normalized.secondaryMuscles,
+      imageUrl: normalized.imageUrl,
+      notes: normalized.notes,
+      trainingStyle: normalizeTrainingTypeToStyle(normalized.type),
+    },
+  });
+
+  if (
+    existingExercise.imageUrl &&
+    existingExercise.imageUrl !== normalized.imageUrl
+  ) {
+    await deleteUploadThingFileByUrl(existingExercise.imageUrl);
+  }
+
+  revalidatePath("/exercises");
+  revalidatePath(`/exercises/${existingExercise.slug}`);
+  revalidatePath(`/exercises/${nextSlug}`);
+  revalidatePath("/goal");
+  revalidatePath("/plan");
+  revalidatePath("/workout/start");
+  revalidatePath("/workout/session");
+
+  return {
+    success: true,
+    error: null,
+    slug: nextSlug,
   };
 }
 
@@ -566,6 +689,63 @@ export async function promoteCustomExerciseAdmin(id: string) {
 
   return {
     success: true,
+  };
+}
+
+export async function archiveCustomExerciseByOwner(id: string) {
+  const userId = await requireUserId();
+
+  const existingExercise = await prisma.exercise.findUnique({
+    where: { id },
+    select: {
+      slug: true,
+      source: true,
+      createdByUserId: true,
+      status: true,
+    },
+  });
+
+  if (!existingExercise) {
+    return {
+      success: false,
+      error: "Exercise tidak ditemukan.",
+    };
+  }
+
+  if (
+    existingExercise.source !== "user" ||
+    existingExercise.createdByUserId !== userId
+  ) {
+    return {
+      success: false,
+      error: "Kamu tidak punya akses untuk menghapus exercise ini.",
+    };
+  }
+
+  if (existingExercise.status === "archived") {
+    return {
+      success: true,
+      error: null,
+    };
+  }
+
+  await prisma.exercise.update({
+    where: { id },
+    data: {
+      status: "archived",
+    },
+  });
+
+  revalidatePath("/exercises");
+  revalidatePath(`/exercises/${existingExercise.slug}`);
+  revalidatePath("/goal");
+  revalidatePath("/plan");
+  revalidatePath("/workout/start");
+  revalidatePath("/workout/session");
+
+  return {
+    success: true,
+    error: null,
   };
 }
 

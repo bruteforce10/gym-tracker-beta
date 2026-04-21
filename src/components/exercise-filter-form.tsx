@@ -18,6 +18,7 @@ type ExerciseFilterFormProps = {
   bodyPart: string;
   equipment: string;
   type: string;
+  ownership: "all" | "mine";
   bodyPartOptions: readonly string[];
   equipmentOptions: readonly string[];
   typeOptions: readonly string[];
@@ -51,9 +52,9 @@ function FilterSelect({
         <SelectContent className="rounded-xl border border-border-subtle bg-[#101218] text-foreground shadow-2xl">
           <SelectItem value="all">Semua</SelectItem>
           {options.map((option) => (
-            <SelectItem key={option} value={option}>
-              {option}
-            </SelectItem>
+          <SelectItem key={option} value={option}>
+              {option === "mine" ? "Buatan Saya" : option}
+          </SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -66,6 +67,7 @@ export default function ExerciseFilterForm({
   bodyPart,
   equipment,
   type,
+  ownership,
   bodyPartOptions,
   equipmentOptions,
   typeOptions,
@@ -79,18 +81,23 @@ export default function ExerciseFilterForm({
     equipment || "all",
   );
   const [selectedType, setSelectedType] = useState(type || "all");
+  const [selectedOwnership, setSelectedOwnership] = useState<
+    "all" | "mine"
+  >(ownership);
 
   const applyFilters = (nextValues?: {
     q?: string;
     bodyPart?: string;
     equipment?: string;
     type?: string;
+    ownership?: "all" | "mine";
   }) => {
     const params = new URLSearchParams();
     const nextQuery = nextValues?.q ?? searchQuery;
     const nextBodyPart = nextValues?.bodyPart ?? selectedBodyPart;
     const nextEquipment = nextValues?.equipment ?? selectedEquipment;
     const nextType = nextValues?.type ?? selectedType;
+    const nextOwnership = nextValues?.ownership ?? selectedOwnership;
 
     if (nextQuery.trim()) params.set("q", nextQuery.trim());
     if (nextBodyPart && nextBodyPart !== "all")
@@ -98,6 +105,7 @@ export default function ExerciseFilterForm({
     if (nextEquipment && nextEquipment !== "all")
       params.set("equipment", nextEquipment);
     if (nextType && nextType !== "all") params.set("type", nextType);
+    if (nextOwnership === "mine") params.set("ownership", "mine");
 
     const nextUrl = params.toString()
       ? `${pathname}?${params.toString()}`
@@ -134,7 +142,7 @@ export default function ExerciseFilterForm({
         />
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-4">
         <FilterSelect
           label="Body Part"
           value={selectedBodyPart}
@@ -156,6 +164,15 @@ export default function ExerciseFilterForm({
           options={typeOptions}
           onChange={(value) => setSelectedType(value ?? "all")}
         />
+        <FilterSelect
+          label="Katalog"
+          value={selectedOwnership}
+          placeholder="Pilih katalog"
+          options={["mine"]}
+          onChange={(value) =>
+            setSelectedOwnership((value as "all" | "mine") ?? "all")
+          }
+        />
       </div>
 
       <div className="flex gap-2 flex-row">
@@ -176,12 +193,14 @@ export default function ExerciseFilterForm({
             setSelectedBodyPart("all");
             setSelectedEquipment("all");
             setSelectedType("all");
+            setSelectedOwnership("all");
             startTransition(() => {
               applyFilters({
                 q: "",
                 bodyPart: "all",
                 equipment: "all",
                 type: "all",
+                ownership: "all",
               });
             });
           }}
