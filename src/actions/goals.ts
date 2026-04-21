@@ -36,6 +36,7 @@ export async function upsertGoal(data: {
   targetWeight: number;
   currentWeight?: number;
   deadline?: string | null;
+  allowCompletedDuplicate?: boolean;
 }) {
   const userId = await getUserId();
   const goalId = data.goalId?.trim() || null;
@@ -115,6 +116,25 @@ export async function upsertGoal(data: {
     };
   }
 
+  const completedGoal = await prisma.goal.findFirst({
+    where: {
+      userId,
+      exerciseId: data.exerciseId,
+      status: "completed",
+      targetWeight: data.targetWeight,
+    },
+    orderBy: [{ completedAt: "desc" }, { updatedAt: "desc" }],
+  });
+
+  if (completedGoal && !data.allowCompletedDuplicate) {
+    return {
+      success: false,
+      code: "duplicate_completed" as const,
+      goalId: completedGoal.id,
+      error: "Sebelumnya sudah capai target. Perlu dibuat kembali?",
+    };
+  }
+
   if (activeGoals.length >= 3) {
     return {
       success: false,
@@ -129,7 +149,7 @@ export async function upsertGoal(data: {
       exerciseId: data.exerciseId,
       status: "active",
       targetWeight: data.targetWeight,
-      currentWeight,
+      currentWeight: data.allowCompletedDuplicate ? 0 : currentWeight,
       deadline: normalizedDeadline,
     },
   });

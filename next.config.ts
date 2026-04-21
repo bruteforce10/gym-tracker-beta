@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     localPatterns: [
       {
+        pathname: "/grynx-logo.webp",
+        search: "",
+      },
+      {
         pathname: "/exercises/images/**",
         search: "",
       },

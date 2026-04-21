@@ -9,16 +9,92 @@ import GoalHistoryCard from "@/components/goal-history-card";
 import GoalSummaryCard from "@/components/goal-summary-card";
 import PageHeader from "@/components/page-header";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { ExerciseCatalogItem } from "@/lib/exercise-catalog";
 import type { GoalDisplayItem } from "@/lib/goal-state";
 
 type GoalCollections = Awaited<ReturnType<typeof getGoalPageData>>;
+type PendingDuplicateGoal = {
+  exerciseId: string;
+  exerciseName: string;
+  targetWeight: number;
+  deadline: string;
+};
 
 const EMPTY_FORM_STATE = {
   exercise: null as ExerciseCatalogItem | null,
   targetWeight: "100",
   deadline: "",
 };
+
+function ConfirmDuplicateGoalDialog({
+  open,
+  pendingGoal,
+  saving,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean;
+  pendingGoal: PendingDuplicateGoal | null;
+  saving: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onCancel()}>
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-md rounded-[28px] border border-white/10 bg-[#0B0D12] p-0"
+      >
+        <DialogHeader className="px-6 pt-6">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-emerald/20 bg-emerald/10 text-emerald">
+            <Target className="h-6 w-6" aria-hidden="true" />
+          </div>
+          <DialogTitle className="pt-3 text-xl font-bold text-foreground">
+            Goal Ini Sudah Pernah Selesai
+          </DialogTitle>
+          <DialogDescription className="text-sm leading-relaxed text-text-muted">
+            Sebelumnya kamu sudah capai target{" "}
+            <span className="font-semibold text-foreground">
+              {pendingGoal?.targetWeight.toFixed(1)} kg
+            </span>{" "}
+            untuk{" "}
+            <span className="font-semibold text-foreground">
+              {pendingGoal?.exerciseName ?? "exercise ini"}
+            </span>
+            . Perlu dibuat kembali?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="rounded-b-[28px] border-white/8 bg-white/[0.02] px-6 py-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={saving}
+            className="h-11 rounded-xl border-border-subtle text-text-muted hover:text-foreground mb-4"
+          >
+            Tidak
+          </Button>
+          <Button
+            type="button"
+            onClick={onConfirm}
+            disabled={saving}
+            className="h-11 rounded-xl bg-emerald font-semibold text-[#0A0A0F] hover:bg-emerald-dark"
+          >
+            {saving ? "Menyimpan..." : "Iya, buat goal baru"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function GoalPage() {
   const [activeGoals, setActiveGoals] = useState<GoalDisplayItem[]>([]);
@@ -32,6 +108,9 @@ export default function GoalPage() {
   const [deletingGoalId, setDeletingGoalId] = useState<string | null>(null);
   const [formMessage, setFormMessage] = useState("");
   const [editForm, setEditForm] = useState(EMPTY_FORM_STATE);
+  const [pendingDuplicateGoal, setPendingDuplicateGoal] =
+    useState<PendingDuplicateGoal | null>(null);
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
   const syncPageData = (data: GoalCollections) => {
     setActiveGoals(data.activeGoals);
@@ -45,6 +124,8 @@ export default function GoalPage() {
     setEditingGoalId(null);
     setFormMessage("");
     setEditForm(EMPTY_FORM_STATE);
+    setPendingDuplicateGoal(null);
+    setDuplicateDialogOpen(false);
   };
 
   const applyGoalToForm = (goal: GoalDisplayItem, message = "") => {
@@ -118,33 +199,59 @@ export default function GoalPage() {
       return;
     }
 
+    const submission = {
+      exerciseId: editForm.exercise.id,
+      exerciseName: editForm.exercise.name,
+      targetWeight: Number(editForm.targetWeight),
+      deadline: editForm.deadline,
+    };
+
+    await submitGoal(submission);
+  };
+
+  const submitGoal = async (
+    submission: PendingDuplicateGoal,
+    allowCompletedDuplicate = false,
+  ) => {
     setSaving(true);
     setFormMessage("");
 
     try {
       const result = await upsertGoal({
         goalId: editingGoalId,
-        exerciseId: editForm.exercise.id,
-        targetWeight: Number(editForm.targetWeight),
-        deadline: editForm.deadline,
+        exerciseId: submission.exerciseId,
+        targetWeight: submission.targetWeight,
+        deadline: submission.deadline,
+        allowCompletedDuplicate,
       });
 
       if (!result.success) {
         if (result.code === "duplicate_active" && result.goalId) {
-          const duplicateGoal = activeGoals.find((goal) => goal.id === result.goalId);
+          const duplicateGoal = activeGoals.find(
+            (goal) => goal.id === result.goalId,
+          );
           if (duplicateGoal) {
             applyGoalToForm(
               duplicateGoal,
-              result.error ?? "Goal untuk exercise ini sudah ada. Kami buka mode edit.",
+              result.error ??
+                "Goal untuk exercise ini sudah ada. Kami buka mode edit.",
             );
             return;
           }
+        }
+
+        if (result.code === "duplicate_completed" && !allowCompletedDuplicate) {
+          setPendingDuplicateGoal(submission);
+          setDuplicateDialogOpen(true);
+          return;
         }
 
         setFormMessage(result.error ?? "Gagal menyimpan goal.");
         return;
       }
 
+      setPendingDuplicateGoal(null);
+      setDuplicateDialogOpen(false);
       await reloadGoalData();
       closeForm();
     } catch {
@@ -180,7 +287,7 @@ export default function GoalPage() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Goal" subtitle="Kelola sampai 3 target aktif sekaligus" />
+        <PageHeader title="Goal" />
         <div className="glass-card p-8 text-center">
           <p className="text-sm text-text-muted">Memuat goal...</p>
         </div>
@@ -189,14 +296,16 @@ export default function GoalPage() {
   }
 
   const hasAnyGoal =
-    activeGoals.length > 0 || completedGoals.length > 0 || overdueGoals.length > 0;
+    activeGoals.length > 0 ||
+    completedGoals.length > 0 ||
+    overdueGoals.length > 0;
 
   return (
     <>
       <div className="space-y-6">
         <PageHeader
           title="Goal"
-          subtitle="Kelola sampai 3 target aktif sekaligus"
+          subtitle="target kekuatanmu, capai puncak performamu!"
           rightContent={
             <Button
               type="button"
@@ -217,17 +326,16 @@ export default function GoalPage() {
                 <Target className="h-3.5 w-3.5" aria-hidden="true" />
                 Goal Aktif
               </div>
-              <p className="mt-2 text-sm text-text-muted">
-                Diurutkan dari deadline paling dekat. Maksimal 3 goal aktif.
-              </p>
             </div>
-            <p className="text-xs text-text-muted">{activeGoalCount}/3 goal aktif</p>
+            <p className="text-xs text-text-muted">
+              {activeGoalCount}/3 goal aktif
+            </p>
           </div>
 
           {activeGoalCount >= 3 ? (
             <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-text-muted">
-              Maksimal 3 goal aktif. Selesaikan satu goal atau tunggu deadline lewat
-              untuk membuka slot baru.
+              Maksimal 3 goal aktif. Selesaikan satu goal atau tunggu deadline
+              lewat untuk membuka slot baru.
             </div>
           ) : null}
 
@@ -252,21 +360,16 @@ export default function GoalPage() {
             </div>
           ) : (
             <div className="glass-card p-8 text-center">
-              <Target className="mx-auto h-10 w-10 text-emerald/80" aria-hidden="true" />
+              <Target
+                className="mx-auto h-10 w-10 text-emerald/80"
+                aria-hidden="true"
+              />
               <p className="mt-4 text-base font-semibold text-foreground">
                 Belum ada goal aktif
               </p>
               <p className="mt-2 text-sm text-text-muted">
                 Buat sampai 3 target kekuatan untuk exercise yang berbeda.
               </p>
-              <Button
-                type="button"
-                onClick={openCreateForm}
-                className="mt-5 h-11 rounded-xl bg-emerald px-4 text-sm font-semibold text-[#0A0A0F] hover:bg-emerald-dark"
-              >
-                <Plus className="mr-1.5 h-4 w-4" aria-hidden="true" />
-                Buat Goal Pertama
-              </Button>
             </div>
           )}
         </section>
@@ -293,7 +396,10 @@ export default function GoalPage() {
         {overdueGoals.length > 0 ? (
           <section className="space-y-3">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-danger" aria-hidden="true" />
+              <AlertTriangle
+                className="h-4 w-4 text-danger"
+                aria-hidden="true"
+              />
               <h2
                 className="text-base font-bold text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
@@ -335,6 +441,21 @@ export default function GoalPage() {
         onDelete={handleDeleteGoal}
         onReset={closeForm}
         onDuplicateGoalSelected={handleExerciseSelection}
+      />
+
+      <ConfirmDuplicateGoalDialog
+        open={duplicateDialogOpen}
+        pendingGoal={pendingDuplicateGoal}
+        saving={saving}
+        onConfirm={() => {
+          if (!pendingDuplicateGoal) return;
+          void submitGoal(pendingDuplicateGoal, true);
+        }}
+        onCancel={() => {
+          setDuplicateDialogOpen(false);
+          setPendingDuplicateGoal(null);
+          setFormMessage("tidak dibuatkan");
+        }}
       />
     </>
   );

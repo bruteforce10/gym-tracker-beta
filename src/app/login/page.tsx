@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import { registerUser } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dumbbell, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -74,23 +75,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen gradient-mesh flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen gradient-mesh flex flex-col items-center justify-center px-6 py-8">
       {/* Logo + Branding */}
       <div
         className="text-center mb-10 animate-fade-in-up"
         style={{ animationDelay: "100ms" }}
       >
-        <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-emerald to-emerald-dark mx-auto mb-5 flex items-center justify-center glow-emerald rotate-3 hover:rotate-0 transition-transform duration-500">
-          <Dumbbell className="w-10 h-10 text-[#0A0A0F]" />
+        <div className="mx-auto mb-5 w-full max-w-[220px]">
+          <Image
+            src="/grynx-logo.webp"
+            alt="GRYNX"
+            width={480}
+            height={168}
+            className="h-auto w-full"
+          />
         </div>
-        <h1
-          className="text-4xl font-black text-foreground tracking-tight"
-          style={{ fontFamily: "var(--font-heading)" }}
-        >
-          Gym<span className="text-emerald">Forge</span>
-        </h1>
         <p className="text-sm text-text-muted mt-2">
-          Lacak progres. Capai target. Jadi lebih kuat.
+          Track Your Strength. Build Your Best.
         </p>
       </div>
 
@@ -180,9 +181,7 @@ export default function LoginPage() {
           </div>
 
           {/* Error message */}
-          {error && (
-            <p className="text-xs text-danger text-center">{error}</p>
-          )}
+          {error && <p className="text-xs text-danger text-center">{error}</p>}
 
           {/* Submit Button */}
           <Button

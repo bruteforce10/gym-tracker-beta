@@ -24,9 +24,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "GymForge — Track Your Strength Progress",
+  title: "GRYNX - Track Your Strength. Build Your Best.",
   description:
-    "Mobile-first gym progress tracker. Set strength goals, log workouts, and monitor your 1RM progress with weekly summaries.",
+    "GRYNX helps you track strength progress, log workouts, and build your best with clear weekly summaries.",
 };
 
 export default function RootLayout({
@@ -35,7 +35,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${outfit.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+    <html
+      lang="id"
+      className={`${outfit.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
+    >
+      <head>
+        <meta name="apple-mobile-web-app-title" content="Grynx" />
+      </head>
       <body className="min-h-full flex flex-col bg-[#0A0A0F] text-[#F5F5F7]">
         {children}
       </body>

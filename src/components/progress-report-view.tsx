@@ -440,8 +440,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                 Progress
               </h1>
               <p className="mt-1 max-w-[16rem] text-sm leading-6 text-text-muted">
-                Glanceable report untuk lihat ritme latihan, durasi sesi, dan
-                perkembangan volume.
+                lihat ritme latihan, durasi sesi, dan perkembangan volume.
               </p>
             </div>
             <Link
@@ -489,9 +488,6 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                 <p className="text-sm font-semibold text-white">
                   Workout times per week
                 </p>
-                <p className="mt-1 text-xs text-text-muted">
-                  Tekan grafik untuk buka history lengkap dan kalender bulanan.
-                </p>
               </div>
               <ChevronRight
                 className="h-4 w-4 text-text-muted"
@@ -529,7 +525,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                 </Popover>
               </div>
               <p className="mt-1 text-sm text-text-muted">
-                Tetap tampil di halaman ini buat baca progres paling cepat.
+                Pantau progres mingguanmu secara instan di halaman ini.
               </p>
             </div>
             <TrendingUp className="h-5 w-5 text-emerald" aria-hidden="true" />
@@ -589,9 +585,6 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-2xl font-semibold text-white">This Week</p>
-              <p className="mt-1 text-sm text-text-muted">
-                Tekan section ini untuk lihat semua workout mingguan di history.
-              </p>
             </div>
             <CalendarDays className="h-5 w-5 text-emerald" aria-hidden="true" />
           </div>
@@ -646,9 +639,6 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-2xl font-semibold text-white">History</p>
-              <p className="mt-1 text-sm text-text-muted">
-                Preview singkat, detail lengkapnya pindah ke halaman history.
-              </p>
             </div>
             <Link
               href="/progress/history"

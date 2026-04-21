@@ -312,8 +312,7 @@ export default function ProgressHistoryView({
               {getWeekRangeLabel(selectedWeekKey)}
             </p>
             <p className="mt-1 text-sm text-text-muted">
-              Fokus ke workout dalam minggu yang sedang kamu pilih dari
-              kalender.
+              Workout minggu ini sesuai pilihan kalender.
             </p>
           </div>
           <div className="text-right">
@@ -370,10 +369,6 @@ export default function ProgressHistoryView({
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-2xl font-semibold text-white">Workout List</p>
-            <p className="mt-1 text-sm text-text-muted">
-              Semua detail history pindah ke halaman ini supaya halaman progress
-              tetap ringkas.
-            </p>
           </div>
           <CalendarDays className="h-5 w-5 text-[#10B981]" aria-hidden="true" />
         </div>

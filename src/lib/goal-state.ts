@@ -23,6 +23,9 @@ type GoalRecord = {
 type WorkoutRecord = {
   id: string;
   date: Date;
+  createdAt: Date;
+  startedAt: Date;
+  endedAt: Date | null;
   exercises: Array<{
     exerciseId: string | null;
     weight: number;
@@ -84,10 +87,39 @@ function sortHistoryGoals(
   return rightValue.localeCompare(leftValue);
 }
 
-async function updateGoalLifecycleState(goals: GoalRecord[], bestMap: Map<string, number>) {
+function getBest1RMRecordedAfterGoal(
+  goal: GoalRecord,
+  workouts: WorkoutRecord[],
+) {
+  if (!goal.exerciseId) return 0;
+
+  let best = 0;
+
+  for (const workout of workouts) {
+    const recordedAt = workout.endedAt ?? workout.startedAt ?? workout.createdAt;
+    if (recordedAt < goal.createdAt) continue;
+
+    for (const exercise of workout.exercises) {
+      if (exercise.exerciseId !== goal.exerciseId) continue;
+
+      const rm = calculate1RM(exercise.weight, exercise.reps);
+      if (rm > best) {
+        best = rm;
+      }
+    }
+  }
+
+  return best;
+}
+
+async function updateGoalLifecycleState(
+  goals: GoalRecord[],
+  workouts: WorkoutRecord[],
+) {
   const todayKey = formatDateInputValue(new Date());
   const updates = goals.flatMap((goal) => {
-    const current1RM = goal.exerciseId ? bestMap.get(goal.exerciseId) ?? 0 : 0;
+    const bestSinceGoalStarted = getBest1RMRecordedAfterGoal(goal, workouts);
+    const current1RM = Math.max(goal.currentWeight, bestSinceGoalStarted);
     const shouldSyncCurrentWeight =
       goal.status === "active" &&
       Math.abs(current1RM - goal.currentWeight) > 0.001;
@@ -179,7 +211,7 @@ export async function getUserGoalCollections(
   }
 
   const best1RMMap = buildBest1RMMap(workouts);
-  const syncedGoals = await updateGoalLifecycleState(goals, best1RMMap);
+  const syncedGoals = await updateGoalLifecycleState(goals, workouts);
   const exerciseIds = Array.from(
     new Set(syncedGoals.map((goal) => goal.exerciseId).filter(Boolean)),
   ) as string[];
@@ -193,10 +225,7 @@ export async function getUserGoalCollections(
       const exercise = exerciseMap.get(goal.exerciseId);
       if (!exercise) return null;
 
-      const current1RM =
-        goal.status === "active"
-          ? best1RMMap.get(goal.exerciseId) ?? goal.currentWeight ?? 0
-          : goal.currentWeight;
+      const current1RM = goal.currentWeight;
       const deadline = goal.deadline ? formatDateInputValue(goal.deadline) : null;
 
       return {

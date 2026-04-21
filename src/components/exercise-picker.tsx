@@ -82,13 +82,13 @@ export default function ExercisePicker({
   const updateFavoriteState = (exerciseId: string, nextValue: boolean) => {
     setSections((current) => ({
       favorites: current.favorites.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
+        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item,
       ),
       recent: current.recent.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
+        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item,
       ),
       results: current.results.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
+        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item,
       ),
     }));
   };
@@ -96,7 +96,7 @@ export default function ExercisePicker({
   const renderSection = (
     title: string,
     items: FavoriteAwareExerciseItem[],
-    tone: "favorite" | "recent" | "search"
+    tone: "favorite" | "recent" | "search",
   ) => {
     if (items.length === 0) return null;
 
@@ -120,15 +120,24 @@ export default function ExercisePicker({
 
         <div className="flex flex-col gap-1.5">
           {items.map((exercise) => (
-            <button
+            <div
               key={exercise.id}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => {
                 onChange(exercise);
                 setQuery(exercise.name);
                 setIsOpen(false);
               }}
-              className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onChange(exercise);
+                  setQuery(exercise.name);
+                  setIsOpen(false);
+                }
+              }}
+              className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors cursor-pointer ${
                 value?.id === exercise.id
                   ? "border-emerald/40 bg-emerald/10"
                   : "border-transparent bg-surface hover:border-emerald/20"
@@ -156,7 +165,9 @@ export default function ExercisePicker({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="shrink-0 text-[10px] text-text-muted">
-                    {exercise.trainingStyle === "compound" ? "Compound" : "Isolation"}
+                    {exercise.trainingStyle === "compound"
+                      ? "Compound"
+                      : "Isolation"}
                   </span>
                   <FavoriteExerciseButton
                     exerciseId={exercise.id}
@@ -167,7 +178,7 @@ export default function ExercisePicker({
                   />
                 </div>
               </div>
-            </button>
+            </div>
           ))}
         </div>
       </div>
@@ -177,7 +188,10 @@ export default function ExercisePicker({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <label htmlFor={inputId} className="text-xs font-medium text-text-muted">
+        <label
+          htmlFor={inputId}
+          className="text-xs font-medium text-text-muted"
+        >
           {label}
         </label>
         {value ? (
@@ -199,7 +213,10 @@ export default function ExercisePicker({
 
       <div className="overflow-hidden rounded-xl border border-border-subtle bg-surface-elevated">
         <div className="flex items-center gap-2 px-3">
-          <Search className="h-4 w-4 shrink-0 text-text-muted" aria-hidden="true" />
+          <Search
+            className="h-4 w-4 shrink-0 text-text-muted"
+            aria-hidden="true"
+          />
           <input
             id={inputId}
             name={inputId}
@@ -225,7 +242,7 @@ export default function ExercisePicker({
                 {renderSection(
                   deferredQuery ? "Hasil Pencarian" : "Explore",
                   sections.results,
-                  "search"
+                  "search",
                 )}
               </div>
 

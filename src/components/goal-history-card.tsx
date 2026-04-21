@@ -96,14 +96,6 @@ export default function GoalHistoryCard({ goal }: GoalHistoryCardProps) {
           </p>
         </div>
       </div>
-
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-[22px] border border-white/8 bg-[#0F1218]/86 px-4 py-3 text-xs text-text-muted/80">
-        <span className="inline-flex items-center gap-1.5">
-          <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
-          {dateLabel}
-        </span>
-        <span>{goal.progress}% progress terakhir</span>
-      </div>
     </div>
   );
 }
