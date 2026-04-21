@@ -116,8 +116,11 @@ function getChartPoints(
   }));
 }
 
-function getChartPath(points: ChartPoint[]) {
+function getChartPath(points: ChartPoint[], chartWidth: number) {
   if (points.length === 0) return "";
+  if (points.length === 1) {
+    return `M0,${points[0].y.toFixed(2)} L${chartWidth.toFixed(2)},${points[0].y.toFixed(2)}`;
+  }
 
   return points
     .map((point, index) => {
@@ -131,7 +134,7 @@ function getAreaPath(
   chartWidth: number,
   chartHeight: number,
 ) {
-  const linePath = getChartPath(points);
+  const linePath = getChartPath(points, chartWidth);
   if (!linePath) return "";
   return `${linePath} L ${chartWidth},${chartHeight} L 0,${chartHeight} Z`;
 }
@@ -227,7 +230,7 @@ function WeightTrend({
   const values = points.map((point) => point.valueKg);
   const bounds = getWeightBounds(values);
   const chartPoints = getChartPoints(values, chartWidth, chartHeight, bounds);
-  const linePath = getChartPath(chartPoints);
+  const linePath = getChartPath(chartPoints, chartWidth);
   const areaPath = getAreaPath(chartPoints, chartWidth, chartHeight);
   const yTicks = getTickValues(bounds);
   const xTickIndices = getXAxisTickIndices(points.length);

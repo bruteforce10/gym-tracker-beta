@@ -572,21 +572,25 @@ export default function WorkoutSessionPage() {
       nextSnapshot,
       primaryExercise.sessionExerciseId
     );
-    const supersetExercise =
-      pairing && pairing.status === "active"
-        ? getExerciseBySessionId(nextSnapshot, pairing.supersetSessionExerciseId)
-        : null;
+    const isOnPrimaryLane = snapshot.progress.activeTurn.lane === "primary";
     const primaryComplete = isExerciseComplete(
       nextSnapshot,
       primaryExercise.sessionExerciseId
     );
-    const supersetComplete = supersetExercise
-      ? isExerciseComplete(nextSnapshot, supersetExercise.sessionExerciseId)
-      : true;
 
     let resolvedSnapshot = nextSnapshot;
 
-    if (pairing && pairing.status === "active" && supersetComplete) {
+    const plannedSupersetPartnerId =
+      primaryExercise.supersetWithNext
+        ? snapshot.progress.planOrder[snapshot.progress.primaryIndex + 1]
+        : null;
+
+    if (
+      !pairing &&
+      isOnPrimaryLane &&
+      plannedSupersetPartnerId &&
+      plannedSupersetPartnerId !== primaryExercise.sessionExerciseId
+    ) {
       resolvedSnapshot = {
         ...resolvedSnapshot,
         progress: {
@@ -594,7 +598,47 @@ export default function WorkoutSessionPage() {
           pairings: {
             ...resolvedSnapshot.progress.pairings,
             [primaryExercise.sessionExerciseId]: {
-              ...pairing,
+              primarySessionExerciseId: primaryExercise.sessionExerciseId,
+              supersetSessionExerciseId: plannedSupersetPartnerId,
+              transitionRestSeconds: 10,
+              status: "active",
+            },
+          },
+        },
+      };
+    }
+
+    const effectivePairing = getPairingForPrimary(
+      resolvedSnapshot,
+      primaryExercise.sessionExerciseId
+    );
+    const effectiveSupersetExercise =
+      effectivePairing && effectivePairing.status === "active"
+        ? getExerciseBySessionId(
+            resolvedSnapshot,
+            effectivePairing.supersetSessionExerciseId
+          )
+        : null;
+    const effectiveSupersetComplete = effectiveSupersetExercise
+      ? isExerciseComplete(
+          resolvedSnapshot,
+          effectiveSupersetExercise.sessionExerciseId
+        )
+      : true;
+
+    if (
+      effectivePairing &&
+      effectivePairing.status === "active" &&
+      effectiveSupersetComplete
+    ) {
+      resolvedSnapshot = {
+        ...resolvedSnapshot,
+        progress: {
+          ...resolvedSnapshot.progress,
+          pairings: {
+            ...resolvedSnapshot.progress.pairings,
+            [primaryExercise.sessionExerciseId]: {
+              ...effectivePairing,
               status: "completed",
             },
           },
@@ -602,14 +646,18 @@ export default function WorkoutSessionPage() {
       };
     }
 
-    const isOnPrimaryLane = snapshot.progress.activeTurn.lane === "primary";
-
-    if (isOnPrimaryLane && pairing && pairing.status === "active" && !supersetComplete) {
+    if (
+      isOnPrimaryLane &&
+      effectivePairing &&
+      effectivePairing.status === "active" &&
+      effectiveSupersetExercise &&
+      !effectiveSupersetComplete
+    ) {
       beginRest(
         resolvedSnapshot,
-        pairing.transitionRestSeconds,
+        effectivePairing.transitionRestSeconds,
         {
-          sessionExerciseId: pairing.supersetSessionExerciseId,
+          sessionExerciseId: effectivePairing.supersetSessionExerciseId,
           lane: "superset",
         },
         "transition"
@@ -618,7 +666,11 @@ export default function WorkoutSessionPage() {
     }
 
     if (!isOnPrimaryLane) {
-      if (pairing && pairing.status === "active" && supersetComplete) {
+      if (
+        effectivePairing &&
+        effectivePairing.status === "active" &&
+        effectiveSupersetComplete
+      ) {
         resolvedSnapshot = {
           ...resolvedSnapshot,
           progress: {
@@ -626,7 +678,7 @@ export default function WorkoutSessionPage() {
             pairings: {
               ...resolvedSnapshot.progress.pairings,
               [primaryExercise.sessionExerciseId]: {
-                ...pairing,
+                ...effectivePairing,
                 status: "completed",
               },
             },
@@ -634,7 +686,7 @@ export default function WorkoutSessionPage() {
         };
       }
 
-      if (!supersetComplete) {
+      if (!effectiveSupersetComplete) {
         beginRest(
           resolvedSnapshot,
           currentExercise.restTime,
@@ -663,7 +715,13 @@ export default function WorkoutSessionPage() {
       return;
     }
 
-    const nextPrimaryIndex = snapshot.progress.primaryIndex + 1;
+    const primaryStep =
+      effectivePairing &&
+      effectivePairing.supersetSessionExerciseId ===
+        snapshot.progress.planOrder[snapshot.progress.primaryIndex + 1]
+        ? 2
+        : 1;
+    const nextPrimaryIndex = snapshot.progress.primaryIndex + primaryStep;
     const nextPrimaryId = snapshot.progress.planOrder[nextPrimaryIndex];
 
     if (!nextPrimaryId) {

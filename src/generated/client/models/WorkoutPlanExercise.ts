@@ -47,6 +47,7 @@ export type WorkoutPlanExerciseMinAggregateOutputType = {
   defaultSets: number | null
   defaultReps: number | null
   restTime: number | null
+  supersetWithNext: boolean | null
   order: number | null
 }
 
@@ -57,6 +58,7 @@ export type WorkoutPlanExerciseMaxAggregateOutputType = {
   defaultSets: number | null
   defaultReps: number | null
   restTime: number | null
+  supersetWithNext: boolean | null
   order: number | null
 }
 
@@ -67,6 +69,7 @@ export type WorkoutPlanExerciseCountAggregateOutputType = {
   defaultSets: number
   defaultReps: number
   restTime: number
+  supersetWithNext: number
   order: number
   _all: number
 }
@@ -93,6 +96,7 @@ export type WorkoutPlanExerciseMinAggregateInputType = {
   defaultSets?: true
   defaultReps?: true
   restTime?: true
+  supersetWithNext?: true
   order?: true
 }
 
@@ -103,6 +107,7 @@ export type WorkoutPlanExerciseMaxAggregateInputType = {
   defaultSets?: true
   defaultReps?: true
   restTime?: true
+  supersetWithNext?: true
   order?: true
 }
 
@@ -113,6 +118,7 @@ export type WorkoutPlanExerciseCountAggregateInputType = {
   defaultSets?: true
   defaultReps?: true
   restTime?: true
+  supersetWithNext?: true
   order?: true
   _all?: true
 }
@@ -210,6 +216,7 @@ export type WorkoutPlanExerciseGroupByOutputType = {
   defaultSets: number
   defaultReps: number
   restTime: number
+  supersetWithNext: boolean
   order: number
   _count: WorkoutPlanExerciseCountAggregateOutputType | null
   _avg: WorkoutPlanExerciseAvgAggregateOutputType | null
@@ -243,6 +250,7 @@ export type WorkoutPlanExerciseWhereInput = {
   defaultSets?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
   defaultReps?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
   restTime?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
+  supersetWithNext?: Prisma.BoolFilter<"WorkoutPlanExercise"> | boolean
   order?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
   plan?: Prisma.XOR<Prisma.WorkoutPlanScalarRelationFilter, Prisma.WorkoutPlanWhereInput>
 }
@@ -254,6 +262,7 @@ export type WorkoutPlanExerciseOrderByWithRelationInput = {
   defaultSets?: Prisma.SortOrder
   defaultReps?: Prisma.SortOrder
   restTime?: Prisma.SortOrder
+  supersetWithNext?: Prisma.SortOrder
   order?: Prisma.SortOrder
   plan?: Prisma.WorkoutPlanOrderByWithRelationInput
 }
@@ -268,6 +277,7 @@ export type WorkoutPlanExerciseWhereUniqueInput = Prisma.AtLeast<{
   defaultSets?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
   defaultReps?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
   restTime?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
+  supersetWithNext?: Prisma.BoolFilter<"WorkoutPlanExercise"> | boolean
   order?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
   plan?: Prisma.XOR<Prisma.WorkoutPlanScalarRelationFilter, Prisma.WorkoutPlanWhereInput>
 }, "id">
@@ -279,6 +289,7 @@ export type WorkoutPlanExerciseOrderByWithAggregationInput = {
   defaultSets?: Prisma.SortOrder
   defaultReps?: Prisma.SortOrder
   restTime?: Prisma.SortOrder
+  supersetWithNext?: Prisma.SortOrder
   order?: Prisma.SortOrder
   _count?: Prisma.WorkoutPlanExerciseCountOrderByAggregateInput
   _avg?: Prisma.WorkoutPlanExerciseAvgOrderByAggregateInput
@@ -297,6 +308,7 @@ export type WorkoutPlanExerciseScalarWhereWithAggregatesInput = {
   defaultSets?: Prisma.IntWithAggregatesFilter<"WorkoutPlanExercise"> | number
   defaultReps?: Prisma.IntWithAggregatesFilter<"WorkoutPlanExercise"> | number
   restTime?: Prisma.IntWithAggregatesFilter<"WorkoutPlanExercise"> | number
+  supersetWithNext?: Prisma.BoolWithAggregatesFilter<"WorkoutPlanExercise"> | boolean
   order?: Prisma.IntWithAggregatesFilter<"WorkoutPlanExercise"> | number
 }
 
@@ -306,6 +318,7 @@ export type WorkoutPlanExerciseCreateInput = {
   defaultSets?: number
   defaultReps?: number
   restTime?: number
+  supersetWithNext?: boolean
   order: number
   plan: Prisma.WorkoutPlanCreateNestedOneWithoutExercisesInput
 }
@@ -317,6 +330,7 @@ export type WorkoutPlanExerciseUncheckedCreateInput = {
   defaultSets?: number
   defaultReps?: number
   restTime?: number
+  supersetWithNext?: boolean
   order: number
 }
 
@@ -326,6 +340,7 @@ export type WorkoutPlanExerciseUpdateInput = {
   defaultSets?: Prisma.IntFieldUpdateOperationsInput | number
   defaultReps?: Prisma.IntFieldUpdateOperationsInput | number
   restTime?: Prisma.IntFieldUpdateOperationsInput | number
+  supersetWithNext?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
   plan?: Prisma.WorkoutPlanUpdateOneRequiredWithoutExercisesNestedInput
 }
@@ -337,6 +352,7 @@ export type WorkoutPlanExerciseUncheckedUpdateInput = {
   defaultSets?: Prisma.IntFieldUpdateOperationsInput | number
   defaultReps?: Prisma.IntFieldUpdateOperationsInput | number
   restTime?: Prisma.IntFieldUpdateOperationsInput | number
+  supersetWithNext?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -347,6 +363,7 @@ export type WorkoutPlanExerciseCreateManyInput = {
   defaultSets?: number
   defaultReps?: number
   restTime?: number
+  supersetWithNext?: boolean
   order: number
 }
 
@@ -356,6 +373,7 @@ export type WorkoutPlanExerciseUpdateManyMutationInput = {
   defaultSets?: Prisma.IntFieldUpdateOperationsInput | number
   defaultReps?: Prisma.IntFieldUpdateOperationsInput | number
   restTime?: Prisma.IntFieldUpdateOperationsInput | number
+  supersetWithNext?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -366,6 +384,7 @@ export type WorkoutPlanExerciseUncheckedUpdateManyInput = {
   defaultSets?: Prisma.IntFieldUpdateOperationsInput | number
   defaultReps?: Prisma.IntFieldUpdateOperationsInput | number
   restTime?: Prisma.IntFieldUpdateOperationsInput | number
+  supersetWithNext?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -386,6 +405,7 @@ export type WorkoutPlanExerciseCountOrderByAggregateInput = {
   defaultSets?: Prisma.SortOrder
   defaultReps?: Prisma.SortOrder
   restTime?: Prisma.SortOrder
+  supersetWithNext?: Prisma.SortOrder
   order?: Prisma.SortOrder
 }
 
@@ -403,6 +423,7 @@ export type WorkoutPlanExerciseMaxOrderByAggregateInput = {
   defaultSets?: Prisma.SortOrder
   defaultReps?: Prisma.SortOrder
   restTime?: Prisma.SortOrder
+  supersetWithNext?: Prisma.SortOrder
   order?: Prisma.SortOrder
 }
 
@@ -413,6 +434,7 @@ export type WorkoutPlanExerciseMinOrderByAggregateInput = {
   defaultSets?: Prisma.SortOrder
   defaultReps?: Prisma.SortOrder
   restTime?: Prisma.SortOrder
+  supersetWithNext?: Prisma.SortOrder
   order?: Prisma.SortOrder
 }
 
@@ -465,12 +487,17 @@ export type WorkoutPlanExerciseUncheckedUpdateManyWithoutPlanNestedInput = {
   deleteMany?: Prisma.WorkoutPlanExerciseScalarWhereInput | Prisma.WorkoutPlanExerciseScalarWhereInput[]
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type WorkoutPlanExerciseCreateWithoutPlanInput = {
   id?: string
   exerciseId: string
   defaultSets?: number
   defaultReps?: number
   restTime?: number
+  supersetWithNext?: boolean
   order: number
 }
 
@@ -480,6 +507,7 @@ export type WorkoutPlanExerciseUncheckedCreateWithoutPlanInput = {
   defaultSets?: number
   defaultReps?: number
   restTime?: number
+  supersetWithNext?: boolean
   order: number
 }
 
@@ -519,6 +547,7 @@ export type WorkoutPlanExerciseScalarWhereInput = {
   defaultSets?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
   defaultReps?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
   restTime?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
+  supersetWithNext?: Prisma.BoolFilter<"WorkoutPlanExercise"> | boolean
   order?: Prisma.IntFilter<"WorkoutPlanExercise"> | number
 }
 
@@ -528,6 +557,7 @@ export type WorkoutPlanExerciseCreateManyPlanInput = {
   defaultSets?: number
   defaultReps?: number
   restTime?: number
+  supersetWithNext?: boolean
   order: number
 }
 
@@ -537,6 +567,7 @@ export type WorkoutPlanExerciseUpdateWithoutPlanInput = {
   defaultSets?: Prisma.IntFieldUpdateOperationsInput | number
   defaultReps?: Prisma.IntFieldUpdateOperationsInput | number
   restTime?: Prisma.IntFieldUpdateOperationsInput | number
+  supersetWithNext?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -546,6 +577,7 @@ export type WorkoutPlanExerciseUncheckedUpdateWithoutPlanInput = {
   defaultSets?: Prisma.IntFieldUpdateOperationsInput | number
   defaultReps?: Prisma.IntFieldUpdateOperationsInput | number
   restTime?: Prisma.IntFieldUpdateOperationsInput | number
+  supersetWithNext?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -555,6 +587,7 @@ export type WorkoutPlanExerciseUncheckedUpdateManyWithoutPlanInput = {
   defaultSets?: Prisma.IntFieldUpdateOperationsInput | number
   defaultReps?: Prisma.IntFieldUpdateOperationsInput | number
   restTime?: Prisma.IntFieldUpdateOperationsInput | number
+  supersetWithNext?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -567,6 +600,7 @@ export type WorkoutPlanExerciseSelect<ExtArgs extends runtime.Types.Extensions.I
   defaultSets?: boolean
   defaultReps?: boolean
   restTime?: boolean
+  supersetWithNext?: boolean
   order?: boolean
   plan?: boolean | Prisma.WorkoutPlanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workoutPlanExercise"]>
@@ -578,6 +612,7 @@ export type WorkoutPlanExerciseSelectCreateManyAndReturn<ExtArgs extends runtime
   defaultSets?: boolean
   defaultReps?: boolean
   restTime?: boolean
+  supersetWithNext?: boolean
   order?: boolean
   plan?: boolean | Prisma.WorkoutPlanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workoutPlanExercise"]>
@@ -589,6 +624,7 @@ export type WorkoutPlanExerciseSelectUpdateManyAndReturn<ExtArgs extends runtime
   defaultSets?: boolean
   defaultReps?: boolean
   restTime?: boolean
+  supersetWithNext?: boolean
   order?: boolean
   plan?: boolean | Prisma.WorkoutPlanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workoutPlanExercise"]>
@@ -600,10 +636,11 @@ export type WorkoutPlanExerciseSelectScalar = {
   defaultSets?: boolean
   defaultReps?: boolean
   restTime?: boolean
+  supersetWithNext?: boolean
   order?: boolean
 }
 
-export type WorkoutPlanExerciseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planId" | "exerciseId" | "defaultSets" | "defaultReps" | "restTime" | "order", ExtArgs["result"]["workoutPlanExercise"]>
+export type WorkoutPlanExerciseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planId" | "exerciseId" | "defaultSets" | "defaultReps" | "restTime" | "supersetWithNext" | "order", ExtArgs["result"]["workoutPlanExercise"]>
 export type WorkoutPlanExerciseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   plan?: boolean | Prisma.WorkoutPlanDefaultArgs<ExtArgs>
 }
@@ -626,6 +663,7 @@ export type $WorkoutPlanExercisePayload<ExtArgs extends runtime.Types.Extensions
     defaultSets: number
     defaultReps: number
     restTime: number
+    supersetWithNext: boolean
     order: number
   }, ExtArgs["result"]["workoutPlanExercise"]>
   composites: {}
@@ -1057,6 +1095,7 @@ export interface WorkoutPlanExerciseFieldRefs {
   readonly defaultSets: Prisma.FieldRef<"WorkoutPlanExercise", 'Int'>
   readonly defaultReps: Prisma.FieldRef<"WorkoutPlanExercise", 'Int'>
   readonly restTime: Prisma.FieldRef<"WorkoutPlanExercise", 'Int'>
+  readonly supersetWithNext: Prisma.FieldRef<"WorkoutPlanExercise", 'Boolean'>
   readonly order: Prisma.FieldRef<"WorkoutPlanExercise", 'Int'>
 }
     

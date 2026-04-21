@@ -21,6 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   Check,
   GripVertical,
+  Link2,
   PencilLine,
   Search,
   Settings2,
@@ -53,6 +54,7 @@ type PlanExercise = {
   defaultSets: number;
   defaultReps: number;
   restTime: number;
+  supersetWithNext: boolean;
   order: number;
   exercise: ExerciseCatalogItem;
 };
@@ -70,6 +72,7 @@ type EditablePlanExercise = {
   defaultSets: number;
   defaultReps: number;
   restTime: number;
+  supersetWithNext: boolean;
   order: number;
 };
 
@@ -81,10 +84,15 @@ interface PlanEditorSheetProps {
 }
 
 function normalizeOrder(items: EditablePlanExercise[]) {
-  return items.map((item, index) => ({
-    ...item,
-    order: index,
-  }));
+  return items.map((item, index) => {
+    const isLast = index === items.length - 1;
+
+    return {
+      ...item,
+      order: index,
+      supersetWithNext: isLast ? false : item.supersetWithNext,
+    };
+  });
 }
 
 function buildEditablePlanExercise(exercise: ExerciseCatalogItem): EditablePlanExercise {
@@ -94,6 +102,7 @@ function buildEditablePlanExercise(exercise: ExerciseCatalogItem): EditablePlanE
     defaultSets: exercise.defaultSets,
     defaultReps: exercise.defaultReps,
     restTime: exercise.defaultRestTime,
+    supersetWithNext: false,
     order: 0,
   };
 }
@@ -113,11 +122,15 @@ function SortableExerciseCard({
   item,
   onEdit,
   onRemove,
+  onToggleSuperset,
+  canToggleSuperset,
 }: {
   index: number;
   item: EditablePlanExercise;
   onEdit: (exerciseId: string) => void;
   onRemove: (exerciseId: string) => void;
+  onToggleSuperset: (index: number) => void;
+  canToggleSuperset: boolean;
 }) {
   const {
     attributes,
@@ -187,6 +200,11 @@ function SortableExerciseCard({
             <span className="rounded-full border border-emerald/20 bg-emerald/10 px-2.5 py-1 text-[11px] font-medium text-emerald">
               {formatPrescription(item)}
             </span>
+            {item.supersetWithNext ? (
+              <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-2.5 py-1 text-[11px] font-medium text-amber-200">
+                Superset dengan next
+              </span>
+            ) : null}
             <button
               type="button"
               onClick={() => onEdit(item.exerciseId)}
@@ -194,6 +212,24 @@ function SortableExerciseCard({
             >
               <PencilLine className="h-3.5 w-3.5" aria-hidden="true" />
               Edit
+            </button>
+            <button
+              type="button"
+              onClick={() => onToggleSuperset(index)}
+              disabled={!canToggleSuperset}
+              className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-[11px] font-semibold transition-colors ${
+                item.supersetWithNext
+                  ? "border-amber-300/30 bg-amber-300/10 text-amber-200"
+                  : "border-border-subtle bg-surface text-text-muted hover:border-amber-300/30 hover:text-amber-200"
+              } disabled:cursor-not-allowed disabled:opacity-40`}
+              title={
+                canToggleSuperset
+                  ? "Pair dengan item berikutnya sebagai superset"
+                  : "Item terakhir tidak bisa dipair ke item berikutnya"
+              }
+            >
+              <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
+              {item.supersetWithNext ? "Superset On" : "Superset"}
             </button>
             <button
               type="button"
@@ -230,6 +266,7 @@ export default function PlanEditorSheet({
         defaultSets: exercise.defaultSets,
         defaultReps: exercise.defaultReps,
         restTime: exercise.restTime,
+        supersetWithNext: exercise.supersetWithNext,
         order: exercise.order,
       }))
     )
@@ -254,6 +291,7 @@ export default function PlanEditorSheet({
           defaultSets: exercise.defaultSets,
           defaultReps: exercise.defaultReps,
           restTime: exercise.restTime,
+          supersetWithNext: exercise.supersetWithNext,
           order: exercise.order,
         }))
       )
@@ -337,6 +375,34 @@ export default function PlanEditorSheet({
     );
   };
 
+  const handleToggleSuperset = (index: number) => {
+    setSelectedExercises((current) => {
+      if (index < 0 || index >= current.length - 1) {
+        return current;
+      }
+
+      const nextValue = !current[index].supersetWithNext;
+
+      return normalizeOrder(
+        current.map((item, itemIndex) => {
+          if (itemIndex === index) {
+            return { ...item, supersetWithNext: nextValue };
+          }
+
+          if (!nextValue) {
+            return item;
+          }
+
+          if (itemIndex === index - 1 || itemIndex === index + 1) {
+            return { ...item, supersetWithNext: false };
+          }
+
+          return item;
+        })
+      );
+    });
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -408,6 +474,7 @@ export default function PlanEditorSheet({
         defaultSets: exercise.defaultSets,
         defaultReps: exercise.defaultReps,
         restTime: exercise.restTime,
+        supersetWithNext: exercise.supersetWithNext,
         order: index,
       }));
 
@@ -603,6 +670,8 @@ export default function PlanEditorSheet({
                           item={exercise}
                           onEdit={handleOpenEditor}
                           onRemove={handleRemoveExercise}
+                          onToggleSuperset={handleToggleSuperset}
+                          canToggleSuperset={index < selectedExercises.length - 1}
                         />
                       ))}
                     </div>

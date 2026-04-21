@@ -32,6 +32,7 @@ export type SessionExercise = {
   defaultSets: number;
   defaultReps: number;
   restTime: number;
+  supersetWithNext?: boolean;
   source: SessionExerciseSource;
 };
 
@@ -112,6 +113,7 @@ export function buildSessionExercise(
     defaultSets: exercise.defaultSets,
     defaultReps: exercise.defaultReps,
     restTime: exercise.defaultRestTime,
+    supersetWithNext: false,
     source: options?.source ?? "plan",
   };
 }
@@ -249,6 +251,7 @@ export function normalizeSessionExercise(
     ...exercise,
     sessionExerciseId:
       exercise.sessionExerciseId ?? createSessionExerciseId(exercise.exerciseId),
+    supersetWithNext: Boolean(exercise.supersetWithNext),
     source: exercise.source === "dynamic-superset" ? "dynamic-superset" : "plan",
   };
 }

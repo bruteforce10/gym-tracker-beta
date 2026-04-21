@@ -19,6 +19,7 @@ type PlanExercise = {
   defaultSets: number;
   defaultReps: number;
   restTime: number;
+  supersetWithNext: boolean;
   order: number;
   exercise: ExerciseCatalogItem;
 };
@@ -95,6 +96,7 @@ export default function WorkoutStartClient() {
           defaultSets: exercise.defaultSets,
           defaultReps: exercise.defaultReps,
           restTime: exercise.restTime,
+          supersetWithNext: exercise.supersetWithNext,
           source: "plan" as const,
         })),
     };

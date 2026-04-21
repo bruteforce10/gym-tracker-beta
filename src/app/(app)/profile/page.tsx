@@ -63,8 +63,11 @@ function ConfirmResetDialog({
           </h3>
           <p className="text-text-muted text-sm leading-relaxed">
             Tindakan ini akan menghapus{" "}
-            <span className="text-danger font-semibold">semua data latihan</span>{" "}
-            kamu secara permanen — termasuk workout history, goals, dan workout plans.
+            <span className="text-danger font-semibold">
+              semua data latihan
+            </span>{" "}
+            kamu secara permanen — termasuk workout history, goals, dan workout
+            plans.
           </p>
           <p className="text-text-muted text-xs bg-surface-elevated rounded-lg px-3 py-2 w-full text-left border border-border-subtle">
             ✓ Akun & info login kamu tetap aman.
@@ -114,7 +117,9 @@ export default function ProfilePage() {
   const [resetSuccess, setResetSuccess] = useState(false);
 
   useEffect(() => {
-    getCurrentStats().then(setStats).catch(() => {});
+    getCurrentStats()
+      .then(setStats)
+      .catch(() => {});
   }, []);
 
   const userName = session?.user?.name || "User";
@@ -163,7 +168,10 @@ export default function ProfilePage() {
       )}
 
       {/* Profile card */}
-      <div className="glass-card p-6 animate-fade-in-up text-center" id="profile-card">
+      <div
+        className="glass-card p-6 animate-fade-in-up text-center"
+        id="profile-card"
+      >
         <div className="w-20 h-20 rounded-full bg-linear-to-br from-emerald to-emerald-dark mx-auto mb-4 flex items-center justify-center glow-emerald">
           <span
             className="text-3xl font-bold text-[#0A0A0F]"
@@ -210,7 +218,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Settings */}
-      <div
+      {/* <div
         className="glass-card overflow-hidden animate-fade-in-up"
         style={{ animationDelay: "200ms" }}
         id="settings-section"
@@ -237,7 +245,7 @@ export default function ProfilePage() {
             )}
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Danger Zone */}
       <div

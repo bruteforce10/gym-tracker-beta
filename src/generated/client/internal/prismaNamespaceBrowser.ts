@@ -231,6 +231,7 @@ export const WorkoutPlanExerciseScalarFieldEnum = {
   defaultSets: 'defaultSets',
   defaultReps: 'defaultReps',
   restTime: 'restTime',
+  supersetWithNext: 'supersetWithNext',
   order: 'order'
 } as const
 

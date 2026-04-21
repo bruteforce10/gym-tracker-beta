@@ -107,7 +107,14 @@ export async function createDefaultPlans() {
 export async function createWorkoutPlan(
   name: string,
   type: string,
-  exerciseItems: { exerciseId: string; defaultSets: number; defaultReps: number; restTime: number; order: number }[]
+  exerciseItems: {
+    exerciseId: string;
+    defaultSets: number;
+    defaultReps: number;
+    restTime: number;
+    order: number;
+    supersetWithNext?: boolean;
+  }[]
 ) {
   const userId = await getUserId();
   const plan = await prisma.workoutPlan.create({
@@ -131,7 +138,14 @@ export async function createWorkoutPlan(
 export async function updateWorkoutPlanExercises(
   planId: string,
   name: string,
-  exerciseItems: { exerciseId: string; defaultSets: number; defaultReps: number; restTime: number; order: number }[]
+  exerciseItems: {
+    exerciseId: string;
+    defaultSets: number;
+    defaultReps: number;
+    restTime: number;
+    order: number;
+    supersetWithNext?: boolean;
+  }[]
 ) {
   const userId = await getUserId();
   const plan = await prisma.workoutPlan.findFirst({ where: { id: planId, userId } });
@@ -209,6 +223,7 @@ export async function addExerciseToPlan(
       defaultSets: defaults.defaultSets,
       defaultReps: defaults.defaultReps,
       restTime: defaults.restTime,
+      supersetWithNext: false,
       order: nextOrder,
     },
   });
@@ -243,6 +258,7 @@ type PlanWithExercises = {
     defaultSets: number;
     defaultReps: number;
     restTime: number;
+    supersetWithNext: boolean;
     order: number;
   }>;
 };

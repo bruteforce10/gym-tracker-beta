@@ -28,6 +28,7 @@ type PlanExercise = {
   defaultSets: number;
   defaultReps: number;
   restTime: number;
+  supersetWithNext: boolean;
   order: number;
   exercise: ExerciseCatalogItem;
 };
