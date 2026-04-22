@@ -1,6 +1,12 @@
 {
   "name": "Grynx",
   "short_name": "Grynx",
+  "description": "Track workouts, manage plans, and monitor strength progress on mobile.",
+  "lang": "id",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "orientation": "portrait",
+  "categories": ["health", "fitness", "sports"],
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -15,7 +21,8 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#19a576",
-  "display": "standalone"
+  "theme_color": "#0A0A0F",
+  "background_color": "#0A0A0F",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"]
 }

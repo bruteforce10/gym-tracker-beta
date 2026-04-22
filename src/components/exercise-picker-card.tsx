@@ -83,7 +83,6 @@ export default function ExercisePickerCard({
             sizes="128px"
             quality={45}
             loading="lazy"
-            preferOptimized
             fallback={
               <div
                 className={`flex h-full w-full items-center justify-center bg-linear-to-br ${gradient}`}

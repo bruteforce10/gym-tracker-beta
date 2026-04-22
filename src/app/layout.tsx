@@ -21,12 +21,24 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#0A0A0F",
+  colorScheme: "dark",
 };
 
 export const metadata: Metadata = {
+  applicationName: "Grynx",
   title: "GRYNX - Track Your Strength. Build Your Best.",
   description:
     "GRYNX helps you track strength progress, log workouts, and build your best with clear weekly summaries.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Grynx",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({
