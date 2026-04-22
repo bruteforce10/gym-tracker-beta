@@ -6,8 +6,8 @@ import { Client } from "pg";
 import { UTApi, UTFile } from "uploadthing/server";
 
 const DEFAULT_API_BASE_URL = "https://gym-fit.p.rapidapi.com";
-const SEARCH_PAGE_SIZE = 100;
-const DEFAULT_BATCH_SIZE = 100;
+const SEARCH_PAGE_SIZE = 50;
+const DEFAULT_BATCH_SIZE = 50;
 const DETAIL_CONCURRENCY = 3;
 const STATE_DIR = path.join(process.cwd(), ".cache");
 const STATE_PATH = path.join(STATE_DIR, "gymfit-import-state.json");
@@ -37,7 +37,10 @@ function getGymFitHeaders() {
 }
 
 function getGymFitBaseUrl() {
-  return (process.env.GYMFIT_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/+$/, "");
+  return (process.env.GYMFIT_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(
+    /\/+$/,
+    "",
+  );
 }
 
 function asString(value) {
@@ -124,8 +127,8 @@ function writeState(nextState) {
         updatedAt: new Date().toISOString(),
       },
       null,
-      2
-    )
+      2,
+    ),
   );
 }
 
@@ -203,10 +206,12 @@ async function requestGymFit(pathname, params = {}) {
     const details = await response.text();
     if (response.status === 429) {
       throw new GymFitQuotaExceededError(
-        `Gym Fit request failed: ${response.status} ${response.statusText} - ${details}`
+        `Gym Fit request failed: ${response.status} ${response.statusText} - ${details}`,
       );
     }
-    throw new Error(`Gym Fit request failed: ${response.status} ${response.statusText} - ${details}`);
+    throw new Error(
+      `Gym Fit request failed: ${response.status} ${response.statusText} - ${details}`,
+    );
   }
 
   return response.json();
@@ -218,14 +223,16 @@ async function uploadImageToUploadThing(imageUrl, exerciseId, exerciseName) {
 
   try {
     const parsedUrl = new URL(normalizedUrl);
-    const extensionMatch = parsedUrl.pathname.match(/\.(png|jpe?g|webp|gif|avif)$/i);
+    const extensionMatch = parsedUrl.pathname.match(
+      /\.(png|jpe?g|webp|gif|avif)$/i,
+    );
     const extension = (extensionMatch?.[1] ?? "png").toLowerCase();
     const fileName = `${safeFileSegment(exerciseId, "exercise")}-${safeFileSegment(exerciseName, "exercise")}.${extension}`;
 
     const sourceResponse = await fetch(normalizedUrl, { method: "GET" });
     if (!sourceResponse.ok) {
       console.warn(
-        `Source image download failed for exercise ${exerciseId}: ${sourceResponse.status} ${sourceResponse.statusText}`
+        `Source image download failed for exercise ${exerciseId}: ${sourceResponse.status} ${sourceResponse.statusText}`,
       );
       return null;
     }
@@ -238,16 +245,13 @@ async function uploadImageToUploadThing(imageUrl, exerciseId, exerciseName) {
       type: contentType,
     });
 
-    const uploadResult = await utapi.uploadFiles(
-      uploadFile,
-      {
-        concurrency: 1,
-      }
-    );
+    const uploadResult = await utapi.uploadFiles(uploadFile, {
+      concurrency: 1,
+    });
 
     if (uploadResult.error || !uploadResult.data?.ufsUrl) {
       console.warn(
-        `UploadThing upload failed for exercise ${exerciseId}: ${uploadResult.error?.message ?? "unknown error"}`
+        `UploadThing upload failed for exercise ${exerciseId}: ${uploadResult.error?.message ?? "unknown error"}`,
       );
       return null;
     }
@@ -255,7 +259,7 @@ async function uploadImageToUploadThing(imageUrl, exerciseId, exerciseName) {
     return uploadResult.data.ufsUrl;
   } catch (error) {
     console.warn(
-      `UploadThing upload failed for exercise ${exerciseId}: ${error instanceof Error ? error.message : "unknown error"}`
+      `UploadThing upload failed for exercise ${exerciseId}: ${error instanceof Error ? error.message : "unknown error"}`,
     );
     return null;
   }
@@ -293,11 +297,13 @@ async function fetchExerciseDetails(refs, options) {
       batch.map(async (ref) => {
         const id = asString(ref.id);
         if (!id) return null;
-        const detail = await requestGymFit(`/v1/exercises/${encodeURIComponent(id)}`);
+        const detail = await requestGymFit(
+          `/v1/exercises/${encodeURIComponent(id)}`,
+        );
         const hostedImageUrl = await uploadImageToUploadThing(
           asString(detail.image) ?? asString(ref.image),
           id,
-          asString(detail.name) ?? asString(ref.name) ?? id
+          asString(detail.name) ?? asString(ref.name) ?? id,
         );
         if (options.delayMs > 0) {
           await sleep(options.delayMs);
@@ -308,7 +314,7 @@ async function fetchExerciseDetails(refs, options) {
           image: hostedImageUrl,
           bodyPart: asString(detail.bodyPart) ?? asString(ref.bodyPart),
         };
-      })
+      }),
     );
 
     details.push(...batchDetails.filter(Boolean));
@@ -413,7 +419,7 @@ async function upsertExercises(client, exercises) {
         exercise.imageUrl,
         exercise.videoUrl,
         exercise.trainingStyle,
-      ]
+      ],
     );
 
     inserted += 1;
@@ -457,14 +463,14 @@ async function main() {
             completed: true,
           },
           null,
-          2
-        )
+          2,
+        ),
       );
       return;
     }
 
     console.log(
-      `Importing batch starting at offset ${startOffset} with batch size ${options.batchSize}.`
+      `Importing batch starting at offset ${startOffset} with batch size ${options.batchSize}.`,
     );
     if (options.delayMs > 0) {
       console.log(`Using delay ${options.delayMs}ms between detail requests.`);
@@ -497,8 +503,8 @@ async function main() {
           completed: remaining === 0,
         },
         null,
-        2
-      )
+        2,
+      ),
     );
   } finally {
     await client.end();
