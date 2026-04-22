@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useDeferredValue, useEffect, useMemo, useState, useTransition } from "react";
 import {
   closestCenter,
   DndContext,
@@ -29,8 +29,13 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { searchExercises } from "@/actions/exercises";
+import {
+  getExerciseQuickPickerData,
+  type FavoriteAwareExerciseItem,
+} from "@/actions/exercises";
+import ExercisePickerCard from "@/components/exercise-picker-card";
 import { createWorkoutPlan, updateWorkoutPlanExercises } from "@/actions/plans";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -82,6 +87,16 @@ interface PlanEditorSheetProps {
   onClose: () => void;
   onSaved: () => void;
 }
+
+type PlanPickerSections = {
+  favorites: FavoriteAwareExerciseItem[];
+  results: FavoriteAwareExerciseItem[];
+};
+
+const EMPTY_PICKER_SECTIONS: PlanPickerSections = {
+  favorites: [],
+  results: [],
+};
 
 function normalizeOrder(items: EditablePlanExercise[]) {
   return items.map((item, index) => {
@@ -272,7 +287,9 @@ export default function PlanEditorSheet({
     )
   );
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<ExerciseCatalogItem[]>([]);
+  const deferredQuery = useDeferredValue(query);
+  const [pickerSections, setPickerSections] =
+    useState<PlanPickerSections>(EMPTY_PICKER_SECTIONS);
   const [saving, setSaving] = useState(false);
   const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null);
   const [editorSets, setEditorSets] = useState("");
@@ -308,21 +325,26 @@ export default function PlanEditorSheet({
     let cancelled = false;
 
     startTransition(async () => {
-      const nextResults = await searchExercises({
-        query,
+      const nextSections = await getExerciseQuickPickerData({
+        query: deferredQuery,
         planBucket: bucket,
-        limit: 8,
+        limitFavorites: 10,
+        limitRecent: 0,
+        limitResults: 12,
       });
 
       if (!cancelled) {
-        setResults(nextResults);
+        setPickerSections({
+          favorites: nextSections.favorites,
+          results: nextSections.results,
+        });
       }
     });
 
     return () => {
       cancelled = true;
     };
-  }, [bucket, query]);
+  }, [bucket, deferredQuery]);
 
   useEffect(() => {
     if (!editingExerciseId) return;
@@ -339,6 +361,8 @@ export default function PlanEditorSheet({
   const selectedIds = new Set(
     selectedExercises.map((exercise) => exercise.exerciseId)
   );
+  const hasPickerItems =
+    pickerSections.favorites.length > 0 || pickerSections.results.length > 0;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -356,6 +380,17 @@ export default function PlanEditorSheet({
 
   const editingExercise =
     selectedExercises.find((exercise) => exercise.exerciseId === editingExerciseId) ?? null;
+
+  const updateFavoriteState = (exerciseId: string, nextValue: boolean) => {
+    setPickerSections((current) => ({
+      favorites: current.favorites.map((item) =>
+        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
+      ),
+      results: current.results.map((item) =>
+        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
+      ),
+    }));
+  };
 
   const toggleExercise = (exercise: ExerciseCatalogItem) => {
     setSelectedExercises((current) => {
@@ -491,6 +526,63 @@ export default function PlanEditorSheet({
     }
   };
 
+  const renderPickerSection = (
+    title: string,
+    items: FavoriteAwareExerciseItem[],
+    tone: "favorite" | "search"
+  ) => {
+    if (items.length === 0) return null;
+
+    const badgeClass =
+      tone === "favorite"
+        ? "border-amber-300/20 bg-amber-300/10 text-amber-200"
+        : "border-white/10 bg-white/5 text-text-muted";
+
+    return (
+      <section className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+            {title}
+          </p>
+          <Badge variant="outline" className={badgeClass}>
+            {items.length}
+          </Badge>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          {items.map((exercise) => {
+            const isSelected = selectedIds.has(exercise.id);
+
+            return (
+              <ExercisePickerCard
+                key={exercise.id}
+                exercise={exercise}
+                selected={isSelected}
+                showPrescriptionBadges={false}
+                onSelect={() => toggleExercise(exercise)}
+                onFavoriteChange={(nextValue) =>
+                  updateFavoriteState(exercise.id, nextValue)
+                }
+                selectionIndicator={
+                  <span
+                    className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${
+                      isSelected
+                        ? "border-emerald/40 bg-emerald text-[#0A0A0F]"
+                        : "border-white/10 text-text-muted"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    <Check className="h-4 w-4" />
+                  </span>
+                }
+              />
+            );
+          })}
+        </div>
+      </section>
+    );
+  };
+
   return (
     <>
       <Sheet open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
@@ -557,83 +649,50 @@ export default function PlanEditorSheet({
               >
                 Cari Exercise ({selectedExercises.length} dipilih)
               </label>
-              <div className="overflow-hidden rounded-xl border border-border-subtle bg-surface-elevated">
-                <div className="flex items-center gap-2 px-3">
-                  <Search
-                    className="h-4 w-4 shrink-0 text-text-muted"
-                    aria-hidden="true"
-                  />
+              <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-11 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/10 text-emerald">
+                    <Search className="h-4 w-4" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                      Quick Find
+                    </p>
                   <input
                     id="plan-exercise-search"
                     name="plan-exercise-search"
                     type="search"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Cari exercise…"
+                    placeholder="Cari exercise..."
                     autoComplete="off"
-                    className="h-11 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-text-muted/70"
+                    className="mt-1 h-auto w-full bg-transparent text-sm text-foreground outline-none placeholder:text-text-muted/70"
                   />
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                {results.map((exercise) => {
-                  const isSelected = selectedIds.has(exercise.id);
-                  const gradient = exercise.category
-                    ? CATEGORY_GRADIENTS[exercise.category]
-                    : "from-slate-500/20 to-slate-400/10";
-
-                  return (
-                    <button
-                      key={exercise.id}
-                      type="button"
-                      onClick={() => toggleExercise(exercise)}
-                      className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors ${
-                        isSelected
-                          ? "border-emerald/30 bg-emerald/10 text-foreground"
-                          : "border-border-subtle bg-surface-elevated text-text-muted hover:border-emerald/20"
-                      }`}
-                    >
-                      <div
-                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
-                          isSelected
-                            ? "bg-emerald"
-                            : "border border-border-subtle bg-surface"
-                        }`}
-                      >
-                        {isSelected && (
-                          <Check className="h-3 w-3 text-[#0A0A0F]" aria-hidden="true" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className={`truncate text-xs font-semibold ${
-                            isSelected ? "text-foreground" : ""
-                          }`}
-                        >
-                          {exercise.name}
-                        </p>
-                        <p className="text-[10px] text-text-muted">
-                          {exercise.primaryLabel}
-                          {exercise.category
-                            ? ` · ${CATEGORY_LABELS[exercise.category]}`
-                            : ""}
-                        </p>
-                      </div>
-                      <span
-                        className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium bg-linear-to-r ${gradient}`}
-                      >
-                        {exercise.trainingStyle === "compound" ? "Compound" : "Isolation"}
-                      </span>
-                    </button>
-                  );
-                })}
-
-                {isPending && (
-                  <div className="glass-card p-4 text-center text-xs text-text-muted">
-                    Memuat hasil pencarian…
-                  </div>
+              <div className="flex flex-col gap-4">
+                {renderPickerSection("Favorite", pickerSections.favorites, "favorite")}
+                {renderPickerSection(
+                  deferredQuery ? "Hasil Pencarian" : "Explore",
+                  pickerSections.results,
+                  "search"
                 )}
+
+                {isPending ? (
+                  <div className="rounded-[22px] border border-white/8 bg-white/[0.02] px-4 py-6 text-center text-sm text-text-muted">
+                    Menyusun daftar favorite dan hasil pencarian...
+                  </div>
+                ) : null}
+
+                {!isPending && !hasPickerItems ? (
+                  <div className="rounded-[22px] border border-dashed border-white/10 bg-white/[0.02] px-4 py-6 text-center text-sm text-text-muted">
+                    Belum ada exercise yang muncul. Coba kata kunci lain atau
+                    tandai beberapa favorit dulu.
+                  </div>
+                ) : null}
+
               </div>
             </div>
 
@@ -825,3 +884,4 @@ export default function PlanEditorSheet({
     </>
   );
 }
+

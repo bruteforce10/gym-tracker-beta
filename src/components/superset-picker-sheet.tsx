@@ -1,13 +1,13 @@
 "use client";
 
 import { useDeferredValue, useEffect, useMemo, useState, useTransition } from "react";
-import { ArrowRight, HeartPulse, Search, Sparkles } from "lucide-react";
+import { ArrowRight, HeartPulse, Search } from "lucide-react";
 
 import {
   getExerciseQuickPickerData,
   type FavoriteAwareExerciseItem,
 } from "@/actions/exercises";
-import FavoriteExerciseButton from "@/components/favorite-exercise-button";
+import ExercisePickerCard from "@/components/exercise-picker-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +17,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { CATEGORY_LABELS, type ExercisePlanBucket } from "@/lib/exercise-catalog";
+import type { ExercisePlanBucket } from "@/lib/exercise-catalog";
 
 type SupersetPickerSheetProps = {
   open: boolean;
@@ -129,64 +129,15 @@ export default function SupersetPickerSheet({
 
         <div className="flex flex-col gap-2">
           {items.map((exercise) => (
-            <div
+            <ExercisePickerCard
               key={exercise.id}
-              role="button"
-              tabIndex={0}
-              onClick={() => setSelectedExercise(exercise)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  setSelectedExercise(exercise);
-                }
-              }}
-              className={`w-full rounded-2xl border px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/45 ${
-                selectedExercise?.id === exercise.id
-                  ? "border-emerald/35 bg-emerald/10"
-                  : "border-white/8 bg-white/[0.03] hover:border-emerald/20"
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-semibold text-foreground">
-                      {exercise.name}
-                    </p>
-                    {exercise.isFavorite ? (
-                      <Sparkles
-                        className="h-3.5 w-3.5 shrink-0 text-amber-300"
-                        aria-hidden="true"
-                      />
-                    ) : null}
-                  </div>
-                  <p className="mt-1 text-[11px] text-text-muted">
-                    {exercise.primaryLabel}
-                    {exercise.category
-                      ? ` · ${CATEGORY_LABELS[exercise.category as keyof typeof CATEGORY_LABELS]}`
-                      : ""}
-                  </p>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="border-white/10 bg-white/5 text-text-muted">
-                      {exercise.trainingStyle === "compound" ? "Compound" : "Isolation"}
-                    </Badge>
-                    <Badge variant="outline" className="border-white/10 bg-white/5 text-text-muted">
-                      {exercise.defaultSets} x {exercise.defaultReps}
-                    </Badge>
-                    <Badge variant="outline" className="border-white/10 bg-white/5 text-text-muted">
-                      Rest {exercise.defaultRestTime}s
-                    </Badge>
-                  </div>
-                </div>
-
-                <FavoriteExerciseButton
-                  exerciseId={exercise.id}
-                  initialFavorite={exercise.isFavorite}
-                  onFavoriteChange={(nextValue) =>
-                    updateFavoriteState(exercise.id, nextValue)
-                  }
-                />
-              </div>
-            </div>
+              exercise={exercise}
+              selected={selectedExercise?.id === exercise.id}
+              onSelect={() => setSelectedExercise(exercise)}
+              onFavoriteChange={(nextValue) =>
+                updateFavoriteState(exercise.id, nextValue)
+              }
+            />
           ))}
         </div>
       </section>

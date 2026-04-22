@@ -115,58 +115,60 @@ export async function getExerciseQuickPickerData(params?: {
     favoriteIdSet
   );
 
-  const recentWorkoutIds = collectUniqueIds(
-    (
-      await prisma.workout.findMany({
-        where: { userId },
-        orderBy: { startedAt: "desc" },
-        take: 12,
-        include: {
-          exercises: {
-            where: {
-              exerciseId: {
-                not: null,
+  let recent: FavoriteAwareExerciseItem[] = [];
+  let recentIds: string[] = [];
+
+  if (limitRecent > 0) {
+    const recentWorkoutIds = collectUniqueIds(
+      (
+        await prisma.workout.findMany({
+          where: { userId },
+          orderBy: { startedAt: "desc" },
+          take: 12,
+          include: {
+            exercises: {
+              where: {
+                exerciseId: {
+                  not: null,
+                },
               },
             },
           },
-        },
-      })
-    ).flatMap((workout) =>
-      workout.exercises
-        .map((exercise) => exercise.exerciseId)
-        .filter(Boolean)
-    ) as string[],
-    limitRecent,
-    favoriteIdSet
-  );
-
-  let recentIds = recentWorkoutIds;
-
-  if (recentIds.length < limitRecent) {
-    const recentPlanIds = collectUniqueIds(
-      (
-        await prisma.workoutPlan.findMany({
-          where: { userId },
-          orderBy: { updatedAt: "desc" },
-          take: 8,
-          include: {
-            exercises: {
-              orderBy: { order: "asc" },
-            },
-          },
         })
-      ).flatMap((plan) => plan.exercises.map((exercise) => exercise.exerciseId)),
-      limitRecent - recentIds.length,
-      new Set([...favoriteIdSet, ...recentIds])
+      ).flatMap((workout) =>
+        workout.exercises
+          .map((exercise) => exercise.exerciseId)
+          .filter(Boolean)
+      ) as string[],
+      limitRecent,
+      favoriteIdSet
     );
 
-    recentIds = [...recentIds, ...recentPlanIds];
-  }
+    recentIds = recentWorkoutIds;
 
-  const recent = withFavoriteState(
-    await fetchExercisesByIds(recentIds, viewer),
-    favoriteIdSet
-  );
+    if (recentIds.length < limitRecent) {
+      const recentPlanIds = collectUniqueIds(
+        (
+          await prisma.workoutPlan.findMany({
+            where: { userId },
+            orderBy: { updatedAt: "desc" },
+            take: 8,
+            include: {
+              exercises: {
+                orderBy: { order: "asc" },
+              },
+            },
+          })
+        ).flatMap((plan) => plan.exercises.map((exercise) => exercise.exerciseId)),
+        limitRecent - recentIds.length,
+        new Set([...favoriteIdSet, ...recentIds])
+      );
+
+      recentIds = [...recentIds, ...recentPlanIds];
+    }
+
+    recent = withFavoriteState(await fetchExercisesByIds(recentIds, viewer), favoriteIdSet);
+  }
 
   const excludedIds = new Set([...favoriteIds, ...recentIds]);
   const results = withFavoriteState(
