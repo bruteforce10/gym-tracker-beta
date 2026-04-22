@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { ArrowRight, HeartPulse, Search } from "lucide-react";
 
 import {
@@ -17,6 +17,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 import type { ExercisePlanBucket } from "@/lib/exercise-catalog";
 
 type SupersetPickerSheetProps = {
@@ -46,12 +47,15 @@ export default function SupersetPickerSheet({
   onOpenChange,
   onConfirm,
 }: SupersetPickerSheetProps) {
+  const [queryInput, setQueryInput] = useState("");
   const [query, setQuery] = useState("");
-  const deferredQuery = useDeferredValue(query);
   const [selectedExercise, setSelectedExercise] =
     useState<FavoriteAwareExerciseItem | null>(null);
   const [sections, setSections] = useState<QuickPickerSections>(EMPTY_SECTIONS);
   const [isPending, startTransition] = useTransition();
+  const updateQuery = useDebounceCallback((nextQuery: string) => {
+    setQuery(nextQuery);
+  }, 300);
 
   useEffect(() => {
     if (!open) return;
@@ -60,7 +64,7 @@ export default function SupersetPickerSheet({
 
     startTransition(async () => {
       const nextSections = await getExerciseQuickPickerData({
-        query: deferredQuery,
+        query,
         planBucket,
         limitFavorites: 10,
         limitRecent: 10,
@@ -75,7 +79,7 @@ export default function SupersetPickerSheet({
     return () => {
       cancelled = true;
     };
-  }, [deferredQuery, open, planBucket]);
+  }, [open, planBucket, query]);
 
   const hasItems = useMemo(
     () =>
@@ -149,6 +153,8 @@ export default function SupersetPickerSheet({
       open={open}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) {
+          updateQuery.cancel();
+          setQueryInput("");
           setQuery("");
           setSelectedExercise(null);
         }
@@ -184,8 +190,12 @@ export default function SupersetPickerSheet({
                   id="superset-search"
                   name="superset-search"
                   type="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
+                  value={queryInput}
+                  onChange={(event) => {
+                    const nextQuery = event.target.value;
+                    setQueryInput(nextQuery);
+                    updateQuery.run(nextQuery);
+                  }}
                   placeholder="Cari exercise untuk dipasangkan..."
                   autoComplete="off"
                   className="mt-1 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-text-muted/70"
@@ -198,7 +208,7 @@ export default function SupersetPickerSheet({
             {renderSection("Favorite", sections.favorites, "favorite")}
             {renderSection("Recent", sections.recent, "recent")}
             {renderSection(
-              deferredQuery ? "Hasil Pencarian" : "Explore",
+              queryInput.trim() ? "Hasil Pencarian" : "Explore",
               sections.results,
               "search"
             )}

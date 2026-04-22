@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   closestCenter,
   DndContext,
@@ -45,6 +45,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 import {
   CATEGORY_GRADIENTS,
   CATEGORY_LABELS,
@@ -286,8 +287,8 @@ export default function PlanEditorSheet({
       }))
     )
   );
+  const [queryInput, setQueryInput] = useState("");
   const [query, setQuery] = useState("");
-  const deferredQuery = useDeferredValue(query);
   const [pickerSections, setPickerSections] =
     useState<PlanPickerSections>(EMPTY_PICKER_SECTIONS);
   const [saving, setSaving] = useState(false);
@@ -296,6 +297,9 @@ export default function PlanEditorSheet({
   const [editorReps, setEditorReps] = useState("");
   const [editorRest, setEditorRest] = useState("");
   const [isPending, startTransition] = useTransition();
+  const updateQuery = useDebounceCallback((nextQuery: string) => {
+    setQuery(nextQuery);
+  }, 300);
 
   useEffect(() => {
     setPlanName(plan.name || "");
@@ -326,7 +330,7 @@ export default function PlanEditorSheet({
 
     startTransition(async () => {
       const nextSections = await getExerciseQuickPickerData({
-        query: deferredQuery,
+        query,
         planBucket: bucket,
         limitFavorites: 10,
         limitRecent: 0,
@@ -344,7 +348,7 @@ export default function PlanEditorSheet({
     return () => {
       cancelled = true;
     };
-  }, [bucket, deferredQuery]);
+  }, [bucket, query]);
 
   useEffect(() => {
     if (!editingExerciseId) return;
@@ -659,14 +663,18 @@ export default function PlanEditorSheet({
                       Quick Find
                     </p>
                   <input
-                    id="plan-exercise-search"
-                    name="plan-exercise-search"
-                    type="search"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Cari exercise..."
-                    autoComplete="off"
-                    className="mt-1 h-auto w-full bg-transparent text-sm text-foreground outline-none placeholder:text-text-muted/70"
+                      id="plan-exercise-search"
+                      name="plan-exercise-search"
+                      type="search"
+                      value={queryInput}
+                      onChange={(event) => {
+                        const nextQuery = event.target.value;
+                        setQueryInput(nextQuery);
+                        updateQuery.run(nextQuery);
+                      }}
+                      placeholder="Cari exercise..."
+                      autoComplete="off"
+                      className="mt-1 h-auto w-full bg-transparent text-sm text-foreground outline-none placeholder:text-text-muted/70"
                   />
                   </div>
                 </div>
@@ -675,7 +683,7 @@ export default function PlanEditorSheet({
               <div className="flex flex-col gap-4">
                 {renderPickerSection("Favorite", pickerSections.favorites, "favorite")}
                 {renderPickerSection(
-                  deferredQuery ? "Hasil Pencarian" : "Explore",
+                  queryInput.trim() ? "Hasil Pencarian" : "Explore",
                   pickerSections.results,
                   "search"
                 )}

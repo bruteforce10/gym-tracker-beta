@@ -6,6 +6,7 @@ import { useState } from "react";
 type ExerciseImageProps = Omit<ImageProps, "src"> & {
   src: string | null | undefined;
   fallback: React.ReactNode;
+  preferOptimized?: boolean;
 };
 
 function shouldBypassNextOptimizer(src: string) {
@@ -21,6 +22,7 @@ export default function ExerciseImage({
   src,
   alt,
   fallback,
+  preferOptimized = false,
   ...props
 }: ExerciseImageProps) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
@@ -30,7 +32,8 @@ export default function ExerciseImage({
     return <>{fallback}</>;
   }
 
-  const shouldUseUnoptimized = shouldBypassNextOptimizer(normalizedSrc);
+  const shouldUseUnoptimized =
+    preferOptimized ? false : shouldBypassNextOptimizer(normalizedSrc);
 
   return (
     <Image

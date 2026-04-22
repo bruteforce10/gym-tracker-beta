@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
-import { getExerciseCatalog } from "@/actions/exercises";
+import { getFavoriteAwareExerciseCatalog } from "@/actions/exercises";
 import { getWorkoutPlans } from "@/actions/plans";
 import ExerciseFilterForm from "@/components/exercise-filter-form";
 import ExercisesFeed from "@/components/exercises-feed";
@@ -40,7 +40,7 @@ export default async function ExercisesPage({
     TRAINING_TYPE_FILTER_OPTIONS,
   );
   const ownership = params.ownership === "mine" ? "mine" : "all";
-  const exercises = await getExerciseCatalog({
+  const exercises = await getFavoriteAwareExerciseCatalog({
     query,
     bodyPart,
     equipment,

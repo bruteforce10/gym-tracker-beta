@@ -44,6 +44,44 @@ export async function getExerciseCatalog(params?: {
   });
 }
 
+export async function getFavoriteAwareExerciseCatalog(params?: {
+  query?: string;
+  planBucket?: ExercisePlanBucket | "all";
+  bodyPart?: string;
+  equipment?: string;
+  type?: string;
+  ownership?: "all" | "mine";
+  limit?: number;
+}) {
+  const viewer = await getViewerContext();
+  const exercises = await fetchExerciseCatalog({
+    ...params,
+    viewer,
+  });
+
+  if (!viewer.userId || exercises.length === 0) {
+    return exercises.map((exercise) => ({
+      ...exercise,
+      isFavorite: false,
+    }));
+  }
+
+  const favoriteRows = await prisma.favoriteExercise.findMany({
+    where: {
+      userId: viewer.userId,
+      exerciseId: {
+        in: exercises.map((exercise) => exercise.id),
+      },
+    },
+    select: {
+      exerciseId: true,
+    },
+  });
+
+  const favoriteIdSet = new Set(favoriteRows.map((entry) => entry.exerciseId));
+  return withFavoriteState(exercises, favoriteIdSet);
+}
+
 export async function searchExercises(params?: {
   query?: string;
   planBucket?: ExercisePlanBucket | "all";

@@ -4,16 +4,17 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+import type { FavoriteAwareExerciseItem } from "@/actions/exercises";
 import AddToPlanSheet from "@/components/add-to-plan-sheet";
 import ExerciseImage from "@/components/exercise-image";
+import FavoriteExerciseButton from "@/components/favorite-exercise-button";
 import {
   CATEGORY_GRADIENTS,
   CATEGORY_LABELS,
-  type ExerciseCatalogItem,
 } from "@/lib/exercise-catalog";
 
 type ExercisesFeedProps = {
-  exercises: ExerciseCatalogItem[];
+  exercises: FavoriteAwareExerciseItem[];
   plans: Array<{
     id: string;
     name: string;
@@ -44,15 +45,17 @@ export default function ExercisesFeed({
   exercises,
   plans,
 }: ExercisesFeedProps) {
+  const [items, setItems] = useState(exercises);
   const [visibleCount, setVisibleCount] = useState(
     Math.min(INITIAL_BATCH_SIZE, exercises.length),
   );
   const [isPending, startTransition] = useTransition();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const hasMore = visibleCount < exercises.length;
-  const visibleExercises = exercises.slice(0, visibleCount);
+  const hasMore = visibleCount < items.length;
+  const visibleExercises = items.slice(0, visibleCount);
 
   useEffect(() => {
+    setItems(exercises);
     setVisibleCount(Math.min(INITIAL_BATCH_SIZE, exercises.length));
   }, [exercises]);
 
@@ -66,7 +69,7 @@ export default function ExercisesFeed({
 
         startTransition(() => {
           setVisibleCount((current) =>
-            Math.min(current + BATCH_SIZE, exercises.length),
+            Math.min(current + BATCH_SIZE, items.length),
           );
         });
       },
@@ -80,9 +83,9 @@ export default function ExercisesFeed({
     return () => {
       observer.disconnect();
     };
-  }, [exercises.length, hasMore, startTransition]);
+  }, [hasMore, items.length, startTransition]);
 
-  if (exercises.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="glass-card p-8 text-center">
         <p className="text-sm text-text-muted">
@@ -144,11 +147,26 @@ export default function ExercisesFeed({
                       </p>
                     </div>
 
-                    <span className="shrink-0 rounded-full border border-white/10 px-2.5 py-1 text-[10px] text-text-muted">
-                      {exercise.trainingStyle === "compound"
-                        ? "Compound"
-                        : "Isolation"}
-                    </span>
+                    <div className="flex shrink-0 items-start gap-2">
+                      <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] text-text-muted">
+                        {exercise.trainingStyle === "compound"
+                          ? "Compound"
+                          : "Isolation"}
+                      </span>
+                      <FavoriteExerciseButton
+                        exerciseId={exercise.id}
+                        initialFavorite={exercise.isFavorite}
+                        onFavoriteChange={(nextValue) => {
+                          setItems((current) =>
+                            current.map((item) =>
+                              item.id === exercise.id
+                                ? { ...item, isFavorite: nextValue }
+                                : item,
+                            ),
+                          );
+                        }}
+                      />
+                    </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-1.5">
@@ -201,7 +219,7 @@ export default function ExercisesFeed({
             onClick={() => {
               startTransition(() => {
                 setVisibleCount((current) =>
-                  Math.min(current + BATCH_SIZE, exercises.length),
+                  Math.min(current + BATCH_SIZE, items.length),
                 );
               });
             }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Search, Sparkles, X } from "lucide-react";
 
 import {
@@ -14,6 +14,7 @@ import {
   type ExerciseCatalogItem,
   type ExercisePlanBucket,
 } from "@/lib/exercise-catalog";
+import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 
 interface ExercisePickerProps {
   inputId: string;
@@ -46,11 +47,14 @@ export default function ExercisePicker({
   planBucket = "all",
   helperText,
 }: ExercisePickerProps) {
+  const [queryInput, setQueryInput] = useState(value?.name ?? "");
   const [query, setQuery] = useState(value?.name ?? "");
-  const deferredQuery = useDeferredValue(query);
   const [sections, setSections] = useState<QuickPickerSections>(EMPTY_SECTIONS);
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const updateQuery = useDebounceCallback((nextQuery: string) => {
+    setQuery(nextQuery);
+  }, 300);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -59,7 +63,7 @@ export default function ExercisePicker({
 
     startTransition(async () => {
       const nextSections = await getExerciseQuickPickerData({
-        query: deferredQuery,
+        query,
         planBucket,
         limitResults: 18,
       });
@@ -72,7 +76,7 @@ export default function ExercisePicker({
     return () => {
       cancelled = true;
     };
-  }, [deferredQuery, isOpen, planBucket]);
+  }, [isOpen, planBucket, query]);
 
   const hasItems =
     sections.favorites.length > 0 ||
@@ -126,6 +130,8 @@ export default function ExercisePicker({
               tabIndex={0}
               onClick={() => {
                 onChange(exercise);
+                updateQuery.cancel();
+                setQueryInput(exercise.name);
                 setQuery(exercise.name);
                 setIsOpen(false);
               }}
@@ -133,6 +139,8 @@ export default function ExercisePicker({
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   onChange(exercise);
+                  updateQuery.cancel();
+                  setQueryInput(exercise.name);
                   setQuery(exercise.name);
                   setIsOpen(false);
                 }
@@ -199,6 +207,8 @@ export default function ExercisePicker({
             type="button"
             onClick={() => {
               onChange(null);
+              updateQuery.cancel();
+              setQueryInput("");
               setQuery("");
               setIsOpen(true);
             }}
@@ -221,10 +231,12 @@ export default function ExercisePicker({
             id={inputId}
             name={inputId}
             type="search"
-            value={query || value?.name || ""}
+            value={queryInput || value?.name || ""}
             onFocus={() => setIsOpen(true)}
             onChange={(event) => {
-              setQuery(event.target.value);
+              const nextQuery = event.target.value;
+              setQueryInput(nextQuery);
+              updateQuery.run(nextQuery);
               setIsOpen(true);
             }}
             placeholder={placeholder}
@@ -240,7 +252,7 @@ export default function ExercisePicker({
                 {renderSection("Favorite", sections.favorites, "favorite")}
                 {renderSection("Recent", sections.recent, "recent")}
                 {renderSection(
-                  deferredQuery ? "Hasil Pencarian" : "Explore",
+                  queryInput.trim() ? "Hasil Pencarian" : "Explore",
                   sections.results,
                   "search",
                 )}

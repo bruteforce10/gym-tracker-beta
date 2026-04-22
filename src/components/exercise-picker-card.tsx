@@ -77,10 +77,13 @@ export default function ExercisePickerCard({
           <ExerciseImage
             src={exercise.imageUrl}
             alt={exercise.name}
-            width={160}
-            height={160}
+            width={128}
+            height={80}
             className="h-full w-full object-cover"
-            sizes="72px"
+            sizes="128px"
+            quality={45}
+            loading="lazy"
+            preferOptimized
             fallback={
               <div
                 className={`flex h-full w-full items-center justify-center bg-linear-to-br ${gradient}`}
