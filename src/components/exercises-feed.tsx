@@ -107,7 +107,7 @@ export default function ExercisesFeed({
               className={`glass-card overflow-hidden bg-linear-to-br transition-colors duration-200 hover:border-emerald/20 hover:shadow-[0_18px_40px_rgba(10,14,22,0.18)] ${gradient}`}
             >
               <div className="flex flex-col">
-                <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-white/8 bg-white/95">
+                <div className="relative w-full overflow-hidden border-b border-white/8 bg-white/95">
                   <ExerciseImage
                     src={exercise.imageUrl}
                     alt={exercise.name}
@@ -117,7 +117,7 @@ export default function ExercisesFeed({
                     sizes="(max-width: 768px) 100vw, 768px"
                     fallback={
                       <div
-                        className={`flex h-full w-full items-center justify-center bg-linear-to-br ${gradient}`}
+                        className={`flex h-32 w-full items-center justify-center bg-linear-to-br ${gradient}`}
                       >
                         <span
                           className="text-lg font-black tracking-[0.18em] text-white/90 sm:text-xl"
