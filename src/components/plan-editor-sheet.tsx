@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   closestCenter,
   DndContext,
@@ -297,6 +297,9 @@ export default function PlanEditorSheet({
   const [editorReps, setEditorReps] = useState("");
   const [editorRest, setEditorRest] = useState("");
   const [isPending, startTransition] = useTransition();
+  const orderSectionRef = useRef<HTMLDivElement | null>(null);
+  const hasAutoScrolledThisOpenRef = useRef(false);
+  const scrollFrameRef = useRef<number | null>(null);
   const updateQuery = useDebounceCallback((nextQuery: string) => {
     setQuery(nextQuery);
   }, 300);
@@ -319,6 +322,15 @@ export default function PlanEditorSheet({
     );
     setEditingExerciseId(null);
   }, [plan]);
+
+  useEffect(() => {
+    hasAutoScrolledThisOpenRef.current = false;
+
+    if (scrollFrameRef.current !== null) {
+      cancelAnimationFrame(scrollFrameRef.current);
+      scrollFrameRef.current = null;
+    }
+  }, [open]);
 
   const bucket: ExercisePlanBucket | "all" = useMemo(() => {
     if (planType === "custom") return "all";
@@ -402,6 +414,20 @@ export default function PlanEditorSheet({
         return normalizeOrder(
           current.filter((item) => item.exerciseId !== exercise.id)
         );
+      }
+
+      if (open && !hasAutoScrolledThisOpenRef.current) {
+        hasAutoScrolledThisOpenRef.current = true;
+
+        scrollFrameRef.current = requestAnimationFrame(() => {
+          scrollFrameRef.current = requestAnimationFrame(() => {
+            orderSectionRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+            scrollFrameRef.current = null;
+          });
+        });
       }
 
       return normalizeOrder([...current, buildEditablePlanExercise(exercise)]);
@@ -704,7 +730,7 @@ export default function PlanEditorSheet({
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div ref={orderSectionRef} className="space-y-2">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-medium text-text-muted">Urutan Exercise</p>
