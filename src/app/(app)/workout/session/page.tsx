@@ -51,14 +51,14 @@ function RestTimer({
   mode,
   targetExerciseName,
   onSkip,
-  onAdd30,
+  onAddTime,
 }: {
   seconds: number;
   total: number;
   mode: "transition" | "normal";
   targetExerciseName?: string | null;
   onSkip: () => void;
-  onAdd30: () => void;
+  onAddTime: () => void;
 }) {
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
@@ -110,16 +110,18 @@ function RestTimer({
       </div>
 
       <div className="flex gap-3">
-        {mode === "normal" ? (
-          <button
-            onClick={onAdd30}
-            className="flex items-center gap-1.5 rounded-xl border border-border-subtle px-4 py-2 text-sm text-text-muted transition-colors hover:border-emerald/30 hover:text-emerald"
-            id="rest-add30"
-          >
-            <Timer className="h-3.5 w-3.5" aria-hidden="true" />
-            +30s
-          </button>
-        ) : null}
+        <button
+          onClick={onAddTime}
+          className={`flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm transition-colors ${
+            mode === "transition"
+              ? "border-amber-300/30 text-amber-300 hover:bg-amber-300/10"
+              : "border-border-subtle text-text-muted hover:border-emerald/30 hover:text-emerald"
+          }`}
+          id={mode === "transition" ? "rest-add15" : "rest-add30"}
+        >
+          <Timer className="h-3.5 w-3.5" aria-hidden="true" />
+          {mode === "transition" ? "+15s" : "+30s"}
+        </button>
         <button
           onClick={onSkip}
           className={`flex items-center gap-1.5 rounded-xl border px-6 py-2 text-sm font-semibold transition-colors ${
@@ -462,7 +464,7 @@ export default function WorkoutSessionPage() {
         nextPairings[primaryId] = {
           primarySessionExerciseId: primaryId,
           supersetSessionExerciseId: supersetExercise.sessionExerciseId,
-          transitionRestSeconds: 10,
+          transitionRestSeconds: 15,
           status: "active",
         };
 
@@ -600,7 +602,7 @@ export default function WorkoutSessionPage() {
             [primaryExercise.sessionExerciseId]: {
               primarySessionExerciseId: primaryExercise.sessionExerciseId,
               supersetSessionExerciseId: plannedSupersetPartnerId,
-              transitionRestSeconds: 10,
+              transitionRestSeconds: 15,
               status: "active",
             },
           },
@@ -1097,8 +1099,9 @@ export default function WorkoutSessionPage() {
                     current ? activateQueuedTurn(current) : current
                   );
                 }}
-                onAdd30={() => {
-                  if (snapshot.progress.restKind !== "normal") return;
+                onAddTime={() => {
+                  const extraSeconds =
+                    snapshot.progress.restKind === "transition" ? 15 : 30;
 
                   setSnapshot((current) =>
                     current
@@ -1106,8 +1109,8 @@ export default function WorkoutSessionPage() {
                           ...current,
                           progress: {
                             ...current.progress,
-                            restLeft: current.progress.restLeft + 30,
-                            restTotal: current.progress.restTotal + 30,
+                            restLeft: current.progress.restLeft + extraSeconds,
+                            restTotal: current.progress.restTotal + extraSeconds,
                           },
                         }
                       : current
