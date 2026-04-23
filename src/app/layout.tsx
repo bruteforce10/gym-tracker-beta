@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, DM_Sans, JetBrains_Mono } from "next/font/google";
+import DevServiceWorkerReset from "@/components/dev-service-worker-reset";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -55,6 +56,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Grynx" />
       </head>
       <body className="min-h-full flex flex-col bg-[#0A0A0F] text-[#F5F5F7]">
+        <DevServiceWorkerReset />
         {children}
       </body>
     </html>

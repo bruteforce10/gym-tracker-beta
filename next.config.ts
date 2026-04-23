@@ -79,7 +79,7 @@ export default withPWA({
   register: true,
   reloadOnOnline: true,
   cacheStartUrl: false,
-  cacheOnFrontEndNav: true,
+  cacheOnFrontEndNav: false,
   fallbacks: {
     document: "/~offline",
   },

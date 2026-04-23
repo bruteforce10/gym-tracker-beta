@@ -17,6 +17,7 @@ import {
 import { createWorkout } from "@/actions/workouts";
 import SupersetPickerSheet from "@/components/superset-picker-sheet";
 import ExerciseImage from "@/components/exercise-image";
+import WorkoutShareResultSheet from "@/components/workout-share-result-sheet";
 import { Badge } from "@/components/ui/badge";
 import {
   CATEGORY_GRADIENTS,
@@ -42,6 +43,10 @@ import {
   type WorkoutSessionSnapshot,
   WORKOUT_SESSION_STORAGE_KEY,
 } from "@/lib/workout-session";
+import {
+  buildWorkoutShareSummary,
+  type WorkoutShareSummary,
+} from "@/lib/workout-share";
 
 const REST_ALARM_STORAGE_KEY = "gym-rest-alarm-enabled";
 
@@ -146,6 +151,8 @@ export default function WorkoutSessionPage() {
   const [reps, setReps] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [shareSummary, setShareSummary] = useState<WorkoutShareSummary | null>(null);
+  const [shareSheetOpen, setShareSheetOpen] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [alarmEnabled, setAlarmEnabled] = useState(true);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -391,15 +398,21 @@ export default function WorkoutSessionPage() {
           throw new Error("Tidak ada set yang selesai untuk disimpan.");
         }
 
+        const endedAt = new Date().toISOString();
+
         await createWorkout(
           new Date(finishedSnapshot.startedAt).toISOString().split("T")[0],
           exercises,
           finishedSnapshot.startedAt,
-          new Date().toISOString()
+          endedAt
         );
 
+        setShareSummary(buildWorkoutShareSummary(finishedSnapshot, endedAt));
+        setShareSheetOpen(true);
         sessionStorage.removeItem(WORKOUT_SESSION_STORAGE_KEY);
       } catch {
+        setShareSummary(null);
+        setShareSheetOpen(false);
         setSaveError("Sesi selesai, tapi penyimpanan workout gagal. Data sesi tetap disimpan.");
       } finally {
         setSaving(false);
@@ -825,6 +838,7 @@ export default function WorkoutSessionPage() {
 
   if (snapshot.progress.state === "done") {
     return (
+      <>
       <div className="gradient-mesh flex min-h-screen flex-col items-center justify-center gap-8 px-6">
         <div className="space-y-4 text-center">
           <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-emerald/30 bg-emerald/20">
@@ -842,6 +856,12 @@ export default function WorkoutSessionPage() {
           </p>
           {saving ? (
             <p className="text-sm text-emerald animate-pulse">Menyimpan workout...</p>
+          ) : null}
+          {!saving && shareSummary ? (
+            <p className="mx-auto max-w-sm text-sm text-text-muted">
+              Stickernya sudah siap. Download PNG transparan atau share langsung
+              dari sheet ini.
+            </p>
           ) : null}
           {saveError ? (
             <p className="mx-auto max-w-sm rounded-2xl border border-danger/20 bg-danger/10 px-4 py-3 text-sm text-danger">
@@ -865,6 +885,12 @@ export default function WorkoutSessionPage() {
           </button>
         </div>
       </div>
+      <WorkoutShareResultSheet
+        open={shareSheetOpen}
+        onOpenChange={setShareSheetOpen}
+        summary={shareSummary}
+      />
+      </>
     );
   }
 
