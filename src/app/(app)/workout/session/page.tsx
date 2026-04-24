@@ -8,7 +8,6 @@ import {
   HeartPulse,
   SkipForward,
   Timer,
-  Trophy,
   Volume2,
   VolumeX,
   X,
@@ -17,7 +16,7 @@ import {
 import { createWorkout } from "@/actions/workouts";
 import SupersetPickerSheet from "@/components/superset-picker-sheet";
 import ExerciseImage from "@/components/exercise-image";
-import WorkoutShareResultSheet from "@/components/workout-share-result-sheet";
+import WorkoutSessionCompleteView from "@/components/workout-session-complete-view";
 import { Badge } from "@/components/ui/badge";
 import {
   CATEGORY_GRADIENTS,
@@ -152,7 +151,7 @@ export default function WorkoutSessionPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [shareSummary, setShareSummary] = useState<WorkoutShareSummary | null>(null);
-  const [shareSheetOpen, setShareSheetOpen] = useState(false);
+  const [completedAt, setCompletedAt] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [alarmEnabled, setAlarmEnabled] = useState(true);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -399,6 +398,10 @@ export default function WorkoutSessionPage() {
         }
 
         const endedAt = new Date().toISOString();
+        const nextSummary = buildWorkoutShareSummary(finishedSnapshot, endedAt);
+
+        setCompletedAt(endedAt);
+        setShareSummary(nextSummary);
 
         await createWorkout(
           new Date(finishedSnapshot.startedAt).toISOString().split("T")[0],
@@ -407,12 +410,8 @@ export default function WorkoutSessionPage() {
           endedAt
         );
 
-        setShareSummary(buildWorkoutShareSummary(finishedSnapshot, endedAt));
-        setShareSheetOpen(true);
         sessionStorage.removeItem(WORKOUT_SESSION_STORAGE_KEY);
       } catch {
-        setShareSummary(null);
-        setShareSheetOpen(false);
         setSaveError("Sesi selesai, tapi penyimpanan workout gagal. Data sesi tetap disimpan.");
       } finally {
         setSaving(false);
@@ -838,59 +837,14 @@ export default function WorkoutSessionPage() {
 
   if (snapshot.progress.state === "done") {
     return (
-      <>
-      <div className="gradient-mesh flex min-h-screen flex-col items-center justify-center gap-8 px-6">
-        <div className="space-y-4 text-center">
-          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-emerald/30 bg-emerald/20">
-            <Trophy className="h-12 w-12 text-emerald" aria-hidden="true" />
-          </div>
-          <h1
-            className="text-3xl font-bold text-foreground"
-            style={{ fontFamily: "Outfit, sans-serif" }}
-          >
-            Sesi Selesai!
-          </h1>
-          <p className="text-sm text-text-muted">
-            {snapshot.exercises.length} exercise ·{" "}
-            {snapshot.exercises.reduce((total, exercise) => total + exercise.defaultSets, 0)} set
-          </p>
-          {saving ? (
-            <p className="text-sm text-emerald animate-pulse">Menyimpan workout...</p>
-          ) : null}
-          {!saving && shareSummary ? (
-            <p className="mx-auto max-w-sm text-sm text-text-muted">
-              Stickernya sudah siap. Download PNG transparan atau share langsung
-              dari sheet ini.
-            </p>
-          ) : null}
-          {saveError ? (
-            <p className="mx-auto max-w-sm rounded-2xl border border-danger/20 bg-danger/10 px-4 py-3 text-sm text-danger">
-              {saveError}
-            </p>
-          ) : null}
-        </div>
-        <div className="w-full space-y-3">
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="h-14 w-full rounded-2xl bg-emerald text-base font-bold text-[#0A0A0F] transition-colors hover:bg-emerald-dark"
-            id="finish-session-btn"
-          >
-            Lihat Dashboard
-          </button>
-          <button
-            onClick={() => router.push("/progress")}
-            className="h-12 w-full rounded-2xl border border-border-subtle text-sm text-text-muted transition-colors hover:border-emerald/30 hover:text-emerald"
-          >
-            Lihat Progres
-          </button>
-        </div>
-      </div>
-      <WorkoutShareResultSheet
-        open={shareSheetOpen}
-        onOpenChange={setShareSheetOpen}
+      <WorkoutSessionCompleteView
+        snapshot={snapshot}
         summary={shareSummary}
+        completedAt={completedAt}
+        saving={saving}
+        saveError={saveError}
+        onFinished={() => router.push("/dashboard")}
       />
-      </>
     );
   }
 

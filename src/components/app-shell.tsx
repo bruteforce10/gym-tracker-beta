@@ -11,7 +11,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [fabMenuOpen, setFabMenuOpen] = useState(false);
   const [manualSheetOpen, setManualSheetOpen] = useState(false);
   const pathname = usePathname();
-  const hideBottomNav = pathname === "/workout/start";
+  const hideBottomNav =
+    pathname === "/workout/start" || pathname === "/workout/session";
 
   return (
     <div className="min-h-screen gradient-mesh">
