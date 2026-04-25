@@ -10,16 +10,16 @@ Repo sudah memiliki fondasi:
 - workout plan melalui model `WorkoutPlan`
 
 Yang belum ada adalah lapisan onboarding fitness yang:
-- mengumpulkan profil latihan user
-- menghasilkan `goal` awal
-- menghasilkan `workout plan` awal
+- mengumpulkan goal utama user secara eksplisit
+- memakai goal itu sebagai parameter utama generator plan
+- menghasilkan `workout plan` awal yang mengikuti goal tersebut
 - memberi user kesempatan review sebelum plan diaktifkan
 
 ## Goals
 
 - Menambahkan onboarding pertama kali setelah login/register
-- Mengumpulkan jawaban fitness inti tanpa membuat flow terasa panjang
-- Menghasilkan `goal` awal dan `workout plan` awal dari jawaban onboarding
+- Membuat onboarding yang berpusat pada `goal` lebih dulu
+- Menghasilkan `workout plan` awal dari goal dan constraint onboarding
 - Menyediakan halaman review sebelum plan aktif
 - Menjaga logika plan tetap mudah dipahami, diuji, dan di-tune
 
@@ -35,13 +35,24 @@ Yang belum ada adalah lapisan onboarding fitness yang:
 1. User login atau register
 2. Sistem cek apakah user sudah memiliki profil onboarding aktif
 3. Jika belum, user diarahkan ke wizard onboarding
-4. Setelah wizard selesai, sistem generate draft:
-   - `goal` awal
-   - `workout plan` awal
+4. User set `goal` utama secara eksplisit:
+   - exercise target
+   - target weight
+   - deadline
+5. User melengkapi constraint pendukung:
+   - fokus program
+   - frekuensi latihan
+   - level gym
+   - kemampuan beban
+   - equipment access
+   - gender opsional
+6. Sistem generate draft:
+   - `goal` dari input user
+   - `workout plan` awal yang mengikuti goal itu
    - alasan singkat rekomendasi
-5. User masuk ke halaman review
-6. User konfirmasi untuk mengaktifkan hasil draft
-7. Setelah aktif, user diarahkan ke dashboard dengan state yang sudah personal
+7. User masuk ke halaman review
+8. User konfirmasi untuk mengaktifkan hasil draft
+9. Setelah aktif, user diarahkan ke dashboard dengan state yang sudah personal
 
 ## Recommendation
 
@@ -155,17 +166,22 @@ Jika nanti kebutuhan review semakin kompleks, payload ini bisa dipindah ke model
 
 Urutan onboarding dibuat dari keputusan paling mudah ke paling teknis.
 
-1. `Apa tujuan utama latihanmu?`
-2. `Apa tujuan sekundermu?`
-3. `Berapa kali kamu realistis latihan per minggu?`
-4. `Level gym kamu sekarang apa?`
-5. `Kemampuan bebanmu secara umum seperti apa?`
-6. `Kamu biasanya latihan di mana?`
-7. `Gender`
+1. `Exercise goal apa yang ingin kamu capai?`
+2. `Berapa target weight yang ingin kamu kejar?`
+3. `Deadline goal itu kapan?`
+4. `Fokus program utamamu apa?`
+5. `Fokus program sekundermu apa?`
+6. `Berapa kali kamu realistis latihan per minggu?`
+7. `Level gym kamu sekarang apa?`
+8. `Kemampuan bebanmu secara umum seperti apa?`
+9. `Kamu biasanya latihan di mana?`
+10. `Gender`
 
 ## Answer Rules
 
-- User memilih satu `primaryGoal`
+- User menetapkan satu `goal` utama secara eksplisit
+- `goal` utama menjadi input nomor satu untuk generator plan
+- User memilih satu `primaryGoal` sebagai fokus program
 - User memilih satu `secondaryGoal`
 - `secondaryGoal` tidak boleh sama dengan `primaryGoal`
 - `trainingDaysPerWeek` diisi fleksibel oleh user dan menjadi input wajib
@@ -245,20 +261,14 @@ Model `Goal` sekarang paling dekat dengan target weight per exercise, jadi goal 
 
 ### Recommendation
 
-Gunakan `exercise-based starter goal`.
+Gunakan `user-defined exercise goal`.
 
 Aturan:
-- pilih 1 atau 2 exercise anchor dari plan
-- buat 1 goal aktif utama
-- target disesuaikan dengan level dan fokus utama
-
-Contoh arah:
-- `strength beginner`
-  - target pada bench press, squat, atau anchor movement sejenis
-- `muscle_gain beginner`
-  - tetap exercise-based, tetapi target lebih konservatif
-- `general_fitness`
-  - pilih exercise anchor yang mudah dipahami dan tidak menakutkan
+- user memilih exercise target sendiri saat onboarding
+- user mengisi target weight sendiri
+- user memilih deadline sendiri
+- generator tidak lagi memilih goal secara otomatis
+- plan disusun untuk mendukung goal tersebut
 
 ### Deferred Scope
 
@@ -294,8 +304,11 @@ Gunakan arah `performance editorial`:
    - ekspektasi bahwa flow hanya beberapa langkah
 
 2. `Question Steps`
-   - primary goal
-   - secondary goal
+   - goal exercise
+   - goal target weight
+   - goal deadline
+   - primary program focus
+   - secondary program focus
    - training days
    - experience level
    - load level

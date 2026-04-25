@@ -107,6 +107,7 @@ export async function clearUserData() {
   await prisma.workout.deleteMany({ where: { userId } });
   await prisma.goal.deleteMany({ where: { userId } });
   await prisma.weightLog.deleteMany({ where: { userId } });
+  await prisma.userFitnessProfile.deleteMany({ where: { userId } });
 
   return { ok: true };
 }

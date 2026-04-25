@@ -137,6 +137,7 @@ export default function SupersetPickerSheet({
               key={exercise.id}
               exercise={exercise}
               selected={selectedExercise?.id === exercise.id}
+              showThumbnail
               onSelect={() => setSelectedExercise(exercise)}
               onFavoriteChange={(nextValue) =>
                 updateFavoriteState(exercise.id, nextValue)

@@ -49,7 +49,7 @@ export default function LoginPage() {
           setLoading(false);
           return;
         }
-        router.push("/dashboard");
+        router.replace("/dashboard");
       } else {
         // Login flow
         const result = await signIn("credentials", {
@@ -62,7 +62,7 @@ export default function LoginPage() {
           setLoading(false);
           return;
         }
-        router.push("/dashboard");
+        router.replace("/dashboard");
       }
     } catch {
       setError("Terjadi kesalahan. Coba lagi.");
@@ -75,7 +75,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen gradient-mesh flex flex-col items-center justify-center px-6 py-8">
+    <main className="min-h-screen gradient-mesh flex flex-col items-center justify-center px-6 py-8">
       {/* Logo + Branding */}
       <div
         className="text-center mb-10 animate-fade-in-up"
@@ -113,7 +113,10 @@ export default function LoginPage() {
           {/* Name (register only) */}
           {isRegister && (
             <div>
-              <label className="text-xs text-text-muted font-medium mb-1.5 block">
+              <label
+                htmlFor="name-input"
+                className="text-xs text-text-muted font-medium mb-1.5 block"
+              >
                 Nama
               </label>
               <div className="relative">
@@ -125,6 +128,8 @@ export default function LoginPage() {
                   onChange={(e) => setName(e.target.value)}
                   className="pl-10 bg-surface-elevated border-border-subtle text-foreground"
                   id="name-input"
+                  name="name"
+                  autoComplete="name"
                 />
               </div>
             </div>
@@ -132,7 +137,10 @@ export default function LoginPage() {
 
           {/* Email */}
           <div>
-            <label className="text-xs text-text-muted font-medium mb-1.5 block">
+            <label
+              htmlFor="email-input"
+              className="text-xs text-text-muted font-medium mb-1.5 block"
+            >
               Email
             </label>
             <div className="relative">
@@ -144,6 +152,9 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-10 bg-surface-elevated border-border-subtle text-foreground"
                 id="email-input"
+                name="email"
+                autoComplete="email"
+                spellCheck={false}
                 required
               />
             </div>
@@ -151,7 +162,10 @@ export default function LoginPage() {
 
           {/* Password */}
           <div>
-            <label className="text-xs text-text-muted font-medium mb-1.5 block">
+            <label
+              htmlFor="password-input"
+              className="text-xs text-text-muted font-medium mb-1.5 block"
+            >
               Password
             </label>
             <div className="relative">
@@ -163,13 +177,16 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="pl-10 pr-10 bg-surface-elevated border-border-subtle text-foreground"
                 id="password-input"
+                name="password"
                 required
                 minLength={6}
+                autoComplete={isRegister ? "new-password" : "current-password"}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-foreground transition-colors"
+                aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4" />
@@ -181,16 +198,20 @@ export default function LoginPage() {
           </div>
 
           {/* Error message */}
-          {error && <p className="text-xs text-danger text-center">{error}</p>}
+          {error && (
+            <p className="text-xs text-danger text-center" aria-live="polite">
+              {error}
+            </p>
+          )}
 
           {/* Submit Button */}
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-emerald hover:bg-emerald-dark text-[#0A0A0F] font-semibold text-base rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+            className="w-full h-12 bg-emerald hover:bg-emerald-dark text-[#0A0A0F] font-semibold text-base rounded-xl transition-[transform,background-color,opacity] active:scale-[0.98] disabled:opacity-50"
             id="login-btn"
           >
-            {loading ? "Loading..." : isRegister ? "Daftar" : "Masuk"}
+            {loading ? "Loading…" : isRegister ? "Daftar" : "Masuk"}
           </Button>
         </div>
 
@@ -205,7 +226,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="w-full h-12 glass-card flex items-center justify-center gap-3 text-sm font-medium text-foreground hover:border-emerald/30 transition-all active:scale-[0.98]"
+          className="w-full h-12 glass-card flex items-center justify-center gap-3 text-sm font-medium text-foreground hover:border-emerald/30 transition-[transform,border-color] active:scale-[0.98]"
           id="google-login-btn"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -244,6 +265,6 @@ export default function LoginPage() {
           </button>
         </p>
       </form>
-    </div>
+    </main>
   );
 }

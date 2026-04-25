@@ -61,7 +61,8 @@ export const ModelName = {
   WeightLog: 'WeightLog',
   ExerciseLog: 'ExerciseLog',
   WorkoutPlan: 'WorkoutPlan',
-  WorkoutPlanExercise: 'WorkoutPlanExercise'
+  WorkoutPlanExercise: 'WorkoutPlanExercise',
+  UserFitnessProfile: 'UserFitnessProfile'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -238,12 +239,41 @@ export const WorkoutPlanExerciseScalarFieldEnum = {
 export type WorkoutPlanExerciseScalarFieldEnum = (typeof WorkoutPlanExerciseScalarFieldEnum)[keyof typeof WorkoutPlanExerciseScalarFieldEnum]
 
 
+export const UserFitnessProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  primaryGoal: 'primaryGoal',
+  secondaryGoal: 'secondaryGoal',
+  experienceLevel: 'experienceLevel',
+  trainingDaysPerWeek: 'trainingDaysPerWeek',
+  loadLevel: 'loadLevel',
+  gender: 'gender',
+  equipmentAccess: 'equipmentAccess',
+  planStatus: 'planStatus',
+  draftPlanPayload: 'draftPlanPayload',
+  planVersion: 'planVersion',
+  onboardingCompletedAt: 'onboardingCompletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserFitnessProfileScalarFieldEnum = (typeof UserFitnessProfileScalarFieldEnum)[keyof typeof UserFitnessProfileScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -260,4 +290,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

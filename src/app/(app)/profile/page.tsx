@@ -138,10 +138,10 @@ export default function ProfilePage() {
       setShowResetDialog(false);
       setResetSuccess(true);
       setStats({ totalWorkouts: 0, totalExercises: 0 });
-      // Brief success state then redirect to dashboard
+      // Brief success state then restart the setup flow from onboarding
       setTimeout(() => {
         setResetSuccess(false);
-        router.push("/dashboard");
+        router.push("/onboarding");
         router.refresh();
       }, 1800);
     } catch {
@@ -162,7 +162,7 @@ export default function ProfilePage() {
             <span className="text-emerald text-sm">✓</span>
           </div>
           <p className="text-sm text-emerald font-medium">
-            Data berhasil direset. Kembali ke dashboard...
+            Data berhasil direset. Masuk lagi ke onboarding...
           </p>
         </div>
       )}

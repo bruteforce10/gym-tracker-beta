@@ -19,38 +19,27 @@ type ExercisePickerCardProps = {
   };
   selected?: boolean;
   showPrescriptionBadges?: boolean;
+  showThumbnail?: boolean;
   selectionIndicator?: ReactNode;
   onSelect?: () => void;
   onFavoriteChange?: (nextValue: boolean) => void;
   className?: string;
 };
 
-function getExerciseMonogram(name: string) {
-  const tokens = name
-    .split(/\s+/)
-    .map((token) => token.trim())
-    .filter(Boolean);
-
-  if (tokens.length === 0) return "EX";
-  if (tokens.length === 1) return tokens[0].slice(0, 2).toUpperCase();
-
-  return `${tokens[0][0] ?? ""}${tokens[1][0] ?? ""}`.toUpperCase();
-}
-
 export default function ExercisePickerCard({
   exercise,
   selected = false,
   showPrescriptionBadges = true,
+  showThumbnail = false,
   selectionIndicator,
   onSelect,
   onFavoriteChange,
   className,
 }: ExercisePickerCardProps) {
+  const isInteractive = typeof onSelect === "function";
   const gradient = exercise.category
     ? CATEGORY_GRADIENTS[exercise.category]
     : "from-slate-500/30 to-slate-400/20";
-  const monogram = getExerciseMonogram(exercise.name);
-  const isInteractive = typeof onSelect === "function";
 
   return (
     <div
@@ -73,30 +62,25 @@ export default function ExercisePickerCard({
       )}
     >
       <div className="flex items-start gap-3">
-        <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-2xl border border-white/20 bg-white aspect-video">
-          <ExerciseImage
-            src={exercise.imageUrl}
-            alt={exercise.name}
-            width={128}
-            height={80}
-            className="h-full w-full object-cover"
-            sizes="128px"
-            quality={45}
-            loading="lazy"
-            fallback={
-              <div
-                className={`flex h-full w-full items-center justify-center bg-linear-to-br ${gradient}`}
-              >
-                <span
-                  className="text-sm font-black tracking-[0.18em] text-white/90"
-                  style={{ fontFamily: "Outfit, sans-serif" }}
-                >
-                  {monogram}
-                </span>
-              </div>
-            }
-          />
-        </div>
+        {showThumbnail ? (
+          <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-2xl border border-white/20 bg-white aspect-video">
+            <ExerciseImage
+              src={exercise.imageUrl}
+              alt={exercise.name}
+              width={128}
+              height={80}
+              className="h-full w-full object-cover"
+              sizes="128px"
+              quality={45}
+              loading="lazy"
+              fallback={
+                <div
+                  className={`flex h-full w-full items-center justify-center bg-linear-to-br ${gradient}`}
+                />
+              }
+            />
+          </div>
+        ) : null}
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">

@@ -394,7 +394,8 @@ export const ModelName = {
   WeightLog: 'WeightLog',
   ExerciseLog: 'ExerciseLog',
   WorkoutPlan: 'WorkoutPlan',
-  WorkoutPlanExercise: 'WorkoutPlanExercise'
+  WorkoutPlanExercise: 'WorkoutPlanExercise',
+  UserFitnessProfile: 'UserFitnessProfile'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "goal" | "exercise" | "favoriteExercise" | "workout" | "weightLog" | "exerciseLog" | "workoutPlan" | "workoutPlanExercise"
+    modelProps: "user" | "account" | "session" | "goal" | "exercise" | "favoriteExercise" | "workout" | "weightLog" | "exerciseLog" | "workoutPlan" | "workoutPlanExercise" | "userFitnessProfile"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1228,6 +1229,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UserFitnessProfile: {
+      payload: Prisma.$UserFitnessProfilePayload<ExtArgs>
+      fields: Prisma.UserFitnessProfileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserFitnessProfileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserFitnessProfileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload>
+        }
+        findFirst: {
+          args: Prisma.UserFitnessProfileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserFitnessProfileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload>
+        }
+        findMany: {
+          args: Prisma.UserFitnessProfileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload>[]
+        }
+        create: {
+          args: Prisma.UserFitnessProfileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload>
+        }
+        createMany: {
+          args: Prisma.UserFitnessProfileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserFitnessProfileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload>[]
+        }
+        delete: {
+          args: Prisma.UserFitnessProfileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload>
+        }
+        update: {
+          args: Prisma.UserFitnessProfileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload>
+        }
+        deleteMany: {
+          args: Prisma.UserFitnessProfileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserFitnessProfileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserFitnessProfileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload>[]
+        }
+        upsert: {
+          args: Prisma.UserFitnessProfileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFitnessProfilePayload>
+        }
+        aggregate: {
+          args: Prisma.UserFitnessProfileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserFitnessProfile>
+        }
+        groupBy: {
+          args: Prisma.UserFitnessProfileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserFitnessProfileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserFitnessProfileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserFitnessProfileCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1425,12 +1500,41 @@ export const WorkoutPlanExerciseScalarFieldEnum = {
 export type WorkoutPlanExerciseScalarFieldEnum = (typeof WorkoutPlanExerciseScalarFieldEnum)[keyof typeof WorkoutPlanExerciseScalarFieldEnum]
 
 
+export const UserFitnessProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  primaryGoal: 'primaryGoal',
+  secondaryGoal: 'secondaryGoal',
+  experienceLevel: 'experienceLevel',
+  trainingDaysPerWeek: 'trainingDaysPerWeek',
+  loadLevel: 'loadLevel',
+  gender: 'gender',
+  equipmentAccess: 'equipmentAccess',
+  planStatus: 'planStatus',
+  draftPlanPayload: 'draftPlanPayload',
+  planVersion: 'planVersion',
+  onboardingCompletedAt: 'onboardingCompletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserFitnessProfileScalarFieldEnum = (typeof UserFitnessProfileScalarFieldEnum)[keyof typeof UserFitnessProfileScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -1447,6 +1551,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -1515,6 +1628,20 @@ export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMode
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 /**
@@ -1623,6 +1750,7 @@ export type GlobalOmitConfig = {
   exerciseLog?: Prisma.ExerciseLogOmit
   workoutPlan?: Prisma.WorkoutPlanOmit
   workoutPlanExercise?: Prisma.WorkoutPlanExerciseOmit
+  userFitnessProfile?: Prisma.UserFitnessProfileOmit
 }
 
 /* Types for Logging */

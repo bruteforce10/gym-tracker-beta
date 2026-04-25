@@ -219,3 +219,24 @@
 .animate-count-up {
   animation: count-up 0.4s ease-out forwards;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in-up,
+  .animate-progress-fill,
+  .animate-count-up,
+  .fab-pulse,
+  .shimmer {
+    animation: none !important;
+    transition-duration: 0ms !important;
+  }
+
+  .glass-card:hover {
+    transform: none;
+  }
+}
