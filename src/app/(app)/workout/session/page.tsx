@@ -6,9 +6,13 @@ import {
   Check,
   ChevronLeft,
   HeartPulse,
+  PauseCircle,
+  Play,
   Plus,
+  RotateCcw,
   SkipForward,
   Timer,
+  Trash2,
   Volume2,
   VolumeX,
   X,
@@ -29,6 +33,7 @@ import {
   appendExerciseToSnapshot,
   buildSessionExercise,
   buildStoredSessionSnapshot,
+  createInitialSnapshot,
   createInitialSetEntries,
   getActivePairing,
   getCompletedSetCount,
@@ -71,8 +76,7 @@ function RestTimer({
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - seconds / total);
-  const accentClass =
-    mode === "transition" ? "text-amber-300" : "text-emerald";
+  const accentClass = mode === "transition" ? "text-amber-300" : "text-emerald";
   const stroke = mode === "transition" ? "#F59E0B" : "#10B981";
 
   return (
@@ -112,7 +116,9 @@ function RestTimer({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-mono text-4xl font-bold text-foreground">{seconds}</span>
+          <span className="font-mono text-4xl font-bold text-foreground">
+            {seconds}
+          </span>
           <span className="text-xs text-text-muted">detik</span>
         </div>
       </div>
@@ -154,12 +160,15 @@ export default function WorkoutSessionPage() {
   const [reps, setReps] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [shareSummary, setShareSummary] = useState<WorkoutShareSummary | null>(null);
+  const [shareSummary, setShareSummary] = useState<WorkoutShareSummary | null>(
+    null,
+  );
   const [completedAt, setCompletedAt] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [alarmEnabled, setAlarmEnabled] = useState(true);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [freePickerOpen, setFreePickerOpen] = useState(false);
+  const [pauseOpen, setPauseOpen] = useState(false);
   const [queuedFreeExercises, setQueuedFreeExercises] = useState<
     FavoriteAwareExerciseItem[]
   >([]);
@@ -169,7 +178,7 @@ export default function WorkoutSessionPage() {
 
   useEffect(() => {
     const nextSnapshot = buildStoredSessionSnapshot(
-      sessionStorage.getItem(WORKOUT_SESSION_STORAGE_KEY)
+      sessionStorage.getItem(WORKOUT_SESSION_STORAGE_KEY),
     );
 
     if (!nextSnapshot) {
@@ -186,13 +195,38 @@ export default function WorkoutSessionPage() {
 
     setSnapshot(nextSnapshot);
     setElapsedSeconds(
-      Math.max(0, Math.floor((Date.now() - startedAtValue.getTime()) / 1000))
+      Math.max(0, Math.floor((Date.now() - startedAtValue.getTime()) / 1000)),
     );
   }, [router]);
 
   useEffect(() => {
     if (!snapshot) return;
-    sessionStorage.setItem(WORKOUT_SESSION_STORAGE_KEY, JSON.stringify(snapshot));
+    sessionStorage.setItem(
+      WORKOUT_SESSION_STORAGE_KEY,
+      JSON.stringify(snapshot),
+    );
+  }, [snapshot]);
+
+  useEffect(() => {
+    if (!snapshot || snapshot.progress.state === "done") return;
+
+    window.history.pushState(
+      { workoutSessionGuard: true },
+      "",
+      window.location.href,
+    );
+
+    const handlePopState = () => {
+      setPauseOpen(true);
+      window.history.pushState(
+        { workoutSessionGuard: true },
+        "",
+        window.location.href,
+      );
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, [snapshot]);
 
   const startedAt = snapshot?.startedAt;
@@ -205,7 +239,7 @@ export default function WorkoutSessionPage() {
 
     const updateElapsed = () => {
       setElapsedSeconds(
-        Math.max(0, Math.floor((Date.now() - startedAtValue.getTime()) / 1000))
+        Math.max(0, Math.floor((Date.now() - startedAtValue.getTime()) / 1000)),
       );
     };
 
@@ -266,7 +300,8 @@ export default function WorkoutSessionPage() {
 
   const activateQueuedTurn = useCallback(
     (current: WorkoutSessionSnapshot): WorkoutSessionSnapshot => {
-      const queuedTurn = current.progress.queuedTurn ?? current.progress.activeTurn;
+      const queuedTurn =
+        current.progress.queuedTurn ?? current.progress.activeTurn;
       const nextState: WorkoutState =
         queuedTurn.lane === "superset" ? "input-superset" : "input-primary";
 
@@ -283,7 +318,7 @@ export default function WorkoutSessionPage() {
         },
       };
     },
-    []
+    [],
   );
 
   const beginRest = useCallback(
@@ -291,7 +326,7 @@ export default function WorkoutSessionPage() {
       baseSnapshot: WorkoutSessionSnapshot,
       seconds: number,
       nextTurn: ActiveTurn,
-      mode: "transition" | "normal"
+      mode: "transition" | "normal",
     ) => {
       stopTimer();
 
@@ -336,7 +371,7 @@ export default function WorkoutSessionPage() {
         }
       }, 1000);
     },
-    [activateQueuedTurn, playRestFinishedAlarm, stopTimer]
+    [activateQueuedTurn, playRestFinishedAlarm, stopTimer],
   );
 
   const formatElapsedTime = useCallback((totalSeconds: number) => {
@@ -364,18 +399,18 @@ export default function WorkoutSessionPage() {
 
     const currentExercise = getExerciseBySessionId(
       snapshot,
-      snapshot.progress.activeTurn.sessionExerciseId
+      snapshot.progress.activeTurn.sessionExerciseId,
     );
     if (!currentExercise) return;
 
     const completedSets = getSetsForExercise(
       snapshot,
-      currentExercise.sessionExerciseId
+      currentExercise.sessionExerciseId,
     ).filter((set) => set.done);
     const latestSet = completedSets.at(-1);
 
     setWeight(
-      latestSet && latestSet.weight > 0 ? String(latestSet.weight) : ""
+      latestSet && latestSet.weight > 0 ? String(latestSet.weight) : "",
     );
     setReps(String(latestSet?.reps ?? currentExercise.defaultReps));
   }, [
@@ -398,7 +433,7 @@ export default function WorkoutSessionPage() {
               weight: item.weight,
               reps: item.reps,
               sets: 1,
-            }))
+            })),
         );
 
         if (exercises.length === 0) {
@@ -415,17 +450,19 @@ export default function WorkoutSessionPage() {
           new Date(finishedSnapshot.startedAt).toISOString().split("T")[0],
           exercises,
           finishedSnapshot.startedAt,
-          endedAt
+          endedAt,
         );
 
         sessionStorage.removeItem(WORKOUT_SESSION_STORAGE_KEY);
       } catch {
-        setSaveError("Sesi selesai, tapi penyimpanan workout gagal. Data sesi tetap disimpan.");
+        setSaveError(
+          "Sesi selesai, tapi penyimpanan workout gagal. Data sesi tetap disimpan.",
+        );
       } finally {
         setSaving(false);
       }
     },
-    []
+    [],
   );
 
   const handleConfirmSuperset = useCallback(
@@ -451,7 +488,7 @@ export default function WorkoutSessionPage() {
 
       const existingPairing = getPairingForPrimary(
         snapshot,
-        primaryExercise.sessionExerciseId
+        primaryExercise.sessionExerciseId,
       );
 
       if (
@@ -505,7 +542,7 @@ export default function WorkoutSessionPage() {
 
       setPickerOpen(false);
     },
-    [snapshot]
+    [snapshot],
   );
 
   const handleCancelSuperset = useCallback(() => {
@@ -562,7 +599,7 @@ export default function WorkoutSessionPage() {
         return [...current, exercise];
       });
     },
-    []
+    [],
   );
 
   const handleConfirmFreeExercises = useCallback(() => {
@@ -577,9 +614,9 @@ export default function WorkoutSessionPage() {
             nextSnapshot,
             buildSessionExercise(exercise, {
               source: "free",
-            })
+            }),
           ),
-        current
+        current,
       );
     });
 
@@ -587,12 +624,79 @@ export default function WorkoutSessionPage() {
     setFreePickerOpen(false);
   }, [queuedFreeExercises]);
 
+  const handleResumeWorkout = useCallback(() => {
+    setSnapshot((current) => {
+      if (!current) return current;
+      const pausedElapsedSeconds =
+        current.pausedElapsedSeconds ?? elapsedSeconds;
+
+      return {
+        ...current,
+        startedAt: new Date(
+          Date.now() - pausedElapsedSeconds * 1000,
+        ).toISOString(),
+        pausedAt: null,
+        pausedElapsedSeconds: null,
+      };
+    });
+    setPauseOpen(false);
+  }, [elapsedSeconds]);
+
+  const handleAwayForAWhile = useCallback(() => {
+    setSnapshot((current) =>
+      current
+        ? {
+            ...current,
+            pausedAt: new Date().toISOString(),
+            pausedElapsedSeconds: elapsedSeconds,
+          }
+        : current,
+    );
+    setPauseOpen(false);
+    // Use setTimeout to ensure state update is batched first
+    setTimeout(() => {
+      router.push("/dashboard");
+    }, 0);
+  }, [elapsedSeconds, router]);
+
+  const handleQuitWorkout = useCallback(() => {
+    stopTimer();
+    sessionStorage.removeItem(WORKOUT_SESSION_STORAGE_KEY);
+    setPauseOpen(false);
+    router.push("/dashboard");
+  }, [router, stopTimer]);
+
+  const handleRestartWorkout = useCallback(() => {
+    if (!snapshot) return;
+
+    stopTimer();
+
+    const restartableExercises = snapshot.exercises.filter(
+      (exercise) => exercise.source !== "dynamic-superset",
+    );
+    const restartedSnapshot = createInitialSnapshot({
+      sessionSource: snapshot.sessionSource,
+      planId: snapshot.planId,
+      planName: snapshot.planName,
+      startedAt: new Date().toISOString(),
+      pausedAt: null,
+      pausedElapsedSeconds: null,
+      exercises: restartableExercises,
+    });
+
+    setPauseOpen(false);
+    setWeight("");
+    setReps("");
+    setElapsedSeconds(0);
+    setSnapshot(restartedSnapshot);
+  }, [snapshot, stopTimer]);
+
   const handleDoneSet = useCallback(() => {
     if (!snapshot) return;
 
     const currentExercise = getExerciseBySessionId(
       snapshot,
-      snapshot.progress.activeTurn.sessionExerciseId
+      snapshot.progress.activeTurn.sessionExerciseId,
     );
     const primaryExercise = getCurrentPrimaryExercise(snapshot);
 
@@ -600,7 +704,7 @@ export default function WorkoutSessionPage() {
 
     const currentSetIndex = getNextSetIndex(
       snapshot,
-      currentExercise.sessionExerciseId
+      currentExercise.sessionExerciseId,
     );
     const nextWeight = parseFloat(weight) || 0;
     const nextReps = parseInt(reps, 10) || currentExercise.defaultReps;
@@ -620,7 +724,7 @@ export default function WorkoutSessionPage() {
                   reps: nextReps,
                   done: true,
                 }
-              : set
+              : set,
           ),
         },
       },
@@ -628,20 +732,19 @@ export default function WorkoutSessionPage() {
 
     const pairing = getPairingForPrimary(
       nextSnapshot,
-      primaryExercise.sessionExerciseId
+      primaryExercise.sessionExerciseId,
     );
     const isOnPrimaryLane = snapshot.progress.activeTurn.lane === "primary";
     const primaryComplete = isExerciseComplete(
       nextSnapshot,
-      primaryExercise.sessionExerciseId
+      primaryExercise.sessionExerciseId,
     );
 
     let resolvedSnapshot = nextSnapshot;
 
-    const plannedSupersetPartnerId =
-      primaryExercise.supersetWithNext
-        ? snapshot.progress.planOrder[snapshot.progress.primaryIndex + 1]
-        : null;
+    const plannedSupersetPartnerId = primaryExercise.supersetWithNext
+      ? snapshot.progress.planOrder[snapshot.progress.primaryIndex + 1]
+      : null;
 
     if (
       !pairing &&
@@ -668,19 +771,19 @@ export default function WorkoutSessionPage() {
 
     const effectivePairing = getPairingForPrimary(
       resolvedSnapshot,
-      primaryExercise.sessionExerciseId
+      primaryExercise.sessionExerciseId,
     );
     const effectiveSupersetExercise =
       effectivePairing && effectivePairing.status === "active"
         ? getExerciseBySessionId(
             resolvedSnapshot,
-            effectivePairing.supersetSessionExerciseId
+            effectivePairing.supersetSessionExerciseId,
           )
         : null;
     const effectiveSupersetComplete = effectiveSupersetExercise
       ? isExerciseComplete(
           resolvedSnapshot,
-          effectiveSupersetExercise.sessionExerciseId
+          effectiveSupersetExercise.sessionExerciseId,
         )
       : true;
 
@@ -718,7 +821,7 @@ export default function WorkoutSessionPage() {
           sessionExerciseId: effectivePairing.supersetSessionExerciseId,
           lane: "superset",
         },
-        "transition"
+        "transition",
       );
       return;
     }
@@ -754,7 +857,7 @@ export default function WorkoutSessionPage() {
               : primaryExercise.sessionExerciseId,
             lane: primaryComplete ? "superset" : "primary",
           },
-          "normal"
+          "normal",
         );
         return;
       }
@@ -768,7 +871,7 @@ export default function WorkoutSessionPage() {
           sessionExerciseId: primaryExercise.sessionExerciseId,
           lane: "primary",
         },
-        "normal"
+        "normal",
       );
       return;
     }
@@ -816,20 +919,29 @@ export default function WorkoutSessionPage() {
         sessionExerciseId: nextPrimaryId,
         lane: "primary",
       },
-      "normal"
+      "normal",
     );
   }, [beginRest, handleAutoSave, reps, snapshot, stopTimer, weight]);
 
   const currentExercise = snapshot
-    ? getExerciseBySessionId(snapshot, snapshot.progress.activeTurn.sessionExerciseId)
+    ? getExerciseBySessionId(
+        snapshot,
+        snapshot.progress.activeTurn.sessionExerciseId,
+      )
     : null;
-  const currentPrimaryExercise = snapshot ? getCurrentPrimaryExercise(snapshot) : null;
+  const currentPrimaryExercise = snapshot
+    ? getCurrentPrimaryExercise(snapshot)
+    : null;
   const activePairing = snapshot ? getActivePairing(snapshot) : null;
-  const activeSupersetExercise = snapshot ? getSupersetExercise(snapshot) : null;
+  const activeSupersetExercise = snapshot
+    ? getSupersetExercise(snapshot)
+    : null;
   const isFreeMode = snapshot?.sessionSource === "free";
-  const existingExerciseIds = new Set(snapshot?.exercises.map((exercise) => exercise.exerciseId));
+  const existingExerciseIds = new Set(
+    snapshot?.exercises.map((exercise) => exercise.exerciseId),
+  );
   const queuedFreeExerciseIds = new Set(
-    queuedFreeExercises.map((exercise) => exercise.id)
+    queuedFreeExercises.map((exercise) => exercise.id),
   );
 
   const progressPercent = useMemo(() => {
@@ -837,12 +949,12 @@ export default function WorkoutSessionPage() {
 
     const totalSets = snapshot.exercises.reduce(
       (total, exercise) => total + exercise.defaultSets,
-      0
+      0,
     );
     const completedSets = snapshot.exercises.reduce(
       (total, exercise) =>
         total + getCompletedSetCount(snapshot, exercise.sessionExerciseId),
-      0
+      0,
     );
 
     return totalSets === 0 ? 0 : (completedSets / totalSets) * 100;
@@ -864,12 +976,15 @@ export default function WorkoutSessionPage() {
 
   const nextPlanExercises =
     snapshot && currentPrimaryExercise
-      ? snapshot.progress.planOrder
-          .slice(snapshot.progress.primaryIndex + 1, snapshot.progress.primaryIndex + 3)
-          .map((sessionExerciseId) =>
-            getExerciseBySessionId(snapshot, sessionExerciseId)
+      ? (snapshot.progress.planOrder
+          .slice(
+            snapshot.progress.primaryIndex + 1,
+            snapshot.progress.primaryIndex + 3,
           )
-          .filter(Boolean) as SessionExercise[]
+          .map((sessionExerciseId) =>
+            getExerciseBySessionId(snapshot, sessionExerciseId),
+          )
+          .filter(Boolean) as SessionExercise[])
       : [];
 
   const canAddSuperset =
@@ -910,26 +1025,25 @@ export default function WorkoutSessionPage() {
         <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 px-4 py-5">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => {
-                if (confirm("Keluar dari sesi ini?")) {
-                  stopTimer();
-                  sessionStorage.removeItem(WORKOUT_SESSION_STORAGE_KEY);
-                  router.back();
-                }
-              }}
+              onClick={() => setPauseOpen(true)}
               className="flex h-9 w-9 items-center justify-center rounded-xl border border-border-subtle bg-surface-elevated"
               id="exit-session-btn"
               aria-label="Keluar dari sesi latihan"
             >
-              <ChevronLeft className="h-5 w-5 text-foreground" aria-hidden="true" />
+              <ChevronLeft
+                className="h-5 w-5 text-foreground"
+                aria-hidden="true"
+              />
             </button>
 
             <div className="min-w-0 flex-1 text-center">
               <p className="text-xs text-text-muted">{snapshot.planName}</p>
               <p className="text-sm font-semibold text-foreground">
-                {isFreeMode ? "Queue" : "Exercise"} {snapshot.progress.primaryIndex + 1}/
+                {isFreeMode ? "Queue" : "Exercise"}{" "}
+                {snapshot.progress.primaryIndex + 1}/
                 {snapshot.progress.planOrder.length} · Set{" "}
-                {Math.min(currentCompletedSets + 1, currentTotalSets)}/{currentTotalSets}
+                {Math.min(currentCompletedSets + 1, currentTotalSets)}/
+                {currentTotalSets}
               </p>
             </div>
 
@@ -950,8 +1064,12 @@ export default function WorkoutSessionPage() {
               }`}
               id="toggle-session-alarm"
               aria-pressed={alarmEnabled}
-              aria-label={alarmEnabled ? "Matikan suara alarm" : "Nyalakan suara alarm"}
-              title={alarmEnabled ? "Suara alarm aktif" : "Suara alarm nonaktif"}
+              aria-label={
+                alarmEnabled ? "Matikan suara alarm" : "Nyalakan suara alarm"
+              }
+              title={
+                alarmEnabled ? "Suara alarm aktif" : "Suara alarm nonaktif"
+              }
             >
               {alarmEnabled ? (
                 <Volume2 className="h-4 w-4" aria-hidden="true" />
@@ -961,7 +1079,9 @@ export default function WorkoutSessionPage() {
             </button>
           </div>
 
-          <div className={`glass-card space-y-4 bg-linear-to-br p-5 ${currentGradient}`}>
+          <div
+            className={`glass-card space-y-4 bg-linear-to-br p-5 ${currentGradient}`}
+          >
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <span className="text-xs font-semibold uppercase tracking-widest text-text-muted">
@@ -997,14 +1117,23 @@ export default function WorkoutSessionPage() {
                     : "border-amber-400/20 bg-amber-400/10 text-amber-200"
                 }
               >
-                {currentExercise.trainingStyle === "compound" ? "Compound" : "Isolation"}
+                {currentExercise.trainingStyle === "compound"
+                  ? "Compound"
+                  : "Isolation"}
               </Badge>
-              <Badge variant="outline" className="border-white/10 bg-white/5 text-text-muted">
+              <Badge
+                variant="outline"
+                className="border-white/10 bg-white/5 text-text-muted"
+              >
                 Rest {currentExercise.restTime}s
               </Badge>
               {activePairing && activeSupersetExercise ? (
-                <Badge variant="outline" className="border-amber-300/25 bg-amber-300/10 text-amber-200">
-                  Pair: {currentPrimaryExercise.name} + {activeSupersetExercise.name}
+                <Badge
+                  variant="outline"
+                  className="border-amber-300/25 bg-amber-300/10 text-amber-200"
+                >
+                  Pair: {currentPrimaryExercise.name} +{" "}
+                  {activeSupersetExercise.name}
                 </Badge>
               ) : null}
             </div>
@@ -1058,7 +1187,8 @@ export default function WorkoutSessionPage() {
                     Live Queue
                   </p>
                   <p className="mt-1 text-sm text-text-muted">
-                    Stopwatch tetap jalan. Tambah exercise baru kapan saja saat sesi berlangsung.
+                    Stopwatch tetap jalan. Tambah exercise baru kapan saja saat
+                    sesi berlangsung.
                   </p>
                 </div>
                 <button
@@ -1095,38 +1225,37 @@ export default function WorkoutSessionPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {[
-                  currentPrimaryExercise,
-                  activeSupersetExercise,
-                ].map((exercise, index) => {
-                  const completed = getCompletedSetCount(
-                    snapshot,
-                    exercise.sessionExerciseId
-                  );
+                {[currentPrimaryExercise, activeSupersetExercise].map(
+                  (exercise, index) => {
+                    const completed = getCompletedSetCount(
+                      snapshot,
+                      exercise.sessionExerciseId,
+                    );
 
-                  return (
-                    <div
-                      key={exercise.sessionExerciseId}
-                      className={`rounded-2xl border p-3 ${
-                        snapshot.progress.activeTurn.sessionExerciseId ===
-                        exercise.sessionExerciseId
-                          ? "border-emerald/30 bg-emerald/10"
-                          : "border-white/8 bg-white/[0.03]"
-                      }`}
-                    >
-                      <p className="text-[10px] uppercase tracking-[0.18em] text-text-muted">
-                        {index === 0 ? "Primary" : "Superset"}
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-foreground">
-                        {exercise.name}
-                      </p>
-                      <p className="mt-2 text-[11px] text-text-muted">
-                        Sisa {Math.max(exercise.defaultSets - completed, 0)} dari{" "}
-                        {exercise.defaultSets} set
-                      </p>
-                    </div>
-                  );
-                })}
+                    return (
+                      <div
+                        key={exercise.sessionExerciseId}
+                        className={`rounded-2xl border p-3 ${
+                          snapshot.progress.activeTurn.sessionExerciseId ===
+                          exercise.sessionExerciseId
+                            ? "border-emerald/30 bg-emerald/10"
+                            : "border-white/8 bg-white/[0.03]"
+                        }`}
+                      >
+                        <p className="text-[10px] uppercase tracking-[0.18em] text-text-muted">
+                          {index === 0 ? "Primary" : "Superset"}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-foreground">
+                          {exercise.name}
+                        </p>
+                        <p className="mt-2 text-[11px] text-text-muted">
+                          Sisa {Math.max(exercise.defaultSets - completed, 0)}{" "}
+                          dari {exercise.defaultSets} set
+                        </p>
+                      </div>
+                    );
+                  },
+                )}
               </div>
             </div>
           ) : null}
@@ -1142,14 +1271,14 @@ export default function WorkoutSessionPage() {
                   snapshot.progress.queuedTurn
                     ? getExerciseBySessionId(
                         snapshot,
-                        snapshot.progress.queuedTurn.sessionExerciseId
+                        snapshot.progress.queuedTurn.sessionExerciseId,
                       )?.name
                     : null
                 }
                 onSkip={() => {
                   stopTimer();
                   setSnapshot((current) =>
-                    current ? activateQueuedTurn(current) : current
+                    current ? activateQueuedTurn(current) : current,
                   );
                 }}
                 onAddTime={() => {
@@ -1163,10 +1292,11 @@ export default function WorkoutSessionPage() {
                           progress: {
                             ...current.progress,
                             restLeft: current.progress.restLeft + extraSeconds,
-                            restTotal: current.progress.restTotal + extraSeconds,
+                            restTotal:
+                              current.progress.restTotal + extraSeconds,
                           },
                         }
-                      : current
+                      : current,
                   );
                 }}
               />
@@ -1178,7 +1308,8 @@ export default function WorkoutSessionPage() {
             <div className="glass-card p-4 space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">
-                  Set {Math.min(currentCompletedSets + 1, currentTotalSets)} dari {currentTotalSets}
+                  Set {Math.min(currentCompletedSets + 1, currentTotalSets)}{" "}
+                  dari {currentTotalSets}
                 </p>
                 {canAddSuperset ? (
                   <button
@@ -1253,7 +1384,9 @@ export default function WorkoutSessionPage() {
                     className="glass-card flex items-center justify-between px-4 py-2.5 opacity-70"
                   >
                     <div>
-                      <p className="text-xs font-semibold text-foreground">{exercise.name}</p>
+                      <p className="text-xs font-semibold text-foreground">
+                        {exercise.name}
+                      </p>
                       <p className="text-[10px] text-text-muted">
                         {exercise.defaultSets}×{exercise.defaultReps}
                       </p>
@@ -1278,7 +1411,9 @@ export default function WorkoutSessionPage() {
       <SupersetPickerSheet
         open={pickerOpen}
         primaryExerciseName={currentPrimaryExercise.name}
-        planBucket={currentPrimaryExercise.category === null ? "all" : undefined}
+        planBucket={
+          currentPrimaryExercise.category === null ? "all" : undefined
+        }
         onOpenChange={setPickerOpen}
         onConfirm={handleConfirmSuperset}
       />
@@ -1295,6 +1430,79 @@ export default function WorkoutSessionPage() {
         onToggleExercise={toggleQueuedFreeExercise}
         onConfirm={handleConfirmFreeExercises}
       />
+
+      {pauseOpen ? (
+        <div className="fixed inset-0 z-[70] bg-[#05070A]/82 backdrop-blur-md">
+          <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-end px-4 pb-6 pt-12">
+            <div className="overflow-hidden rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_32%),rgba(255,255,255,0.04)] shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
+              <div className="border-b border-white/8 px-5 py-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald/80">
+                  Session Overlay
+                </p>
+                <h2
+                  className="mt-2 text-[2rem] font-bold leading-none text-foreground"
+                  style={{ fontFamily: "Outfit, sans-serif" }}
+                >
+                  Pause
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-text-muted">
+                  Pilih apakah kamu mau lanjut sekarang, simpan progress untuk
+                  nanti, mulai ulang, atau keluar dari workout ini.
+                </p>
+              </div>
+
+              <div className="space-y-3 px-5 py-5">
+                <button
+                  type="button"
+                  onClick={handleAwayForAWhile}
+                  className="flex min-h-16 w-full items-start gap-4 rounded-[26px] border border-emerald/18 bg-emerald/10 p-4 text-left transition-colors hover:bg-emerald/12"
+                >
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald/15 text-emerald">
+                    <PauseCircle className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-semibold text-foreground">
+                      Away for a while
+                    </p>
+                    <p className="mt-1 text-sm text-text-muted">
+                      Keep my progress and I&apos;ll continue later.
+                    </p>
+                  </div>
+                </button>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <button
+                    type="button"
+                    onClick={handleRestartWorkout}
+                    className="flex min-h-14 items-center justify-center gap-2 rounded-[22px] border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm font-semibold text-amber-200 transition-colors hover:bg-amber-300/14"
+                  >
+                    <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                    Restart
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleQuitWorkout}
+                    className="flex min-h-14 items-center justify-center gap-2 rounded-[22px] border border-danger/20 bg-danger/10 px-4 py-3 text-sm font-semibold text-danger transition-colors hover:bg-danger/14"
+                  >
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                    Quit
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleResumeWorkout}
+                    className="flex min-h-14 items-center justify-center gap-2 rounded-[22px] bg-emerald px-4 py-3 text-sm font-semibold text-[#08110A] transition-colors hover:bg-emerald-dark"
+                  >
+                    <Play className="h-4 w-4" aria-hidden="true" />
+                    Resume
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

@@ -42,6 +42,8 @@ export type SessionData = {
   planId: string | null;
   planName: string;
   startedAt: string;
+  pausedAt?: string | null;
+  pausedElapsedSeconds?: number | null;
   exercises: SessionExercise[];
 };
 
@@ -82,6 +84,8 @@ type StoredSessionLike =
       planId?: unknown;
       planName?: unknown;
       startedAt?: unknown;
+      pausedAt?: unknown;
+      pausedElapsedSeconds?: unknown;
       exercises?: unknown;
       progress?: unknown;
     };
@@ -155,6 +159,8 @@ export function buildStoredSessionSnapshot(
         planId: parsed.planId,
         planName: parsed.planName,
         startedAt: parsed.startedAt,
+        pausedAt: null,
+        pausedElapsedSeconds: null,
         exercises: parsed.exercises as SessionExercise[],
       });
     }
@@ -179,6 +185,8 @@ export function createInitialSnapshot(session: SessionData): WorkoutSessionSnaps
 
   return {
     ...session,
+    pausedAt: session.pausedAt ?? null,
+    pausedElapsedSeconds: session.pausedElapsedSeconds ?? null,
     exercises: normalizedExercises,
     progress: {
       allSets: Object.fromEntries(
@@ -222,6 +230,8 @@ export function normalizeSnapshot(
     ...snapshot,
     sessionSource: snapshot.sessionSource === "free" ? "free" : "plan",
     planId: snapshot.planId ?? null,
+    pausedAt: snapshot.pausedAt ?? null,
+    pausedElapsedSeconds: snapshot.pausedElapsedSeconds ?? null,
     exercises: incomingExercises,
     progress: {
       ...baseSnapshot.progress,

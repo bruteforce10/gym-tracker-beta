@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import NextTopLoader from "nextjs-toploader";
 import BottomNav from "@/components/bottom-nav";
 import AddWorkoutSheet from "@/components/add-workout-sheet";
+import ContinueWorkoutBanner from "@/components/continue-workout-banner";
 import FabMenuSheet from "@/components/fab-menu-sheet";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -13,6 +14,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideBottomNav =
     pathname === "/workout/start" || pathname === "/workout/session";
+  const shellPaddingClass = hideBottomNav
+    ? "pb-6"
+    : "pb-[calc(10rem+env(safe-area-inset-bottom,0px))]";
 
   return (
     <div className="min-h-screen gradient-mesh">
@@ -24,10 +28,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         speed={220}
       />
       <main
-        className={`max-w-md mx-auto px-4 pt-6 ${hideBottomNav ? "pb-6" : "pb-nav"}`}
+        className={`max-w-md mx-auto px-4 pt-6 ${shellPaddingClass}`}
       >
         {children}
       </main>
+      {!hideBottomNav && <ContinueWorkoutBanner />}
       {!hideBottomNav && <BottomNav onFabClick={() => setFabMenuOpen(true)} />}
       <FabMenuSheet
         open={fabMenuOpen}
