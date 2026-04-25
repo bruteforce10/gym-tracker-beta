@@ -40,6 +40,12 @@ export default function ExercisePickerCard({
   const gradient = exercise.category
     ? CATEGORY_GRADIENTS[exercise.category]
     : "from-slate-500/30 to-slate-400/20";
+  const exerciseInitials = exercise.name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((segment) => segment[0]?.toUpperCase() ?? "")
+    .join("");
 
   return (
     <div
@@ -76,7 +82,14 @@ export default function ExercisePickerCard({
               fallback={
                 <div
                   className={`flex h-full w-full items-center justify-center bg-linear-to-br ${gradient}`}
-                />
+                >
+                  <span
+                    className="text-lg font-bold tracking-[0.18em] text-white/88"
+                    style={{ fontFamily: "Outfit, sans-serif" }}
+                  >
+                    {exerciseInitials || "EX"}
+                  </span>
+                </div>
               }
             />
           </div>

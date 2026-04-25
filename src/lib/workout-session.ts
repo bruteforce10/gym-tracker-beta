@@ -6,8 +6,9 @@ import type {
 
 export const WORKOUT_SESSION_STORAGE_KEY = "gym-session";
 
-export type SessionExerciseSource = "plan" | "dynamic-superset";
+export type SessionExerciseSource = "plan" | "free" | "dynamic-superset";
 export type SessionTurnLane = "primary" | "superset";
+export type SessionSource = "plan" | "free";
 export type WorkoutState =
   | "input-primary"
   | "input-superset"
@@ -37,7 +38,8 @@ export type SessionExercise = {
 };
 
 export type SessionData = {
-  planId: string;
+  sessionSource: SessionSource;
+  planId: string | null;
   planName: string;
   startedAt: string;
   exercises: SessionExercise[];
@@ -76,6 +78,7 @@ type StoredSessionLike =
   | SessionData
   | WorkoutSessionSnapshot
   | {
+      sessionSource?: unknown;
       planId?: unknown;
       planName?: unknown;
       startedAt?: unknown;
@@ -142,12 +145,13 @@ export function buildStoredSessionSnapshot(
     if (
       parsed &&
       typeof parsed === "object" &&
-      typeof parsed.planId === "string" &&
+      (typeof parsed.planId === "string" || parsed.planId === null) &&
       typeof parsed.planName === "string" &&
       typeof parsed.startedAt === "string" &&
       Array.isArray(parsed.exercises)
     ) {
       return createInitialSnapshot({
+        sessionSource: "plan",
         planId: parsed.planId,
         planName: parsed.planName,
         startedAt: parsed.startedAt,
@@ -166,7 +170,10 @@ export function createInitialSnapshot(session: SessionData): WorkoutSessionSnaps
     normalizeSessionExercise(exercise)
   );
   const planOrder = normalizedExercises
-    .filter((exercise) => exercise.source === "plan")
+    .filter(
+      (exercise) =>
+        exercise.source === "plan" || exercise.source === "free"
+    )
     .map((exercise) => exercise.sessionExerciseId);
   const firstPrimaryId = planOrder[0] ?? normalizedExercises[0]?.sessionExerciseId ?? "";
 
@@ -199,7 +206,11 @@ export function createInitialSnapshot(session: SessionData): WorkoutSessionSnaps
 export function normalizeSnapshot(
   snapshot: WorkoutSessionSnapshot
 ): WorkoutSessionSnapshot {
-  const baseSnapshot = createInitialSnapshot(snapshot);
+  const baseSnapshot = createInitialSnapshot({
+    ...snapshot,
+    sessionSource: snapshot.sessionSource === "free" ? "free" : "plan",
+    planId: snapshot.planId ?? null,
+  });
   const incomingExercises = snapshot.exercises.map((exercise) =>
     normalizeSessionExercise(exercise)
   );
@@ -209,6 +220,8 @@ export function normalizeSnapshot(
 
   return {
     ...snapshot,
+    sessionSource: snapshot.sessionSource === "free" ? "free" : "plan",
+    planId: snapshot.planId ?? null,
     exercises: incomingExercises,
     progress: {
       ...baseSnapshot.progress,
@@ -252,7 +265,52 @@ export function normalizeSessionExercise(
     sessionExerciseId:
       exercise.sessionExerciseId ?? createSessionExerciseId(exercise.exerciseId),
     supersetWithNext: Boolean(exercise.supersetWithNext),
-    source: exercise.source === "dynamic-superset" ? "dynamic-superset" : "plan",
+    source:
+      exercise.source === "dynamic-superset"
+        ? "dynamic-superset"
+        : exercise.source === "free"
+          ? "free"
+          : "plan",
+  };
+}
+
+export function appendExerciseToSnapshot(
+  snapshot: WorkoutSessionSnapshot,
+  exercise: SessionExercise
+): WorkoutSessionSnapshot {
+  const normalizedExercise = normalizeSessionExercise(exercise);
+  const alreadyExists = snapshot.exercises.some(
+    (item) => item.sessionExerciseId === normalizedExercise.sessionExerciseId
+  );
+
+  if (alreadyExists) return snapshot;
+
+  const shouldJoinQueue =
+    normalizedExercise.source === "plan" || normalizedExercise.source === "free";
+  const nextPlanOrder = shouldJoinQueue
+    ? [...snapshot.progress.planOrder, normalizedExercise.sessionExerciseId]
+    : snapshot.progress.planOrder;
+  const nextActiveTurn =
+    snapshot.progress.activeTurn.sessionExerciseId.length > 0
+      ? snapshot.progress.activeTurn
+      : {
+          sessionExerciseId: normalizedExercise.sessionExerciseId,
+          lane: "primary" as const,
+        };
+
+  return {
+    ...snapshot,
+    exercises: [...snapshot.exercises, normalizedExercise],
+    progress: {
+      ...snapshot.progress,
+      planOrder: nextPlanOrder,
+      activeTurn: nextActiveTurn,
+      allSets: {
+        ...snapshot.progress.allSets,
+        [normalizedExercise.sessionExerciseId]:
+          createInitialSetEntries(normalizedExercise),
+      },
+    },
   };
 }
 

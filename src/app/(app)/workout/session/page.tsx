@@ -6,6 +6,7 @@ import {
   Check,
   ChevronLeft,
   HeartPulse,
+  Plus,
   SkipForward,
   Timer,
   Volume2,
@@ -13,6 +14,8 @@ import {
   X,
 } from "lucide-react";
 
+import type { FavoriteAwareExerciseItem } from "@/actions/exercises";
+import FreeWorkoutPickerSheet from "@/components/free-workout-picker-sheet";
 import { createWorkout } from "@/actions/workouts";
 import SupersetPickerSheet from "@/components/superset-picker-sheet";
 import ExerciseImage from "@/components/exercise-image";
@@ -23,6 +26,7 @@ import {
   type ExerciseDisplayCategory,
 } from "@/lib/exercise-catalog";
 import {
+  appendExerciseToSnapshot,
   buildSessionExercise,
   buildStoredSessionSnapshot,
   createInitialSetEntries,
@@ -155,6 +159,10 @@ export default function WorkoutSessionPage() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [alarmEnabled, setAlarmEnabled] = useState(true);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [freePickerOpen, setFreePickerOpen] = useState(false);
+  const [queuedFreeExercises, setQueuedFreeExercises] = useState<
+    FavoriteAwareExerciseItem[]
+  >([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const alarmRef = useRef<HTMLAudioElement | null>(null);
   const alarmEnabledRef = useRef(true);
@@ -543,6 +551,42 @@ export default function WorkoutSessionPage() {
     });
   }, [snapshot, stopTimer]);
 
+  const toggleQueuedFreeExercise = useCallback(
+    (exercise: FavoriteAwareExerciseItem) => {
+      setQueuedFreeExercises((current) => {
+        const exists = current.some((item) => item.id === exercise.id);
+        if (exists) {
+          return current.filter((item) => item.id !== exercise.id);
+        }
+
+        return [...current, exercise];
+      });
+    },
+    []
+  );
+
+  const handleConfirmFreeExercises = useCallback(() => {
+    if (queuedFreeExercises.length === 0) return;
+
+    setSnapshot((current) => {
+      if (!current) return current;
+
+      return queuedFreeExercises.reduce(
+        (nextSnapshot, exercise) =>
+          appendExerciseToSnapshot(
+            nextSnapshot,
+            buildSessionExercise(exercise, {
+              source: "free",
+            })
+          ),
+        current
+      );
+    });
+
+    setQueuedFreeExercises([]);
+    setFreePickerOpen(false);
+  }, [queuedFreeExercises]);
+
   const handleDoneSet = useCallback(() => {
     if (!snapshot) return;
 
@@ -782,6 +826,11 @@ export default function WorkoutSessionPage() {
   const currentPrimaryExercise = snapshot ? getCurrentPrimaryExercise(snapshot) : null;
   const activePairing = snapshot ? getActivePairing(snapshot) : null;
   const activeSupersetExercise = snapshot ? getSupersetExercise(snapshot) : null;
+  const isFreeMode = snapshot?.sessionSource === "free";
+  const existingExerciseIds = new Set(snapshot?.exercises.map((exercise) => exercise.exerciseId));
+  const queuedFreeExerciseIds = new Set(
+    queuedFreeExercises.map((exercise) => exercise.id)
+  );
 
   const progressPercent = useMemo(() => {
     if (!snapshot) return 0;
@@ -878,8 +927,9 @@ export default function WorkoutSessionPage() {
             <div className="min-w-0 flex-1 text-center">
               <p className="text-xs text-text-muted">{snapshot.planName}</p>
               <p className="text-sm font-semibold text-foreground">
-                Exercise {snapshot.progress.primaryIndex + 1}/{snapshot.progress.planOrder.length} ·
-                Set {Math.min(currentCompletedSets + 1, currentTotalSets)}/{currentTotalSets}
+                {isFreeMode ? "Queue" : "Exercise"} {snapshot.progress.primaryIndex + 1}/
+                {snapshot.progress.planOrder.length} · Set{" "}
+                {Math.min(currentCompletedSets + 1, currentTotalSets)}/{currentTotalSets}
               </p>
             </div>
 
@@ -999,6 +1049,29 @@ export default function WorkoutSessionPage() {
               </div>
             </div>
           </div>
+
+          {isFreeMode ? (
+            <div className="rounded-[26px] border border-amber-300/18 bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.16),transparent_38%),rgba(255,255,255,0.03)] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.22)]">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300/80">
+                    Live Queue
+                  </p>
+                  <p className="mt-1 text-sm text-text-muted">
+                    Stopwatch tetap jalan. Tambah exercise baru kapan saja saat sesi berlangsung.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFreePickerOpen(true)}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber-300/25 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-200 transition-colors hover:bg-amber-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/30"
+                >
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  Tambah Exercise
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           {activePairing && activeSupersetExercise ? (
             <div className="glass-card space-y-3 p-4">
@@ -1171,7 +1244,7 @@ export default function WorkoutSessionPage() {
           {nextPlanExercises.length > 0 ? (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">
-                Setelah Itu
+                {isFreeMode ? "Antrean Berikutnya" : "Setelah Itu"}
               </p>
               <div className="space-y-1.5">
                 {nextPlanExercises.map((exercise, index) => (
@@ -1208,6 +1281,19 @@ export default function WorkoutSessionPage() {
         planBucket={currentPrimaryExercise.category === null ? "all" : undefined}
         onOpenChange={setPickerOpen}
         onConfirm={handleConfirmSuperset}
+      />
+      <FreeWorkoutPickerSheet
+        open={freePickerOpen}
+        selectedIds={queuedFreeExerciseIds}
+        excludeIds={existingExerciseIds}
+        onOpenChange={(open) => {
+          setFreePickerOpen(open);
+          if (!open) {
+            setQueuedFreeExercises([]);
+          }
+        }}
+        onToggleExercise={toggleQueuedFreeExercise}
+        onConfirm={handleConfirmFreeExercises}
       />
     </>
   );
