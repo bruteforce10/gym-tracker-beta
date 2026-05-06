@@ -20,6 +20,10 @@ import {
 
 import type { FavoriteAwareExerciseItem } from "@/actions/exercises";
 import FreeWorkoutPickerSheet from "@/components/free-workout-picker-sheet";
+import FreeWorkoutCompletionPopup from "@/components/free-workout-completion-popup";
+import CompletionExerciseEditorSheet, {
+  type CompletionExerciseConfig,
+} from "@/components/completion-exercise-editor-sheet";
 import { createWorkout } from "@/actions/workouts";
 import SupersetPickerSheet from "@/components/superset-picker-sheet";
 import ExerciseImage from "@/components/exercise-image";
@@ -171,6 +175,14 @@ export default function WorkoutSessionPage() {
   const [pauseOpen, setPauseOpen] = useState(false);
   const [queuedFreeExercises, setQueuedFreeExercises] = useState<
     FavoriteAwareExerciseItem[]
+  >([]);
+  const [completionPopupOpen, setCompletionPopupOpen] = useState(false);
+  const [pendingFinishSnapshot, setPendingFinishSnapshot] =
+    useState<WorkoutSessionSnapshot | null>(null);
+  const [isCompletionAddMode, setIsCompletionAddMode] = useState(false);
+  const [completionEditorOpen, setCompletionEditorOpen] = useState(false);
+  const [completionConfigs, setCompletionConfigs] = useState<
+    CompletionExerciseConfig[]
   >([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const alarmRef = useRef<HTMLAudioElement | null>(null);
@@ -605,6 +617,21 @@ export default function WorkoutSessionPage() {
   const handleConfirmFreeExercises = useCallback(() => {
     if (queuedFreeExercises.length === 0) return;
 
+    if (isCompletionAddMode) {
+      setCompletionConfigs(
+        queuedFreeExercises.map((exercise) => ({
+          exercise,
+          sets: String(exercise.defaultSets),
+          reps: String(exercise.defaultReps),
+          rest: String(exercise.defaultRestTime),
+        })),
+      );
+      setQueuedFreeExercises([]);
+      setFreePickerOpen(false);
+      setCompletionEditorOpen(true);
+      return;
+    }
+
     setSnapshot((current) => {
       if (!current) return current;
 
@@ -622,7 +649,88 @@ export default function WorkoutSessionPage() {
 
     setQueuedFreeExercises([]);
     setFreePickerOpen(false);
-  }, [queuedFreeExercises]);
+  }, [queuedFreeExercises, isCompletionAddMode]);
+
+  const handleFinishFromCompletion = useCallback(() => {
+    if (!pendingFinishSnapshot) return;
+    setCompletionPopupOpen(false);
+    setPendingFinishSnapshot(null);
+    stopTimer();
+    setSnapshot(pendingFinishSnapshot);
+    void handleAutoSave(pendingFinishSnapshot);
+  }, [pendingFinishSnapshot, stopTimer, handleAutoSave]);
+
+  const handleAddExerciseFromCompletion = useCallback(() => {
+    setCompletionPopupOpen(false);
+    setIsCompletionAddMode(true);
+    setFreePickerOpen(true);
+  }, []);
+
+  const handleCompletionConfigChange = useCallback(
+    (index: number, field: "sets" | "reps" | "rest", value: string) => {
+      setCompletionConfigs((current) =>
+        current.map((config, i) =>
+          i === index ? { ...config, [field]: value } : config,
+        ),
+      );
+    },
+    [],
+  );
+
+  const handleCompletionEditorConfirm = useCallback(() => {
+    if (completionConfigs.length === 0) return;
+
+    setSnapshot((current) => {
+      if (!current) return current;
+
+      return completionConfigs.reduce((snap, config) => {
+        const sets = Math.max(1, parseInt(config.sets, 10) || config.exercise.defaultSets);
+        const reps = Math.max(1, parseInt(config.reps, 10) || config.exercise.defaultReps);
+        const rest = Math.max(1, parseInt(config.rest, 10) || config.exercise.defaultRestTime);
+
+        const sessionExercise = buildSessionExercise(config.exercise, {
+          source: "free",
+        });
+        const withOverrides: typeof sessionExercise = {
+          ...sessionExercise,
+          defaultSets: sets,
+          defaultReps: reps,
+          restTime: rest,
+        };
+        return appendExerciseToSnapshot(snap, withOverrides);
+      }, current);
+    });
+
+    setTimeout(() => {
+      setSnapshot((current) => {
+        if (!current) return current;
+        const nextIndex = current.progress.primaryIndex + 1;
+        const nextId = current.progress.planOrder[nextIndex];
+        if (!nextId) return current;
+        return {
+          ...current,
+          progress: {
+            ...current.progress,
+            primaryIndex: nextIndex,
+            activeTurn: {
+              sessionExerciseId: nextId,
+              lane: "primary" as const,
+            },
+            queuedTurn: null,
+            restLeft: 0,
+            restTotal: 0,
+            restKind: null,
+            state: "input-primary" as const,
+          },
+        };
+      });
+    }, 0);
+
+    setCompletionEditorOpen(false);
+    setCompletionConfigs([]);
+    setIsCompletionAddMode(false);
+    setPendingFinishSnapshot(null);
+  }, [completionConfigs]);
 
   const handleResumeWorkout = useCallback(() => {
     setSnapshot((current) => {
@@ -897,6 +1005,12 @@ export default function WorkoutSessionPage() {
           state: "done" as const,
         },
       };
+
+      if (resolvedSnapshot.sessionSource === "free") {
+        setPendingFinishSnapshot(finishedSnapshot);
+        setCompletionPopupOpen(true);
+        return;
+      }
 
       stopTimer();
       setSnapshot(finishedSnapshot);
@@ -1425,10 +1539,36 @@ export default function WorkoutSessionPage() {
           setFreePickerOpen(open);
           if (!open) {
             setQueuedFreeExercises([]);
+            if (isCompletionAddMode) {
+              setIsCompletionAddMode(false);
+            }
           }
         }}
         onToggleExercise={toggleQueuedFreeExercise}
         onConfirm={handleConfirmFreeExercises}
+      />
+
+      <FreeWorkoutCompletionPopup
+        open={completionPopupOpen}
+        onOpenChange={(open) => {
+          if (!open) handleFinishFromCompletion();
+        }}
+        onAddExercise={handleAddExerciseFromCompletion}
+        onFinishWorkout={handleFinishFromCompletion}
+      />
+
+      <CompletionExerciseEditorSheet
+        open={completionEditorOpen}
+        configs={completionConfigs}
+        onConfigChange={handleCompletionConfigChange}
+        onConfirm={handleCompletionEditorConfirm}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCompletionEditorOpen(false);
+            setCompletionConfigs([]);
+            setIsCompletionAddMode(false);
+          }
+        }}
       />
 
       {pauseOpen ? (

@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
         search: "",
       },
       {
+        pathname: "/feature-mockup/**",
+        search: "",
+      },
+      {
         pathname: "/exercises/images/**",
         search: "",
       },

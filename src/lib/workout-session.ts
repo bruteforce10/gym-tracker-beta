@@ -155,7 +155,8 @@ export function buildStoredSessionSnapshot(
       Array.isArray(parsed.exercises)
     ) {
       return createInitialSnapshot({
-        sessionSource: "plan",
+        sessionSource:
+          parsed.sessionSource === "free" ? "free" : "plan",
         planId: parsed.planId,
         planName: parsed.planName,
         startedAt: parsed.startedAt,
