@@ -19,6 +19,7 @@ function isValidCallbackUrl(value: string, baseUrl: string) {
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
+  const isHomePage = req.nextUrl.pathname === "/";
   const isLoginPage = req.nextUrl.pathname === "/login";
   const isAuthApi = req.nextUrl.pathname.startsWith("/api/auth");
   const isUploadthingApi = req.nextUrl.pathname.startsWith("/api/uploadthing");
@@ -38,6 +39,7 @@ export default auth((req) => {
   // Allow auth API routes
   if (isAuthApi) return applyCookieCleanup(NextResponse.next());
   if (isUploadthingApi) return applyCookieCleanup(NextResponse.next());
+  if (isHomePage) return applyCookieCleanup(NextResponse.next());
 
   // Redirect logged-in users away from login page
   if (isLoginPage && isLoggedIn) {
