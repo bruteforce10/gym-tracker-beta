@@ -3,8 +3,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  closestCenter,
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
   Check,
   ChevronLeft,
+  GripVertical,
   HeartPulse,
   PauseCircle,
   Play,
@@ -157,6 +175,108 @@ function RestTimer({
   );
 }
 
+function getLockedNextQueueExerciseId(snapshot: WorkoutSessionSnapshot) {
+  const primaryExercise = getCurrentPrimaryExercise(snapshot);
+  const nextQueueId =
+    snapshot.progress.planOrder[snapshot.progress.primaryIndex + 1];
+
+  if (!primaryExercise || !nextQueueId) return null;
+
+  const pairing = getPairingForPrimary(
+    snapshot,
+    primaryExercise.sessionExerciseId,
+  );
+
+  if (
+    pairing?.status === "active" &&
+    pairing.supersetSessionExerciseId === nextQueueId
+  ) {
+    return nextQueueId;
+  }
+
+  return primaryExercise.supersetWithNext ? nextQueueId : null;
+}
+
+function SortableQueueExerciseCard({
+  exercise,
+  position,
+  completedSets,
+  isLocked,
+}: {
+  exercise: SessionExercise;
+  position: number;
+  completedSets: number;
+  isLocked: boolean;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: exercise.sessionExerciseId,
+    disabled: isLocked,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+      className={`glass-card flex items-center gap-3 px-3 py-2.5 transition-[opacity,box-shadow,transform] ${
+        isDragging
+          ? "z-10 border border-emerald/40 opacity-100 shadow-[0_20px_48px_rgba(16,185,129,0.16)]"
+          : "opacity-80"
+      }`}
+    >
+      <button
+        type="button"
+        disabled={isLocked}
+        aria-label={
+          isLocked
+            ? `${exercise.name} terkunci sebagai superset berikutnya`
+            : `Geser untuk mengurutkan ${exercise.name}`
+        }
+        title={isLocked ? "Superset berikutnya" : "Ubah urutan antrean"}
+        className={`flex size-9 shrink-0 items-center justify-center rounded-xl border transition-colors touch-none ${
+          isLocked
+            ? "cursor-not-allowed border-amber-300/18 bg-amber-300/8 text-amber-200/70"
+            : "border-border-subtle bg-surface-elevated text-text-muted hover:border-emerald/30 hover:text-emerald focus-visible:ring-2 focus-visible:ring-emerald/30"
+        }`}
+        {...(!isLocked ? attributes : {})}
+        {...(!isLocked ? listeners : {})}
+      >
+        <GripVertical className="size-4" aria-hidden="true" />
+      </button>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="truncate text-xs font-semibold text-foreground">
+            {exercise.name}
+          </p>
+          {isLocked ? (
+            <span className="shrink-0 rounded-full border border-amber-300/20 bg-amber-300/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-amber-200">
+              Superset
+            </span>
+          ) : null}
+        </div>
+        <p className="mt-0.5 text-[10px] text-text-muted">
+          {completedSets}/{exercise.defaultSets} set · {exercise.defaultSets}×
+          {exercise.defaultReps}
+        </p>
+      </div>
+
+      <span className="shrink-0 font-mono text-[11px] text-text-muted">
+        #{position}
+      </span>
+    </div>
+  );
+}
+
 export default function WorkoutSessionPage() {
   const router = useRouter();
   const [snapshot, setSnapshot] = useState<WorkoutSessionSnapshot | null>(null);
@@ -187,6 +307,19 @@ export default function WorkoutSessionPage() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const alarmRef = useRef<HTMLAudioElement | null>(null);
   const alarmEnabledRef = useRef(true);
+  const queueSensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 120,
+        tolerance: 8,
+      },
+    }),
+  );
 
   useEffect(() => {
     const nextSnapshot = buildStoredSessionSnapshot(
@@ -799,6 +932,45 @@ export default function WorkoutSessionPage() {
     setSnapshot(restartedSnapshot);
   }, [snapshot, stopTimer]);
 
+  const handleQueueDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setSnapshot((current) => {
+      if (!current) return current;
+
+      const queueStartIndex = current.progress.primaryIndex + 1;
+      const futureOrder = current.progress.planOrder.slice(queueStartIndex);
+      const activeId = String(active.id);
+      const overId = String(over.id);
+      const lockedId = getLockedNextQueueExerciseId(current);
+
+      if (
+        activeId === lockedId ||
+        overId === lockedId ||
+        !futureOrder.includes(activeId) ||
+        !futureOrder.includes(overId)
+      ) {
+        return current;
+      }
+
+      const oldIndex = futureOrder.indexOf(activeId);
+      const newIndex = futureOrder.indexOf(overId);
+      const reorderedFutureOrder = arrayMove(futureOrder, oldIndex, newIndex);
+
+      return {
+        ...current,
+        progress: {
+          ...current.progress,
+          planOrder: [
+            ...current.progress.planOrder.slice(0, queueStartIndex),
+            ...reorderedFutureOrder,
+          ],
+        },
+      };
+    });
+  }, []);
+
   const handleDoneSet = useCallback(() => {
     if (!snapshot) return;
 
@@ -1091,15 +1263,15 @@ export default function WorkoutSessionPage() {
   const nextPlanExercises =
     snapshot && currentPrimaryExercise
       ? (snapshot.progress.planOrder
-          .slice(
-            snapshot.progress.primaryIndex + 1,
-            snapshot.progress.primaryIndex + 3,
-          )
+          .slice(snapshot.progress.primaryIndex + 1)
           .map((sessionExerciseId) =>
             getExerciseBySessionId(snapshot, sessionExerciseId),
           )
           .filter(Boolean) as SessionExercise[])
       : [];
+  const lockedNextQueueExerciseId = snapshot
+    ? getLockedNextQueueExerciseId(snapshot)
+    : null;
 
   const canAddSuperset =
     snapshot?.progress.state === "input-primary" &&
@@ -1488,29 +1660,46 @@ export default function WorkoutSessionPage() {
 
           {nextPlanExercises.length > 0 ? (
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">
-                {isFreeMode ? "Antrean Berikutnya" : "Setelah Itu"}
-              </p>
-              <div className="space-y-1.5">
-                {nextPlanExercises.map((exercise, index) => (
-                  <div
-                    key={exercise.sessionExerciseId}
-                    className="glass-card flex items-center justify-between px-4 py-2.5 opacity-70"
-                  >
-                    <div>
-                      <p className="text-xs font-semibold text-foreground">
-                        {exercise.name}
-                      </p>
-                      <p className="text-[10px] text-text-muted">
-                        {exercise.defaultSets}×{exercise.defaultReps}
-                      </p>
-                    </div>
-                    <span className="text-[10px] text-text-muted">
-                      #{snapshot.progress.primaryIndex + index + 2}
-                    </span>
-                  </div>
-                ))}
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+                  {isFreeMode ? "Antrean Berikutnya" : "Setelah Itu"}
+                </p>
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold text-text-muted">
+                  {nextPlanExercises.length} item
+                </span>
               </div>
+
+              <DndContext
+                sensors={queueSensors}
+                collisionDetection={closestCenter}
+                modifiers={[restrictToVerticalAxis]}
+                onDragEnd={handleQueueDragEnd}
+              >
+                <SortableContext
+                  items={nextPlanExercises.map(
+                    (exercise) => exercise.sessionExerciseId,
+                  )}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-1.5">
+                    {nextPlanExercises.map((exercise, index) => (
+                      <SortableQueueExerciseCard
+                        key={exercise.sessionExerciseId}
+                        exercise={exercise}
+                        position={snapshot.progress.primaryIndex + index + 2}
+                        completedSets={getCompletedSetCount(
+                          snapshot,
+                          exercise.sessionExerciseId,
+                        )}
+                        isLocked={
+                          exercise.sessionExerciseId ===
+                          lockedNextQueueExerciseId
+                        }
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
           ) : null}
 
