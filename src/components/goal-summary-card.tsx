@@ -1,4 +1,4 @@
-import { AlertTriangle, Calendar, Sparkles, Target } from "lucide-react";
+import { AlertTriangle, Calendar, Target } from "lucide-react";
 
 import ProgressRing from "@/components/progress-ring";
 import { parseDateInputValue } from "@/lib/date";
@@ -48,11 +48,11 @@ export default function GoalSummaryCard({
     <div className="glass-card relative overflow-hidden rounded-[28px] border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] p-4 animate-fade-in-up sm:p-5">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
-          className={`absolute -left-16 top-0 h-36 w-36 rounded-full blur-3xl ${
+          className={`absolute -left-16 top-0 size-36 rounded-full blur-3xl ${
             isDeadlineWarning ? "bg-danger/10" : "bg-emerald/10"
           }`}
         />
-        <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-white/[0.03] blur-3xl" />
+        <div className="absolute bottom-0 right-0 size-32 rounded-full bg-white/[0.03] blur-3xl" />
       </div>
 
       <div
@@ -72,7 +72,7 @@ export default function GoalSummaryCard({
           <div className={`min-w-0 flex-1 ${action ? "pr-24" : ""}`}>
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted/70">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1">
-                <Target className="h-3.5 w-3.5" aria-hidden="true" />
+                <Target className="size-3.5" aria-hidden="true" />
                 Goal Aktif
               </span>
               <span
@@ -84,12 +84,12 @@ export default function GoalSummaryCard({
               >
                 {isDeadlineWarning ? (
                   <AlertTriangle
-                    className="h-3.5 w-3.5 shrink-0"
+                    className="size-3.5 shrink-0"
                     aria-hidden="true"
                   />
                 ) : (
                   <Calendar
-                    className="h-3.5 w-3.5 shrink-0"
+                    className="size-3.5 shrink-0"
                     aria-hidden="true"
                   />
                 )}
@@ -118,7 +118,7 @@ export default function GoalSummaryCard({
         <div className="grid items-stretch gap-3">
           <div className={`${surfaceClass} p-3`}>
             <div
-              className={`relative flex h-full flex-col justify-between overflow-hidden rounded-[20px] px-3 py-3 ${
+              className={`relative flex h-full flex-col justify-between overflow-hidden rounded-[20px] p-3 ${
                 exerciseBackgroundStyle ? "bg-white/95" : "bg-black"
               }`}
             >
@@ -155,7 +155,7 @@ export default function GoalSummaryCard({
 
           <div className="grid min-w-0 gap-3">
             <div className="grid grid-cols-3 gap-3">
-              <div className={`${surfaceClass} px-4 py-4`}>
+              <div className={`${surfaceClass} p-4`}>
                 <p className={metricLabelClass}>1RM Saat Ini</p>
                 <p
                   className={`mt-2 font-data font-bold ${metricValueClass} text-foreground`}
@@ -167,7 +167,7 @@ export default function GoalSummaryCard({
                 </p>
               </div>
 
-              <div className={`${surfaceClass} px-4 py-4`}>
+              <div className={`${surfaceClass} p-4`}>
                 <p className={metricLabelClass}>Target</p>
                 <p
                   className={`mt-2 font-data font-bold ${metricValueClass} text-emerald`}
@@ -179,7 +179,7 @@ export default function GoalSummaryCard({
                 </p>
               </div>
 
-              <div className={`${surfaceClass} px-4 py-4`}>
+              <div className={`${surfaceClass} p-4`}>
                 <p className={metricLabelClass}>Sisa Target</p>
                 <p
                   className={`mt-2 font-data font-bold ${metricValueClass} ${

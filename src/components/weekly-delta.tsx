@@ -9,7 +9,7 @@ export default function WeeklyDelta({ delta, className = "" }: WeeklyDeltaProps)
   if (delta === 0) {
     return (
       <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 text-text-muted text-xs font-medium ${className}`}>
-        <Minus className="w-3 h-3" />
+        <Minus className="size-3" />
         <span className="font-data">0</span>
       </div>
     );
@@ -26,9 +26,9 @@ export default function WeeklyDelta({ delta, className = "" }: WeeklyDeltaProps)
       } ${className}`}
     >
       {isPositive ? (
-        <TrendingUp className="w-3 h-3" />
+        <TrendingUp className="size-3" />
       ) : (
-        <TrendingDown className="w-3 h-3" />
+        <TrendingDown className="size-3" />
       )}
       <span className="font-data">
         {isPositive ? "+" : ""}

@@ -46,10 +46,10 @@ export default function OnboardingReview({
         <div className="mb-6 flex items-center justify-between gap-4">
           <Link
             href="/onboarding"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-border-subtle bg-surface-elevated/70 text-foreground transition-[border-color,background-color] duration-200 hover:border-emerald/25 hover:bg-surface-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40"
+            className="inline-flex size-11 items-center justify-center rounded-2xl border border-border-subtle bg-surface-elevated/70 text-foreground transition-[border-color,background-color] duration-200 hover:border-emerald/25 hover:bg-surface-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40"
             aria-label="Kembali ke jawaban onboarding"
           >
-            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+            <ArrowLeft className="size-5" aria-hidden="true" />
           </Link>
           <div className="flex-1">
             <p className="text-xs uppercase tracking-[0.18em] text-emerald/80">
@@ -65,7 +65,7 @@ export default function OnboardingReview({
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald/20 bg-emerald/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-emerald/80">
-                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                <CheckCircle2 className="size-3.5" aria-hidden="true" />
                 Rekomendasi Awal
               </div>
               <p className="mt-4 text-2xl font-bold leading-tight text-foreground">
@@ -105,8 +105,8 @@ export default function OnboardingReview({
 
             <div className="rounded-[26px] border border-emerald/10 bg-emerald/5 p-5">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/12 text-emerald">
-                  <Target className="h-5 w-5" aria-hidden="true" />
+                <div className="flex size-11 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/12 text-emerald">
+                  <Target className="size-5" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.16em] text-emerald/80">
@@ -181,7 +181,7 @@ export default function OnboardingReview({
               <div className="mt-3 space-y-3">
                 {draft.rationale.map((item) => (
                   <div key={item} className="flex items-start gap-3">
-                    <div className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald" aria-hidden="true" />
+                    <div className="mt-1 size-2.5 rounded-full bg-emerald" aria-hidden="true" />
                     <p className="text-sm leading-6 text-text-muted">{item}</p>
                   </div>
                 ))}
@@ -205,8 +205,8 @@ export default function OnboardingReview({
                       {plan.description}
                     </p>
                   </div>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/8 bg-white/[0.04] text-emerald">
-                    <Dumbbell className="h-5 w-5" aria-hidden="true" />
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl border border-white/8 bg-white/[0.04] text-emerald">
+                    <Dumbbell className="size-5" aria-hidden="true" />
                   </div>
                 </div>
 
@@ -231,11 +231,11 @@ export default function OnboardingReview({
                       </div>
                       <div className="mt-3 flex items-center justify-between gap-3 text-xs text-text-muted">
                         <div className="inline-flex items-center gap-1.5">
-                          <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" />
+                          <CalendarRange className="size-3.5" aria-hidden="true" />
                           Rest {exercise.restTime}s
                         </div>
                         <div className="inline-flex items-center gap-1.5">
-                          <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+                          <ChevronRight className="size-3.5" aria-hidden="true" />
                           {exercise.rationale}
                         </div>
                       </div>

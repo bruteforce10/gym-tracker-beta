@@ -73,7 +73,7 @@ export default async function ExerciseDetailPage({
         href="/exercises"
         className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-foreground transition-colors"
       >
-        <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+        <ChevronLeft className="size-4" aria-hidden="true" />
         Kembali ke katalog
       </Link>
 
@@ -141,9 +141,9 @@ export default async function ExerciseDetailPage({
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-emerald hover:text-emerald-light"
               >
-                <PlayCircle className="w-4 h-4" aria-hidden="true" />
+                <PlayCircle className="size-4" aria-hidden="true" />
                 Buka video di tab baru
-                <ExternalLink className="w-4 h-4" aria-hidden="true" />
+                <ExternalLink className="size-4" aria-hidden="true" />
               </a>
             </div>
           ) : (

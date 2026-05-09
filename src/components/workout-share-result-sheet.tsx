@@ -97,13 +97,13 @@ export default function WorkoutShareResultSheet({
         showCloseButton={false}
         className="max-h-[100dvh] overflow-y-auto rounded-t-[32px] border-t border-white/8 bg-[#090B10] px-0"
       >
-        <SheetHeader className="border-b border-white/8 px-5 py-5">
+        <SheetHeader className="border-b border-white/8 p-5">
           <SheetTitle
             className="flex items-center gap-3 text-left text-xl"
             style={{ fontFamily: "Outfit, sans-serif" }}
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/10 text-emerald">
-              <Trophy className="h-4 w-4" aria-hidden="true" />
+            <span className="flex size-10 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/10 text-emerald">
+              <Trophy className="size-4" aria-hidden="true" />
             </span>
             Workout Share
           </SheetTitle>
@@ -113,7 +113,7 @@ export default function WorkoutShareResultSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="px-4 py-4 sm:px-5 sm:py-5">
+        <div className="p-4 sm:px-5 sm:py-5">
           <div className="mx-auto w-full max-w-[348px] rounded-[24px] border border-white/8 bg-white/[0.03] p-3 sm:max-w-[380px] sm:rounded-[28px] sm:p-4">
             <div className="rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.015))] p-2.5 sm:rounded-[24px] sm:p-3">
               <div
@@ -151,7 +151,7 @@ export default function WorkoutShareResultSheet({
           )}
         </div>
 
-        <div className="sticky bottom-0 border-t border-white/8 bg-[#090B10]/95 px-4 py-4 backdrop-blur-xl sm:px-5">
+        <div className="sticky bottom-0 border-t border-white/8 bg-[#090B10]/95 p-4 backdrop-blur-xl sm:px-5">
           <div className="grid grid-cols-2 gap-3 sm:mx-auto sm:max-w-[380px]">
             <Button
               type="button"
@@ -160,7 +160,7 @@ export default function WorkoutShareResultSheet({
               onClick={handleDownload}
               disabled={!summary || isExporting}
             >
-              <Download className="h-4 w-4" aria-hidden="true" />
+              <Download className="size-4" aria-hidden="true" />
               {isExporting ? "Menyiapkan..." : "Download PNG"}
             </Button>
             <Button
@@ -169,7 +169,7 @@ export default function WorkoutShareResultSheet({
               onClick={handleShare}
               disabled={!summary || isExporting}
             >
-              <Share2 className="h-4 w-4" aria-hidden="true" />
+              <Share2 className="size-4" aria-hidden="true" />
               {isExporting ? "Menyiapkan..." : "Share"}
             </Button>
           </div>
@@ -190,7 +190,7 @@ export default function WorkoutShareResultSheet({
 
 function MetricPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[20px] border border-white/8 bg-white/[0.03] px-3 py-3 text-center">
+    <div className="rounded-[20px] border border-white/8 bg-white/[0.03] p-3 text-center">
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted">
         {label}
       </p>

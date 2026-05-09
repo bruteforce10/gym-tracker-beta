@@ -146,8 +146,8 @@ export default function WorkoutCard({ workout, delay = 0 }: WorkoutCardProps) {
         aria-label={`Lihat detail workout ${displayDate}`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald/10 flex items-center justify-center">
-            <Dumbbell className="w-5 h-5 text-emerald" aria-hidden="true" />
+          <div className="size-10 rounded-xl bg-emerald/10 flex items-center justify-center">
+            <Dumbbell className="size-5 text-emerald" aria-hidden="true" />
           </div>
           <div className="space-y-1">
             <p className="text-sm font-semibold text-foreground">
@@ -168,7 +168,7 @@ export default function WorkoutCard({ workout, delay = 0 }: WorkoutCardProps) {
           </div>
         </div>
         <ChevronDown
-          className={`w-4 h-4 text-text-muted transition-transform duration-300 ${
+          className={`size-4 text-text-muted transition-transform duration-300 ${
             expanded ? "rotate-180" : ""
           }`}
           aria-hidden="true"

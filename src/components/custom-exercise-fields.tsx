@@ -102,7 +102,7 @@ export default function CustomExerciseFields({
           onChange={(event) => onChange("notes", event.target.value)}
           rows={4}
           placeholder="Tambahkan catatan singkat agar admin lebih mudah review."
-          className="w-full rounded-xl border border-border-subtle bg-surface-elevated px-3 py-3 text-sm text-foreground outline-none placeholder:text-text-muted/70 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="w-full rounded-xl border border-border-subtle bg-surface-elevated p-3 text-sm text-foreground outline-none placeholder:text-text-muted/70 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </Field>
     </div>

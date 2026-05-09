@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function FinalCTA() {
   return (
@@ -20,13 +21,13 @@ export default function FinalCTA() {
           Stop guessing. Start progressing.
         </p>
 
-        <a
+        <Link
           href="/login"
           className="inline-flex min-h-14 w-full max-w-[20rem] items-center justify-center gap-3 border-2 border-[#03140b] bg-[#020403] px-8 py-4 text-center text-lg font-black uppercase tracking-tight text-primary transition-transform hover:scale-[1.02] active:scale-[0.98] sm:min-h-16 sm:w-auto sm:px-12 md:text-xl"
         >
           GET STARTED
           <ArrowRight aria-hidden="true" className="size-5" strokeWidth={2.8} />
-        </a>
+        </Link>
       </div>
     </section>
   );

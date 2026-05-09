@@ -1,15 +1,22 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { WifiOff } from "lucide-react";
 
 import OfflineRefreshButton from "@/components/offline-refresh-button";
+
+export const metadata: Metadata = {
+  title: "Offline - Grynx",
+  description:
+    "Grynx offline fallback page for reconnecting when your network is unstable.",
+};
 
 export default function OfflinePage() {
   return (
     <main className="min-h-screen bg-[#0A0A0F] px-5 py-8 text-[#F5F5F7]">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col justify-center">
         <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
-          <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald/12 text-emerald">
-            <WifiOff className="h-6 w-6" aria-hidden="true" />
+          <div className="mb-5 inline-flex size-14 items-center justify-center rounded-2xl bg-emerald/12 text-emerald">
+            <WifiOff className="size-6" aria-hidden="true" />
           </div>
 
           <h1

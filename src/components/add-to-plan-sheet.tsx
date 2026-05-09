@@ -67,7 +67,7 @@ export default function AddToPlanSheet({
         }
         onClick={() => setOpen(true)}
       >
-        <Plus className="h-4 w-4" aria-hidden="true" />
+        <Plus className="size-4" aria-hidden="true" />
         {triggerLabel}
       </Button>
 
@@ -92,7 +92,7 @@ export default function AddToPlanSheet({
             </SheetDescription>
           </SheetHeader>
 
-          <div className="space-y-4 overflow-y-auto px-5 py-5">
+          <div className="space-y-4 overflow-y-auto p-5">
             {plans.length === 0 ? (
               <div className="glass-card p-5 text-center">
                 <p className="text-sm text-text-muted">
@@ -140,13 +140,13 @@ export default function AddToPlanSheet({
                         </div>
 
                         <span
-                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${
+                          className={`flex size-8 shrink-0 items-center justify-center rounded-full border ${
                             isSelected
                               ? "border-emerald/40 bg-emerald text-[#0A0A0F]"
                               : "border-white/10 text-text-muted"
                           }`}
                         >
-                          <Check className="h-4 w-4" aria-hidden="true" />
+                          <Check className="size-4" aria-hidden="true" />
                         </span>
                       </div>
                     </button>
@@ -203,7 +203,7 @@ export default function AddToPlanSheet({
                   });
                 }}
               >
-                <ClipboardList className="h-4 w-4" aria-hidden="true" />
+                <ClipboardList className="size-4" aria-hidden="true" />
                 Tambahkan
               </Button>
             </div>

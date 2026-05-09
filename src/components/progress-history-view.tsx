@@ -122,6 +122,7 @@ export default function ProgressHistoryView({
     const dateFromUrl = searchParams.get("date");
 
     if (monthFromUrl && data.availableMonths.includes(monthFromUrl)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedMonth(monthFromUrl);
     }
 
@@ -152,6 +153,7 @@ export default function ProgressHistoryView({
       currentMonthWorkouts[0]?.date ??
       currentMonthCalendarDays.find((day) => day.inMonth)?.date ??
       null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedDate((currentDate) => {
       if (
         currentDate &&
@@ -216,10 +218,10 @@ export default function ProgressHistoryView({
       <div className="flex items-center gap-3">
         <Link
           href="/progress"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60"
+          className="inline-flex size-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60"
           aria-label="Kembali ke progress"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <ArrowLeft className="size-4" aria-hidden="true" />
         </Link>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#10B981]">
@@ -231,16 +233,16 @@ export default function ProgressHistoryView({
         </div>
       </div>
 
-      <section className="rounded-[32px] border border-white/6 bg-[linear-gradient(180deg,#131722_0%,#0E1118_100%)] px-5 py-5">
+      <section className="rounded-[32px] border border-white/6 bg-[linear-gradient(180deg,#131722_0%,#0E1118_100%)] p-5">
         <div className="flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => previousMonth && setSelectedMonth(previousMonth)}
             disabled={!previousMonth}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60 disabled:opacity-30"
+            className="inline-flex size-10 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60 disabled:opacity-30"
             aria-label="Bulan sebelumnya"
           >
-            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            <ChevronLeft className="size-4" aria-hidden="true" />
           </button>
           <p className="text-xl font-semibold text-white">
             {getMonthLabel(selectedMonth)}
@@ -249,10 +251,10 @@ export default function ProgressHistoryView({
             type="button"
             onClick={() => nextMonth && setSelectedMonth(nextMonth)}
             disabled={!nextMonth}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60 disabled:opacity-30"
+            className="inline-flex size-10 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/60 disabled:opacity-30"
             aria-label="Bulan berikutnya"
           >
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            <ChevronRight className="size-4" aria-hidden="true" />
           </button>
         </div>
 
@@ -297,7 +299,7 @@ export default function ProgressHistoryView({
               >
                 {new Date(day.date).getDate()}
                 {workoutCount > 0 ? (
-                  <span className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-[#34D399]" />
+                  <span className="absolute bottom-1 size-1.5 rounded-full bg-[#34D399]" />
                 ) : null}
               </button>
             );
@@ -305,7 +307,7 @@ export default function ProgressHistoryView({
         </div>
       </section>
 
-      <section className="rounded-[30px] border border-white/6 bg-[#12161F] px-5 py-5">
+      <section className="rounded-[30px] border border-white/6 bg-[#12161F] p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-2xl font-semibold text-white">
@@ -326,9 +328,9 @@ export default function ProgressHistoryView({
         </div>
 
         <div className="mt-5 grid grid-cols-3 gap-3">
-          <div className="rounded-[24px] bg-white/[0.03] px-4 py-4">
+          <div className="rounded-[24px] bg-white/[0.03] p-4">
             <div className="flex items-center gap-2 text-text-muted">
-              <Clock3 className="h-4 w-4" aria-hidden="true" />
+              <Clock3 className="size-4" aria-hidden="true" />
               <span className="text-xs uppercase tracking-[0.14em]">
                 Total Time
               </span>
@@ -337,9 +339,9 @@ export default function ProgressHistoryView({
               {formatDurationMinutesSeconds(selectedWeekDurationSeconds)}
             </p>
           </div>
-          <div className="rounded-[24px] bg-white/[0.03] px-4 py-4">
+          <div className="rounded-[24px] bg-white/[0.03] p-4">
             <div className="flex items-center gap-2 text-text-muted">
-              <Weight className="h-4 w-4" aria-hidden="true" />
+              <Weight className="size-4" aria-hidden="true" />
               <span className="text-xs uppercase tracking-[0.14em]">
                 Volume
               </span>
@@ -348,9 +350,9 @@ export default function ProgressHistoryView({
               {formatVolume(selectedWeekVolume)}
             </p>
           </div>
-          <div className="rounded-[24px] bg-white/[0.03] px-4 py-4">
+          <div className="rounded-[24px] bg-white/[0.03] p-4">
             <div className="flex items-center gap-2 text-text-muted">
-              <Dumbbell className="h-4 w-4" aria-hidden="true" />
+              <Dumbbell className="size-4" aria-hidden="true" />
               <span className="text-xs uppercase tracking-[0.14em]">
                 Exercises
               </span>
@@ -370,7 +372,7 @@ export default function ProgressHistoryView({
           <div>
             <p className="text-2xl font-semibold text-white">Workout List</p>
           </div>
-          <CalendarDays className="h-5 w-5 text-[#10B981]" aria-hidden="true" />
+          <CalendarDays className="size-5 text-[#10B981]" aria-hidden="true" />
         </div>
 
         {selectedWeekWorkouts.length > 0 ? (

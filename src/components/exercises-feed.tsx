@@ -196,7 +196,7 @@ export default function ExercisesFeed({
                       href={`/exercises/${exercise.slug}`}
                       className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-emerald/20 bg-emerald/10 px-4 text-sm font-semibold text-emerald transition-colors hover:bg-emerald/20 focus-visible:ring-2 focus-visible:ring-emerald/30"
                     >
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      <ArrowRight className="size-4" aria-hidden="true" />
                       Detail
                     </Link>
                   </div>

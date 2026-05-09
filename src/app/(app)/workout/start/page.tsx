@@ -243,7 +243,7 @@ export default function WorkoutStartClient() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center gradient-mesh">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
+        <div className="size-8 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
       </div>
     );
   }
@@ -257,11 +257,11 @@ export default function WorkoutStartClient() {
         <div className="mb-6 flex items-center gap-3">
           <button
             onClick={handleBack}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/35"
+            className="flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/35"
             id="back-btn"
             aria-label="Kembali"
           >
-            <ChevronLeft className="h-5 w-5 text-foreground" aria-hidden="true" />
+            <ChevronLeft className="size-5 text-foreground" aria-hidden="true" />
           </button>
 
           <div className="min-w-0 flex-1">
@@ -308,14 +308,14 @@ export default function WorkoutStartClient() {
                   className="group w-full rounded-[28px] border border-white/10 bg-white/[0.04] p-4 text-left transition-colors hover:border-emerald/30 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/30"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald/12 text-emerald ring-1 ring-emerald/20">
-                      <Layers2 className="h-5 w-5" aria-hidden="true" />
+                    <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-emerald/12 text-emerald ring-1 ring-emerald/20">
+                      <Layers2 className="size-5" aria-hidden="true" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
                         <p className="text-base font-semibold text-foreground">Dari Plan</p>
                         <ChevronRight
-                          className="h-4 w-4 text-text-muted transition-transform group-hover:translate-x-1 group-hover:text-emerald"
+                          className="size-4 text-text-muted transition-transform group-hover:translate-x-1 group-hover:text-emerald"
                           aria-hidden="true"
                         />
                       </div>
@@ -336,14 +336,14 @@ export default function WorkoutStartClient() {
                   className="group w-full rounded-[28px] border border-amber-300/18 bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.18),transparent_30%),rgba(255,255,255,0.04)] p-4 text-left transition-colors hover:border-amber-300/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/30"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-300/12 text-amber-300 ring-1 ring-amber-300/20">
-                      <Flame className="h-5 w-5" aria-hidden="true" />
+                    <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-amber-300/12 text-amber-300 ring-1 ring-amber-300/20">
+                      <Flame className="size-5" aria-hidden="true" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
                         <p className="text-base font-semibold text-foreground">Mode Bebas</p>
                         <ChevronRight
-                          className="h-4 w-4 text-text-muted transition-transform group-hover:translate-x-1 group-hover:text-amber-300"
+                          className="size-4 text-text-muted transition-transform group-hover:translate-x-1 group-hover:text-amber-300"
                           aria-hidden="true"
                         />
                       </div>
@@ -392,7 +392,7 @@ export default function WorkoutStartClient() {
                       </p>
                     </div>
                     <ChevronRight
-                      className="h-4 w-4 text-text-muted transition-transform group-hover:translate-x-1 group-hover:text-emerald"
+                      className="size-4 text-text-muted transition-transform group-hover:translate-x-1 group-hover:text-emerald"
                       aria-hidden="true"
                     />
                   </div>
@@ -464,13 +464,13 @@ export default function WorkoutStartClient() {
                         id={`toggle-ex-${item.exerciseId}`}
                       >
                         <div
-                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border ${
+                          className={`flex size-10 shrink-0 items-center justify-center rounded-2xl border ${
                             isSelected
                               ? "border-emerald/40 bg-emerald text-[#09110E]"
                               : "border-white/10 bg-white/[0.04] text-text-muted"
                           }`}
                         >
-                          <Check className="h-4 w-4" aria-hidden="true" />
+                          <Check className="size-4" aria-hidden="true" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-semibold text-foreground">
@@ -515,7 +515,7 @@ export default function WorkoutStartClient() {
                 </div>
                 <div className="hidden rounded-[24px] border border-white/10 bg-white/[0.05] p-3 text-right sm:block">
                   <p className="text-[10px] uppercase tracking-[0.18em] text-text-muted">Search</p>
-                  <Search className="ml-auto mt-2 h-5 w-5 text-amber-300" aria-hidden="true" />
+                  <Search className="ml-auto mt-2 size-5 text-amber-300" aria-hidden="true" />
                 </div>
               </div>
               <p className="mt-3 max-w-[30ch] text-sm leading-6 text-text-muted">
@@ -547,10 +547,10 @@ export default function WorkoutStartClient() {
                   {selectedFreeExercises.map((exercise, index) => (
                     <div
                       key={exercise.id}
-                      className="flex items-center justify-between gap-3 rounded-[22px] border border-white/10 bg-white/[0.04] px-3 py-3"
+                      className="flex items-center justify-between gap-3 rounded-[22px] border border-white/10 bg-white/[0.04] p-3"
                     >
                       <div className="min-w-0 flex items-center gap-3">
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-300/14 text-[11px] text-amber-300">
+                        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-300/14 text-[11px] text-amber-300">
                           {index + 1}
                         </span>
                         <div className="min-w-0">
@@ -569,7 +569,7 @@ export default function WorkoutStartClient() {
                           onClick={() => handleOpenFreeEditor(exercise.id)}
                           className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs font-semibold text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/30"
                         >
-                          <Settings2 className="h-3.5 w-3.5" aria-hidden="true" />
+                          <Settings2 className="size-3.5" aria-hidden="true" />
                           Edit
                         </button>
                         <button
@@ -612,7 +612,7 @@ export default function WorkoutStartClient() {
                 } disabled:opacity-40`}
                 id="start-session-btn"
               >
-                <Dumbbell className="h-5 w-5" aria-hidden="true" />
+                <Dumbbell className="size-5" aria-hidden="true" />
                 {mode === "free"
                   ? `Mulai ${selectedFreeExercises.length} Exercise`
                   : `Mulai ${selectedPlanExerciseIds.size} Exercise`}
@@ -636,7 +636,7 @@ export default function WorkoutStartClient() {
         >
           <SheetHeader className="pb-2">
             <SheetTitle className="flex items-center gap-2 text-left text-lg font-bold text-foreground">
-              <Settings2 className="h-4 w-4 text-amber-300" aria-hidden="true" />
+              <Settings2 className="size-4 text-amber-300" aria-hidden="true" />
               Atur Exercise
             </SheetTitle>
             <SheetDescription className="text-left text-xs text-text-muted">

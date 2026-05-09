@@ -143,7 +143,7 @@ export default function WeightLogSheet({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1 pr-2">
               <SheetTitle className="flex items-center gap-2 text-left">
-                <Scale className="h-4 w-4 text-emerald" aria-hidden="true" />
+                <Scale className="size-4 text-emerald" aria-hidden="true" />
                 Current Weight
               </SheetTitle>
               <SheetDescription className="mt-1 text-left text-xs text-text-muted">
@@ -159,7 +159,7 @@ export default function WeightLogSheet({
                     "h-9 rounded-full border-white/8 bg-white/[0.04] px-3 text-xs text-foreground hover:bg-white/[0.08] focus-visible:ring-emerald/40",
                   )}
                 >
-                  <CalendarIcon className="mr-1.5 h-3.5 w-3.5 text-emerald" />
+                  <CalendarIcon className="mr-1.5 size-3.5 text-emerald" />
                   {format(parseDateInputValue(loggedOn) ?? new Date(), "dd MMM")}
                 </PopoverTrigger>
                 <PopoverContent
@@ -177,16 +177,16 @@ export default function WeightLogSheet({
               </Popover>
 
               <SheetClose
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/8 bg-white/[0.04] text-text-muted transition-colors hover:bg-white/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40"
+                className="inline-flex size-9 items-center justify-center rounded-full border border-white/8 bg-white/[0.04] text-text-muted transition-colors hover:bg-white/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40"
                 aria-label="Close"
               >
-                <X className="h-4 w-4" aria-hidden="true" />
+                <X className="size-4" aria-hidden="true" />
               </SheetClose>
             </div>
           </div>
         </SheetHeader>
 
-        <div className="space-y-6 px-5 py-5">
+        <div className="space-y-6 p-5">
           <div className="flex items-center gap-2 rounded-full bg-white/[0.04] p-1">
             <button
               type="button"
@@ -274,7 +274,7 @@ export default function WeightLogSheet({
             className="h-12 rounded-2xl border-white/8 bg-white/[0.03] text-text-muted hover:bg-white/[0.06] hover:text-foreground"
             onClick={() => onOpenChange(false)}
           >
-            <X className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            <X className="mr-1.5 size-4" aria-hidden="true" />
             Cancel
           </Button>
           <Button

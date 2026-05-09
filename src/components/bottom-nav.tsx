@@ -40,8 +40,8 @@ export default function BottomNav({ onFabClick }: BottomNavProps) {
                 onClick={onFabClick}
                 className="relative -mt-5 flex flex-col items-center group"
               >
-                <div className="w-14 h-14 rounded-full bg-emerald flex items-center justify-center fab-pulse glow-emerald transition-transform active:scale-90 group-hover:scale-105">
-                  <Plus className="w-7 h-7 text-[#0A0A0F] stroke-[2.5]" />
+                <div className="size-14 rounded-full bg-emerald flex items-center justify-center fab-pulse glow-emerald transition-transform active:scale-90 group-hover:scale-105">
+                  <Plus className="size-7 text-[#0A0A0F] stroke-[2.5]" />
                 </div>
               </button>
             );
@@ -64,12 +64,12 @@ export default function BottomNav({ onFabClick }: BottomNavProps) {
                   : "text-text-muted hover:text-foreground"
               }`}
             >
-              <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
+              <Icon className="size-5" strokeWidth={isActive ? 2.5 : 1.8} />
               <span className="text-[10px] font-medium tracking-wide">
                 {item.label}
               </span>
               {isActive && (
-                <div className="absolute -bottom-0 w-1 h-1 rounded-full bg-emerald" />
+                <div className="absolute -bottom-0 size-1 rounded-full bg-emerald" />
               )}
             </Link>
           );

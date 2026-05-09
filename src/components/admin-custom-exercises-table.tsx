@@ -125,17 +125,17 @@ export default function AdminCustomExercisesTable({
         <StatCard
           label="Total Exercise"
           value={String(summary.total)}
-          icon={<Database className="h-4 w-4" />}
+          icon={<Database className="size-4" />}
         />
         <StatCard
           label="Custom User"
           value={String(summary.custom)}
-          icon={<Users className="h-4 w-4" />}
+          icon={<Users className="size-4" />}
         />
         <StatCard
           label="Private"
           value={String(summary.private)}
-          icon={<Lock className="h-4 w-4" />}
+          icon={<Lock className="size-4" />}
         />
       </div>
 
@@ -156,7 +156,7 @@ export default function AdminCustomExercisesTable({
               Search Exercise
             </label>
             <div className="flex h-11 items-center gap-2 rounded-xl border border-border-subtle bg-surface-elevated px-3">
-              <Search className="h-4 w-4 text-text-muted" aria-hidden="true" />
+              <Search className="size-4 text-text-muted" aria-hidden="true" />
               <input
                 type="search"
                 value={searchQuery}
@@ -303,7 +303,7 @@ export default function AdminCustomExercisesTable({
                         size="sm"
                         className="border-border-subtle bg-surface-elevated text-foreground"
                       >
-                        <Pencil className="h-3.5 w-3.5" />
+                        <Pencil className="size-3.5" />
                         Edit
                       </Button>
                     </Link>
@@ -372,7 +372,7 @@ export default function AdminCustomExercisesTable({
                             });
                           }}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="size-3.5" />
                         </Button>
                       </>
                     ) : exercise.status !== "archived" ? (

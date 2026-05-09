@@ -155,14 +155,14 @@ function OptionCard({
         </div>
         <div
           className={cn(
-            "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
+            "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border",
             selected
               ? "border-current bg-current/20"
               : "border-border-subtle bg-background/60"
           )}
           aria-hidden="true"
         >
-          {selected ? <div className="h-2.5 w-2.5 rounded-full bg-current" /> : null}
+          {selected ? <div className="size-2.5 rounded-full bg-current" /> : null}
         </div>
       </div>
     </button>
@@ -205,8 +205,8 @@ function GeneratingState() {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-10">
       <div className="w-full max-w-md rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(18,21,30,0.96),rgba(10,10,15,0.96))] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/10 text-emerald">
-          <Flame className="h-6 w-6 animate-pulse" aria-hidden="true" />
+        <div className="mb-6 flex size-14 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/10 text-emerald">
+          <Flame className="size-6 animate-pulse" aria-hidden="true" />
         </div>
         <h2 className="text-2xl font-bold text-foreground">Menyusun plan pertamamu</h2>
         <p className="mt-2 text-sm leading-6 text-text-muted">
@@ -219,7 +219,7 @@ function GeneratingState() {
               className="flex items-center gap-3 rounded-2xl border border-white/6 bg-white/[0.03] px-4 py-3 animate-fade-in-up"
               style={{ animationDelay: `${120 + index * 120}ms` }}
             >
-              <div className="h-2.5 w-2.5 rounded-full bg-emerald shimmer" aria-hidden="true" />
+              <div className="size-2.5 rounded-full bg-emerald shimmer" aria-hidden="true" />
               <p className="text-sm text-foreground/88">{message}</p>
             </div>
           ))}
@@ -326,10 +326,10 @@ export default function OnboardingFlow({
           <button
             type="button"
             onClick={goBack}
-            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border border-border-subtle bg-surface-elevated/70 text-foreground transition-[border-color,background-color] duration-200 hover:border-emerald/25 hover:bg-surface-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40"
+            className="flex size-11 cursor-pointer items-center justify-center rounded-2xl border border-border-subtle bg-surface-elevated/70 text-foreground transition-[border-color,background-color] duration-200 hover:border-emerald/25 hover:bg-surface-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40"
             aria-label={stepIndex === 0 ? "Kembali ke dashboard" : "Kembali ke pertanyaan sebelumnya"}
           >
-            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+            <ArrowLeft className="size-5" aria-hidden="true" />
           </button>
           <div className="flex-1">
             <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-text-muted">
@@ -349,8 +349,8 @@ export default function OnboardingFlow({
 
         <section className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(16,18,25,0.92),rgba(10,10,15,0.94))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.42)] sm:p-6">
           <div className="mb-6">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/10 text-emerald">
-              <currentStep.icon className="h-5 w-5" aria-hidden="true" />
+            <div className="mb-4 flex size-12 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/10 text-emerald">
+              <currentStep.icon className="size-5" aria-hidden="true" />
             </div>
             <p className="text-xs uppercase tracking-[0.18em] text-emerald/80">
               Langkah {stepIndex + 1}
@@ -424,7 +424,7 @@ export default function OnboardingFlow({
                         !answers.goalDeadline && "text-text-muted"
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-emerald" aria-hidden="true" />
+                      <CalendarIcon className="mr-2 size-4 text-emerald" aria-hidden="true" />
                       {answers.goalDeadline ? (
                         format(
                           parseDateInputValue(answers.goalDeadline) ?? new Date(),
@@ -632,7 +632,7 @@ export default function OnboardingFlow({
               className="ml-auto h-12 min-w-[170px] rounded-2xl bg-emerald text-[#08110D] hover:bg-emerald-dark"
             >
               {stepIndex === STEPS.length - 1 ? "Generate Plan" : "Lanjut"}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <ArrowRight className="size-4" aria-hidden="true" />
             </Button>
           </div>
         </section>

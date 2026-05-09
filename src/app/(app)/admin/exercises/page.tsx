@@ -16,13 +16,13 @@ export default async function AdminExercisesPage() {
           href="/dashboard"
           className="inline-flex items-center gap-2 text-sm text-text-muted transition-colors hover:text-foreground"
         >
-          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          <ChevronLeft className="size-4" aria-hidden="true" />
           Kembali ke dashboard
         </Link>
 
         <div>
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-emerald/15 bg-emerald/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-100">
-            <Shield className="h-3.5 w-3.5" aria-hidden="true" />
+            <Shield className="size-3.5" aria-hidden="true" />
             Admin Only
           </div>
           <h1

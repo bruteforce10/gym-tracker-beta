@@ -159,9 +159,9 @@ export default function SupersetPickerSheet({
         side="bottom"
         className="max-h-[92vh] rounded-t-[30px] border-t border-white/8 bg-[#0B0D12] px-0"
       >
-        <SheetHeader className="border-b border-white/8 px-5 py-5">
+        <SheetHeader className="border-b border-white/8 p-5">
           <SheetTitle className="flex items-center gap-2 text-left text-xl">
-            <HeartPulse className="h-4 w-4 text-amber-300" aria-hidden="true" />
+            <HeartPulse className="size-4 text-amber-300" aria-hidden="true" />
             Tambah Superset
           </SheetTitle>
           <SheetDescription className="text-left text-xs text-text-muted">
@@ -170,11 +170,11 @@ export default function SupersetPickerSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-5">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-5">
           <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4">
             <div className="flex items-center gap-3">
               <div className="flex size-11 items-center justify-center rounded-2xl border border-amber-300/20 bg-amber-300/10 text-amber-300">
-                <Search className="h-4 w-4" aria-hidden="true" />
+                <Search className="size-4" aria-hidden="true" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
@@ -230,7 +230,7 @@ export default function SupersetPickerSheet({
               </p>
               <div className="mt-2 flex items-center gap-2 text-sm text-foreground">
                 <span className="truncate font-semibold">{primaryExerciseName}</span>
-                <ArrowRight className="h-4 w-4 shrink-0 text-emerald" aria-hidden="true" />
+                <ArrowRight className="size-4 shrink-0 text-emerald" aria-hidden="true" />
                 <span className="truncate font-semibold">{selectedExercise.name}</span>
               </div>
               <p className="mt-2 text-xs text-text-muted">

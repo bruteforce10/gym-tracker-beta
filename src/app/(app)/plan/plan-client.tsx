@@ -100,15 +100,15 @@ export default function PlanClient({ plans }: { plans: Plan[] }) {
         className="w-full glass-card p-4 flex items-center gap-4 group border border-emerald/20 hover:border-emerald/40 transition-colors"
         id="quick-start-btn"
       >
-        <div className="w-12 h-12 rounded-xl bg-emerald/10 flex items-center justify-center shrink-0">
-          <Dumbbell className="w-6 h-6 text-emerald" aria-hidden="true" />
+        <div className="size-12 rounded-xl bg-emerald/10 flex items-center justify-center shrink-0">
+          <Dumbbell className="size-6 text-emerald" aria-hidden="true" />
         </div>
         <div className="text-left">
           <p className="text-foreground font-semibold text-sm">Mulai Latihan Sekarang</p>
           <p className="text-text-muted text-xs mt-0.5">Pilih plan & langsung mulai</p>
         </div>
         <ChevronRight
-          className="w-5 h-5 text-emerald ml-auto group-hover:translate-x-1 transition-transform"
+          className="size-5 text-emerald ml-auto group-hover:translate-x-1 transition-transform"
           aria-hidden="true"
         />
       </button>
@@ -139,9 +139,9 @@ export default function PlanClient({ plans }: { plans: Plan[] }) {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-10 h-10 rounded-xl bg-linear-to-br ${config.color} flex items-center justify-center`}
+                    className={`size-10 rounded-xl bg-linear-to-br ${config.color} flex items-center justify-center`}
                   >
-                    <ClipboardList className="w-5 h-5 text-foreground/70" aria-hidden="true" />
+                    <ClipboardList className="size-5 text-foreground/70" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-foreground font-semibold text-sm">{plan.name}</p>
@@ -159,11 +159,11 @@ export default function PlanClient({ plans }: { plans: Plan[] }) {
                   <button
                     onClick={() => handleDelete(plan.id)}
                     disabled={deleting === plan.id}
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-text-muted hover:text-danger hover:bg-danger/10 transition-colors disabled:opacity-50"
+                    className="size-7 rounded-lg flex items-center justify-center text-text-muted hover:text-danger hover:bg-danger/10 transition-colors disabled:opacity-50"
                     id={`delete-plan-${plan.id}`}
                     aria-label={`Hapus plan ${plan.name}`}
                   >
-                    <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                    <Trash2 className="size-3.5" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export default function PlanClient({ plans }: { plans: Plan[] }) {
           className="w-full py-3 rounded-xl border border-dashed border-border-subtle text-text-muted hover:border-emerald/30 hover:text-emerald transition-colors flex items-center justify-center gap-2 text-sm"
           id="add-plan-btn"
         >
-          <Plus className="w-4 h-4" aria-hidden="true" />
+          <Plus className="size-4" aria-hidden="true" />
           Buat Custom Plan
         </button>
       </div>
@@ -203,7 +203,7 @@ export default function PlanClient({ plans }: { plans: Plan[] }) {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider flex items-center gap-2">
-            <LayoutGrid className="w-4 h-4" aria-hidden="true" />
+            <LayoutGrid className="size-4" aria-hidden="true" />
             Exercise Catalog
           </h2>
           <Link
@@ -228,7 +228,7 @@ export default function PlanClient({ plans }: { plans: Plan[] }) {
                   </p>
                 </div>
                 <ChevronRight
-                  className="ml-auto h-4 w-4 shrink-0 text-foreground/60"
+                  className="ml-auto size-4 shrink-0 text-foreground/60"
                   aria-hidden="true"
                 />
               </Link>

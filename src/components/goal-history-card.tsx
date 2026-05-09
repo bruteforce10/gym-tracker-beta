@@ -1,4 +1,4 @@
-import { AlertTriangle, Calendar, CheckCircle2, Target } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Target } from "lucide-react";
 
 import { parseDateInputValue } from "@/lib/date";
 import type { GoalDisplayItem } from "@/lib/goal-state";
@@ -11,9 +11,9 @@ export default function GoalHistoryCard({ goal }: GoalHistoryCardProps) {
   const isCompleted = goal.status === "completed";
   const badgeLabel = isCompleted ? "Completed" : "Terlambat";
   const badgeIcon = isCompleted ? (
-    <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+    <CheckCircle2 className="size-3.5" aria-hidden="true" />
   ) : (
-    <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
+    <AlertTriangle className="size-3.5" aria-hidden="true" />
   );
   const dateValue = isCompleted ? goal.completedAt : goal.expiredAt;
   const parsedDate = dateValue ? parseDateInputValue(dateValue) : null;
@@ -32,7 +32,7 @@ export default function GoalHistoryCard({ goal }: GoalHistoryCardProps) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted/70">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1">
-              <Target className="h-3.5 w-3.5" aria-hidden="true" />
+              <Target className="size-3.5" aria-hidden="true" />
               Riwayat Goal
             </span>
             <span
@@ -62,7 +62,7 @@ export default function GoalHistoryCard({ goal }: GoalHistoryCardProps) {
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-[22px] border border-white/8 bg-white/[0.04] px-4 py-4">
+        <div className="rounded-[22px] border border-white/8 bg-white/[0.04] p-4">
           <p className="text-[10px] uppercase tracking-[0.18em] text-text-muted/80">
             1RM Terakhir
           </p>
@@ -72,7 +72,7 @@ export default function GoalHistoryCard({ goal }: GoalHistoryCardProps) {
           </p>
         </div>
 
-        <div className="rounded-[22px] border border-white/8 bg-white/[0.04] px-4 py-4">
+        <div className="rounded-[22px] border border-white/8 bg-white/[0.04] p-4">
           <p className="text-[10px] uppercase tracking-[0.18em] text-text-muted/80">
             Target
           </p>
@@ -82,7 +82,7 @@ export default function GoalHistoryCard({ goal }: GoalHistoryCardProps) {
           </p>
         </div>
 
-        <div className="rounded-[22px] border border-white/8 bg-white/[0.04] px-4 py-4">
+        <div className="rounded-[22px] border border-white/8 bg-white/[0.04] p-4">
           <p className="text-[10px] uppercase tracking-[0.18em] text-text-muted/80">
             Selisih
           </p>

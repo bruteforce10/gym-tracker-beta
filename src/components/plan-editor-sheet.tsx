@@ -181,11 +181,11 @@ function SortableExerciseCard({
         <button
           type="button"
           aria-label={`Geser untuk mengurutkan ${item.exercise.name}`}
-          className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-surface-elevated text-text-muted transition-colors hover:border-emerald/30 hover:text-emerald focus-visible:border-emerald/40 focus-visible:ring-2 focus-visible:ring-emerald/30 touch-none"
+          className="mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-surface-elevated text-text-muted transition-colors hover:border-emerald/30 hover:text-emerald focus-visible:border-emerald/40 focus-visible:ring-2 focus-visible:ring-emerald/30 touch-none"
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="h-4 w-4" aria-hidden="true" />
+          <GripVertical className="size-4" aria-hidden="true" />
         </button>
 
         <div className="min-w-0 flex-1">
@@ -227,7 +227,7 @@ function SortableExerciseCard({
               onClick={() => onEdit(item.exerciseId)}
               className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border-subtle bg-surface px-3 text-[11px] font-semibold text-text-muted transition-colors hover:border-emerald/30 hover:text-foreground focus-visible:border-emerald/40 focus-visible:ring-2 focus-visible:ring-emerald/30"
             >
-              <PencilLine className="h-3.5 w-3.5" aria-hidden="true" />
+              <PencilLine className="size-3.5" aria-hidden="true" />
               Edit
             </button>
             <button
@@ -245,16 +245,16 @@ function SortableExerciseCard({
                   : "Item terakhir tidak bisa dipair ke item berikutnya"
               }
             >
-              <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
+              <Link2 className="size-3.5" aria-hidden="true" />
               {item.supersetWithNext ? "Superset On" : "Superset"}
             </button>
             <button
               type="button"
               onClick={() => onRemove(item.exerciseId)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border-subtle bg-surface text-text-muted transition-colors hover:border-danger/30 hover:text-danger focus-visible:border-danger/40 focus-visible:ring-2 focus-visible:ring-danger/20"
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-border-subtle bg-surface text-text-muted transition-colors hover:border-danger/30 hover:text-danger focus-visible:border-danger/40 focus-visible:ring-2 focus-visible:ring-danger/20"
               aria-label={`Hapus ${item.exercise.name} dari plan`}
             >
-              <X className="h-4 w-4" aria-hidden="true" />
+              <X className="size-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -591,14 +591,14 @@ export default function PlanEditorSheet({
                 }
                 selectionIndicator={
                   <span
-                    className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${
+                    className={`flex size-8 items-center justify-center rounded-full border transition-colors ${
                       isSelected
                         ? "border-emerald/40 bg-emerald text-[#0A0A0F]"
                         : "border-white/10 text-text-muted"
                     }`}
                     aria-hidden="true"
                   >
-                    <Check className="h-4 w-4" />
+                    <Check className="size-4" />
                   </span>
                 }
               />
@@ -678,7 +678,7 @@ export default function PlanEditorSheet({
               <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex size-11 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/10 text-emerald">
-                    <Search className="h-4 w-4" aria-hidden="true" />
+                    <Search className="size-4" aria-hidden="true" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
@@ -799,7 +799,7 @@ export default function PlanEditorSheet({
         >
           <SheetHeader className="pb-2">
             <SheetTitle className="flex items-center gap-2 text-left text-lg font-bold text-foreground">
-              <Settings2 className="h-4 w-4 text-emerald" aria-hidden="true" />
+              <Settings2 className="size-4 text-emerald" aria-hidden="true" />
               Atur Exercise
             </SheetTitle>
             <SheetDescription className="text-left text-xs text-text-muted">

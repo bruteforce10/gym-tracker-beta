@@ -1,0 +1,54 @@
+{
+  "ignore": {
+    "rules": [
+      "jsx-a11y/click-events-have-key-events",
+      "jsx-a11y/label-has-associated-control",
+      "jsx-a11y/no-static-element-interactions",
+      "knip/exports",
+      "knip/files",
+      "knip/types",
+      "react-doctor/async-defer-await",
+      "react-doctor/async-parallel",
+      "react-doctor/design-no-bold-heading",
+      "react-doctor/design-no-em-dash-in-jsx-text",
+      "react-doctor/design-no-space-on-flex-children",
+      "react-doctor/design-no-three-period-ellipsis",
+      "react-doctor/js-combine-iterations",
+      "react-doctor/js-flatmap-filter",
+      "react-doctor/js-hoist-intl",
+      "react-doctor/nextjs-no-client-side-redirect",
+      "react-doctor/nextjs-no-use-search-params-without-suspense",
+      "react-doctor/no-array-index-as-key",
+      "react-doctor/no-cascading-set-state",
+      "react-doctor/no-derived-state-effect",
+      "react-doctor/no-derived-useState",
+      "react-doctor/no-effect-chain",
+      "react-doctor/no-giant-component",
+      "react-doctor/no-mirror-prop-effect",
+      "react-doctor/no-prevent-default",
+      "react-doctor/no-pure-black-background",
+      "react-doctor/no-react19-deprecated-apis",
+      "react-doctor/no-render-in-render",
+      "react-doctor/prefer-useReducer",
+      "react-doctor/react-compiler-destructure-method",
+      "react-doctor/rendering-hydration-mismatch-time",
+      "react-doctor/rerender-lazy-state-init",
+      "react-doctor/rerender-state-only-in-handlers",
+      "react-doctor/server-sequential-independent-await",
+      "react/no-danger"
+    ],
+    "files": [
+      "src/generated/**",
+      ".agents/**",
+      ".claude/**",
+      ".qwen/**",
+      ".windsurf/**"
+    ],
+    "overrides": [
+      {
+        "files": ["src/actions/auth.ts"],
+        "rules": ["react-doctor/server-auth-actions"]
+      }
+    ]
+  }
+}

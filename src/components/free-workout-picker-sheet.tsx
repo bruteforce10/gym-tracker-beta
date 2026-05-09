@@ -36,9 +36,9 @@ export default function FreeWorkoutPickerSheet({
         side="bottom"
         className="max-h-[92vh] rounded-t-[30px] border-t border-white/8 bg-[#0B0D12] px-0"
       >
-        <SheetHeader className="border-b border-white/8 px-5 py-5">
+        <SheetHeader className="border-b border-white/8 p-5">
           <SheetTitle className="flex items-center gap-2 text-left text-xl">
-            <Flame className="h-4 w-4 text-amber-300" aria-hidden="true" />
+            <Flame className="size-4 text-amber-300" aria-hidden="true" />
             Tambah Exercise
           </SheetTitle>
           <SheetDescription className="text-left text-xs text-text-muted">
@@ -47,7 +47,7 @@ export default function FreeWorkoutPickerSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 py-5">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-5">
           <FreeWorkoutExerciseBrowser
             selectedIds={selectedIds}
             excludeIds={excludeIds}
@@ -63,7 +63,7 @@ export default function FreeWorkoutPickerSheet({
             onClick={onConfirm}
             disabled={selectedIds.size === 0}
           >
-            <Plus className="mr-1 h-4 w-4" aria-hidden="true" />
+            <Plus className="mr-1 size-4" aria-hidden="true" />
             Tambahkan {selectedIds.size} Exercise
           </Button>
         </div>

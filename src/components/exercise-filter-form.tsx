@@ -124,12 +124,12 @@ export default function ExerciseFilterForm({
       }}
     >
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald/80">
-        <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
+        <SlidersHorizontal className="size-3.5" aria-hidden="true" />
         Filter Katalog
       </div>
 
       <div className="flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-elevated px-3 focus-within:border-emerald/30 focus-within:ring-2 focus-within:ring-emerald/15">
-        <Search className="h-4 w-4 text-text-muted" aria-hidden="true" />
+        <Search className="size-4 text-text-muted" aria-hidden="true" />
         <input
           id="exercise-search"
           name="q"

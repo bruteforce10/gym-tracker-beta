@@ -40,7 +40,7 @@ export default function ExerciseOwnerActions({
           href={editHref}
           className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border-subtle bg-surface-elevated px-4 text-sm font-semibold text-foreground transition-colors hover:bg-surface"
         >
-          <Pencil className="h-4 w-4" aria-hidden="true" />
+          <Pencil className="size-4" aria-hidden="true" />
           Edit Exercise
         </Link>
 
@@ -54,7 +54,7 @@ export default function ExerciseOwnerActions({
               />
             }
           >
-            <Trash2 className="h-4 w-4" aria-hidden="true" />
+            <Trash2 className="size-4" aria-hidden="true" />
             Delete
           </DialogTrigger>
 

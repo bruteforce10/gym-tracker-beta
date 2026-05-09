@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Hero() {
@@ -37,7 +38,7 @@ export default function Hero() {
         className={`fixed inset-x-0 top-0 z-30 transition-all duration-500 ease-out ${scrolled ? "border-b border-white/10 bg-black/20 backdrop-blur-xl shadow-lg" : "bg-transparent border-transparent"}`}
       >
         <div className="container mx-auto flex items-center justify-center px-5 py-4 sm:justify-between sm:px-6 sm:py-5">
-          <a
+          <Link
             href="#top"
             className="inline-flex shrink-0 items-center"
             aria-label="Grynx home"
@@ -50,33 +51,33 @@ export default function Hero() {
               priority
               className="h-7 w-auto sm:h-8 md:h-9"
             />
-          </a>
+          </Link>
 
           <div className="hidden items-center gap-2 sm:flex sm:gap-3">
             <nav
               aria-label="Landing navigation"
               className="flex items-center gap-1 border border-white/10 bg-black/20 px-2 py-1.5 backdrop-blur-md sm:gap-2 sm:px-3"
             >
-              <a
+              <Link
                 href="/login"
                 className="px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-white/78 transition-colors hover:text-white sm:px-3 sm:text-xs"
               >
                 Feature
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/login"
                 className="px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-white/78 transition-colors hover:text-white sm:px-3 sm:text-xs"
               >
                 Why
-              </a>
+              </Link>
             </nav>
 
-            <a
+            <Link
               href="/login"
               className="inline-flex min-h-10 items-center justify-center border border-transparent bg-primary px-3.5 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-primary-foreground transition-transform hover:scale-[1.02] active:scale-[0.98] sm:min-h-11 sm:px-5 sm:text-xs"
             >
               Start Now
-            </a>
+            </Link>
           </div>
         </div>
       </header>
@@ -98,18 +99,18 @@ export default function Hero() {
 
         {/* CTA Buttons */}
         <div className="mx-auto flex w-full max-w-[18rem] flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center sm:gap-4">
-          <a
+          <Link
             href="/login"
             className="inline-flex min-h-14 w-full items-center justify-center border-2 border-transparent bg-primary px-6 py-4 text-center text-lg font-bold uppercase tracking-tight text-primary-foreground transition-transform hover:scale-[1.02] active:scale-[0.98] sm:w-[18rem] md:min-h-16 md:px-12 md:py-5 md:text-lg"
           >
             Start Tracking
-          </a>
-          <a
+          </Link>
+          <Link
             href="/login"
             className="inline-flex min-h-14 w-full items-center justify-center border-2 border-border bg-transparent px-6 py-4 text-center text-lg font-bold uppercase tracking-tight text-foreground transition-colors hover:bg-foreground hover:text-background sm:w-[18rem] md:min-h-16 md:px-12 md:py-5 md:text-lg"
           >
             See Features
-          </a>
+          </Link>
         </div>
       </div>
     </section>

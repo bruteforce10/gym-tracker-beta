@@ -142,7 +142,7 @@ export default function CustomExerciseForm({
     <div className="space-y-6">
       <div className="rounded-2xl border border-emerald/15 bg-emerald/8 px-4 py-3 text-xs text-emerald-100/90">
         <div className="mb-1 flex items-center gap-2 font-semibold text-emerald-100">
-          <ImagePlus className="h-4 w-4" aria-hidden="true" />
+          <ImagePlus className="size-4" aria-hidden="true" />
           {isEditMode ? "Edit Exercise" : "Private Publish"}
         </div>
         {resolvedDescription}
@@ -197,7 +197,7 @@ export default function CustomExerciseForm({
                   className="absolute left-3 top-3 z-10 h-10 rounded-xl border-white/10 bg-[#0F1117]/80 text-foreground backdrop-blur hover:bg-[#0F1117]"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Upload className="h-4 w-4" aria-hidden="true" />
+                  <Upload className="size-4" aria-hidden="true" />
                   Ganti Gambar
                 </Button>
                 <Button
@@ -207,7 +207,7 @@ export default function CustomExerciseForm({
                   className="absolute right-3 top-3 z-10 border-white/10 bg-[#0F1117]/80 text-foreground backdrop-blur hover:bg-[#0F1117]"
                   onClick={clearSelectedImage}
                 >
-                  <X className="h-4 w-4" aria-hidden="true" />
+                  <X className="size-4" aria-hidden="true" />
                   <span className="sr-only">Hapus gambar terpilih</span>
                 </Button>
                 <Image
@@ -222,7 +222,7 @@ export default function CustomExerciseForm({
             ) : (
               <div className="flex h-72 w-full flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.18),_transparent_55%),linear-gradient(135deg,_rgba(255,255,255,0.04),_rgba(255,255,255,0.01))] px-6 text-center">
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-emerald">
-                  <ImagePlus className="h-6 w-6" aria-hidden="true" />
+                  <ImagePlus className="size-6" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">
@@ -241,7 +241,7 @@ export default function CustomExerciseForm({
                   className="mt-2 h-11 rounded-xl border-border-subtle bg-surface text-foreground hover:bg-surface-elevated"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Upload className="h-4 w-4" aria-hidden="true" />
+                  <Upload className="size-4" aria-hidden="true" />
                   Pilih Gambar
                 </Button>
                 {selectedImageFile ? (

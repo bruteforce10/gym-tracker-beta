@@ -96,8 +96,8 @@ function RestTimer({
         </p>
       </div>
 
-      <div className="relative h-40 w-40">
-        <svg className="h-40 w-40 -rotate-90" viewBox="0 0 120 120">
+      <div className="relative size-40">
+        <svg className="size-40 -rotate-90" viewBox="0 0 120 120">
           <circle
             cx="60"
             cy="60"
@@ -137,7 +137,7 @@ function RestTimer({
           }`}
           id={mode === "transition" ? "rest-add15" : "rest-add30"}
         >
-          <Timer className="h-3.5 w-3.5" aria-hidden="true" />
+          <Timer className="size-3.5" aria-hidden="true" />
           {mode === "transition" ? "+15s" : "+30s"}
         </button>
         <button
@@ -149,7 +149,7 @@ function RestTimer({
           }`}
           id="rest-skip"
         >
-          <SkipForward className="h-3.5 w-3.5" aria-hidden="true" />
+          <SkipForward className="size-3.5" aria-hidden="true" />
           Skip
         </button>
       </div>
@@ -1108,7 +1108,7 @@ export default function WorkoutSessionPage() {
   if (!snapshot || !currentExercise || !currentPrimaryExercise) {
     return (
       <div className="flex min-h-screen items-center justify-center gradient-mesh">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
+        <div className="size-8 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
       </div>
     );
   }
@@ -1140,12 +1140,12 @@ export default function WorkoutSessionPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setPauseOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border-subtle bg-surface-elevated"
+              className="flex size-9 items-center justify-center rounded-xl border border-border-subtle bg-surface-elevated"
               id="exit-session-btn"
               aria-label="Keluar dari sesi latihan"
             >
               <ChevronLeft
-                className="h-5 w-5 text-foreground"
+                className="size-5 text-foreground"
                 aria-hidden="true"
               />
             </button>
@@ -1162,7 +1162,7 @@ export default function WorkoutSessionPage() {
             </div>
 
             <div className="inline-flex min-w-[84px] items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-surface-elevated px-3 py-2">
-              <Timer className="h-4 w-4 text-emerald" aria-hidden="true" />
+              <Timer className="size-4 text-emerald" aria-hidden="true" />
               <span className="font-mono text-sm font-semibold text-foreground">
                 {formatElapsedTime(elapsedSeconds)}
               </span>
@@ -1171,7 +1171,7 @@ export default function WorkoutSessionPage() {
             <button
               type="button"
               onClick={() => setAlarmEnabled((current) => !current)}
-              className={`flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
+              className={`flex size-9 items-center justify-center rounded-xl border transition-colors ${
                 alarmEnabled
                   ? "border-emerald/30 bg-emerald/10 text-emerald"
                   : "border-border-subtle bg-surface-elevated text-text-muted"
@@ -1186,9 +1186,9 @@ export default function WorkoutSessionPage() {
               }
             >
               {alarmEnabled ? (
-                <Volume2 className="h-4 w-4" aria-hidden="true" />
+                <Volume2 className="size-4" aria-hidden="true" />
               ) : (
-                <VolumeX className="h-4 w-4" aria-hidden="true" />
+                <VolumeX className="size-4" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -1310,7 +1310,7 @@ export default function WorkoutSessionPage() {
                   onClick={() => setFreePickerOpen(true)}
                   className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber-300/25 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-200 transition-colors hover:bg-amber-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/30"
                 >
-                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <Plus className="size-4" aria-hidden="true" />
                   Tambah Exercise
                 </button>
               </div>
@@ -1333,7 +1333,7 @@ export default function WorkoutSessionPage() {
                   onClick={handleCancelSuperset}
                   className="inline-flex items-center gap-1 rounded-full border border-danger/25 bg-danger/10 px-3 py-1 text-[11px] font-semibold text-danger transition-colors hover:bg-danger/15"
                 >
-                  <X className="h-3.5 w-3.5" aria-hidden="true" />
+                  <X className="size-3.5" aria-hidden="true" />
                   Batalkan
                 </button>
               </div>
@@ -1431,7 +1431,7 @@ export default function WorkoutSessionPage() {
                     onClick={() => setPickerOpen(true)}
                     className="inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1.5 text-[11px] font-semibold text-amber-200 transition-colors hover:bg-amber-300/15"
                   >
-                    <HeartPulse className="h-3.5 w-3.5" aria-hidden="true" />
+                    <HeartPulse className="size-3.5" aria-hidden="true" />
                     Tambah Superset
                   </button>
                 ) : null}
@@ -1480,7 +1480,7 @@ export default function WorkoutSessionPage() {
                 onClick={handleDoneSet}
                 className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald font-semibold text-[#0A0A0F] transition-[transform,background-color] hover:bg-emerald-dark active:scale-[0.98]"
               >
-                <Check className="h-4 w-4" aria-hidden="true" />
+                <Check className="size-4" aria-hidden="true" />
                 Selesaikan Set
               </button>
             </div>
@@ -1575,7 +1575,7 @@ export default function WorkoutSessionPage() {
         <div className="fixed inset-0 z-[70] bg-[#05070A]/82 backdrop-blur-md">
           <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-end px-4 pb-6 pt-12">
             <div className="overflow-hidden rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_32%),rgba(255,255,255,0.04)] shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-              <div className="border-b border-white/8 px-5 py-5">
+              <div className="border-b border-white/8 p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald/80">
                   Session Overlay
                 </p>
@@ -1591,14 +1591,14 @@ export default function WorkoutSessionPage() {
                 </p>
               </div>
 
-              <div className="space-y-3 px-5 py-5">
+              <div className="space-y-3 p-5">
                 <button
                   type="button"
                   onClick={handleAwayForAWhile}
                   className="flex min-h-16 w-full items-start gap-4 rounded-[26px] border border-emerald/18 bg-emerald/10 p-4 text-left transition-colors hover:bg-emerald/12"
                 >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald/15 text-emerald">
-                    <PauseCircle className="h-5 w-5" aria-hidden="true" />
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-emerald/15 text-emerald">
+                    <PauseCircle className="size-5" aria-hidden="true" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-base font-semibold text-foreground">
@@ -1616,7 +1616,7 @@ export default function WorkoutSessionPage() {
                     onClick={handleRestartWorkout}
                     className="flex min-h-14 items-center justify-center gap-2 rounded-[22px] border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm font-semibold text-amber-200 transition-colors hover:bg-amber-300/14"
                   >
-                    <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                    <RotateCcw className="size-4" aria-hidden="true" />
                     Restart
                   </button>
 
@@ -1625,7 +1625,7 @@ export default function WorkoutSessionPage() {
                     onClick={handleQuitWorkout}
                     className="flex min-h-14 items-center justify-center gap-2 rounded-[22px] border border-danger/20 bg-danger/10 px-4 py-3 text-sm font-semibold text-danger transition-colors hover:bg-danger/14"
                   >
-                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                    <Trash2 className="size-4" aria-hidden="true" />
                     Quit
                   </button>
 
@@ -1634,7 +1634,7 @@ export default function WorkoutSessionPage() {
                     onClick={handleResumeWorkout}
                     className="flex min-h-14 items-center justify-center gap-2 rounded-[22px] bg-emerald px-4 py-3 text-sm font-semibold text-[#08110A] transition-colors hover:bg-emerald-dark"
                   >
-                    <Play className="h-4 w-4" aria-hidden="true" />
+                    <Play className="size-4" aria-hidden="true" />
                     Resume
                   </button>
                 </div>

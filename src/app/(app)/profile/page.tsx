@@ -4,7 +4,6 @@ import { useSession, signOut } from "next-auth/react";
 import PageHeader from "@/components/page-header";
 import { getCurrentStats } from "@/actions/progress";
 import { clearUserData } from "@/actions/workouts";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -14,9 +13,6 @@ import {
   Dumbbell,
   LogOut,
   ChevronRight,
-  Moon,
-  Bell,
-  Shield,
   Trash2,
   AlertTriangle,
   X,
@@ -45,15 +41,15 @@ function ConfirmResetDialog({
         {/* Close button */}
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 w-7 h-7 rounded-full bg-surface-elevated flex items-center justify-center text-text-muted hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 size-7 rounded-full bg-surface-elevated flex items-center justify-center text-text-muted hover:text-foreground transition-colors"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="size-3.5" />
         </button>
 
         {/* Warning icon */}
         <div className="flex flex-col items-center text-center space-y-3 pt-2">
-          <div className="w-16 h-16 rounded-full bg-danger/10 border border-danger/20 flex items-center justify-center">
-            <AlertTriangle className="w-8 h-8 text-danger" />
+          <div className="size-16 rounded-full bg-danger/10 border border-danger/20 flex items-center justify-center">
+            <AlertTriangle className="size-8 text-danger" />
           </div>
           <h3
             className="text-xl font-bold text-foreground"
@@ -84,12 +80,12 @@ function ConfirmResetDialog({
           >
             {loading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Menghapus...
               </>
             ) : (
               <>
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="size-4" />
                 Ya, Hapus Semua Data
               </>
             )}
@@ -125,12 +121,6 @@ export default function ProfilePage() {
   const userName = session?.user?.name || "User";
   const userEmail = session?.user?.email || "";
 
-  const settingsItems = [
-    { icon: Moon, label: "Tampilan", value: "Dark Mode", id: "setting-theme" },
-    { icon: Bell, label: "Notifikasi", value: "Aktif", id: "setting-notif" },
-    { icon: Shield, label: "Privasi", value: "", id: "setting-privacy" },
-  ];
-
   const handleReset = async () => {
     setResetting(true);
     try {
@@ -158,7 +148,7 @@ export default function ProfilePage() {
       {/* Reset success banner */}
       {resetSuccess && (
         <div className="glass-card p-3 border border-emerald/30 bg-emerald/5 flex items-center gap-3 animate-fade-in-up">
-          <div className="w-8 h-8 rounded-full bg-emerald/20 flex items-center justify-center shrink-0">
+          <div className="size-8 rounded-full bg-emerald/20 flex items-center justify-center shrink-0">
             <span className="text-emerald text-sm">✓</span>
           </div>
           <p className="text-sm text-emerald font-medium">
@@ -172,7 +162,7 @@ export default function ProfilePage() {
         className="glass-card p-6 animate-fade-in-up text-center"
         id="profile-card"
       >
-        <div className="w-20 h-20 rounded-full bg-linear-to-br from-emerald to-emerald-dark mx-auto mb-4 flex items-center justify-center glow-emerald">
+        <div className="size-20 rounded-full bg-linear-to-br from-emerald to-emerald-dark mx-auto mb-4 flex items-center justify-center glow-emerald">
           <span
             className="text-3xl font-bold text-[#0A0A0F]"
             style={{ fontFamily: "var(--font-heading)" }}
@@ -187,7 +177,7 @@ export default function ProfilePage() {
           {userName}
         </h2>
         <div className="flex items-center justify-center gap-1.5 mt-1 text-text-muted">
-          <Mail className="w-3 h-3" />
+          <Mail className="size-3" />
           <span className="text-xs">{userEmail}</span>
         </div>
       </div>
@@ -198,8 +188,8 @@ export default function ProfilePage() {
         style={{ animationDelay: "100ms" }}
       >
         <div className="glass-card p-4 text-center">
-          <div className="w-10 h-10 rounded-xl bg-emerald/10 flex items-center justify-center mx-auto mb-2">
-            <Dumbbell className="w-5 h-5 text-emerald" />
+          <div className="size-10 rounded-xl bg-emerald/10 flex items-center justify-center mx-auto mb-2">
+            <Dumbbell className="size-5 text-emerald" />
           </div>
           <p className="font-data text-2xl font-bold text-foreground">
             {stats.totalWorkouts}
@@ -207,8 +197,8 @@ export default function ProfilePage() {
           <p className="text-xs text-text-muted mt-0.5">Total Workout</p>
         </div>
         <div className="glass-card p-4 text-center">
-          <div className="w-10 h-10 rounded-xl bg-emerald/10 flex items-center justify-center mx-auto mb-2">
-            <User className="w-5 h-5 text-emerald" />
+          <div className="size-10 rounded-xl bg-emerald/10 flex items-center justify-center mx-auto mb-2">
+            <User className="size-5 text-emerald" />
           </div>
           <p className="font-data text-2xl font-bold text-foreground">
             {stats.totalExercises}
@@ -230,14 +220,14 @@ export default function ProfilePage() {
               id={item.id}
             >
               <div className="flex items-center gap-3">
-                <item.icon className="w-4 h-4 text-text-muted" />
+                <item.icon className="size-4 text-text-muted" />
                 <span className="text-sm text-foreground">{item.label}</span>
               </div>
               <div className="flex items-center gap-2">
                 {item.value && (
                   <span className="text-xs text-text-muted">{item.value}</span>
                 )}
-                <ChevronRight className="w-4 h-4 text-text-muted/50" />
+                <ChevronRight className="size-4 text-text-muted/50" />
               </div>
             </button>
             {i < settingsItems.length - 1 && (
@@ -255,7 +245,7 @@ export default function ProfilePage() {
       >
         <div className="px-4 py-3 border-b border-danger/10">
           <p className="text-xs font-semibold text-danger/70 uppercase tracking-wider flex items-center gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5" />
+            <AlertTriangle className="size-3.5" />
             Danger Zone
           </p>
         </div>
@@ -265,7 +255,7 @@ export default function ProfilePage() {
           id="reset-data-btn"
         >
           <div className="flex items-center gap-3">
-            <Trash2 className="w-4 h-4 text-danger/60 group-hover:text-danger transition-colors" />
+            <Trash2 className="size-4 text-danger/60 group-hover:text-danger transition-colors" />
             <div className="text-left">
               <p className="text-sm text-foreground group-hover:text-danger transition-colors">
                 Reset Data Latihan
@@ -275,7 +265,7 @@ export default function ProfilePage() {
               </p>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-danger/40 group-hover:text-danger transition-colors" />
+          <ChevronRight className="size-4 text-danger/40 group-hover:text-danger transition-colors" />
         </button>
       </div>
 
@@ -286,7 +276,7 @@ export default function ProfilePage() {
         className="w-full h-12 border-danger/30 text-danger hover:bg-danger/10 rounded-xl"
         id="logout-btn"
       >
-        <LogOut className="w-4 h-4 mr-2" />
+        <LogOut className="size-4 mr-2" />
         Keluar
       </Button>
 

@@ -67,7 +67,7 @@ export default async function ExercisesPage({
           href="/exercises/new"
           className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald px-4 text-sm font-semibold text-[#0A0A0F] transition-colors hover:bg-emerald-dark"
         >
-          <Plus className="h-4 w-4" aria-hidden="true" />
+          <Plus className="size-4" aria-hidden="true" />
           Tambah Exercise
         </Link>
       </div>

@@ -78,7 +78,7 @@ export default function GoalEditorSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-5">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-5">
           <div className="space-y-4">
             <ExercisePicker
               inputId="goal-exercise"
@@ -131,7 +131,7 @@ export default function GoalEditorSheet({
                   )}
                 >
                   <CalendarIcon
-                    className="mr-2 h-4 w-4 text-emerald"
+                    className="mr-2 size-4 text-emerald"
                     aria-hidden="true"
                   />
                   {value.deadline ? (
@@ -177,7 +177,7 @@ export default function GoalEditorSheet({
             ) : null}
 
             {isEditing ? (
-              <div className="rounded-2xl border border-danger/15 bg-danger/5 px-4 py-4">
+              <div className="rounded-2xl border border-danger/15 bg-danger/5 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-danger/80">
                   Danger Zone
                 </p>
@@ -192,7 +192,7 @@ export default function GoalEditorSheet({
                   disabled={saving || deleting}
                   className="mt-4 h-11 w-full rounded-xl"
                 >
-                  <Trash2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                  <Trash2 className="mr-1.5 size-4" aria-hidden="true" />
                   {deleting ? "Menghapus..." : "Hapus Goal"}
                 </Button>
               </div>
@@ -207,7 +207,7 @@ export default function GoalEditorSheet({
             variant="outline"
             className="h-11 rounded-xl border-border-subtle text-text-muted hover:text-foreground"
           >
-            <X className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            <X className="mr-1.5 size-4" aria-hidden="true" />
             Batal
           </Button>
           <Button
@@ -222,7 +222,7 @@ export default function GoalEditorSheet({
             }
             className="h-11 rounded-xl bg-emerald font-semibold text-[#0A0A0F] hover:bg-emerald-dark disabled:opacity-50"
           >
-            <Check className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            <Check className="mr-1.5 size-4" aria-hidden="true" />
             {saving ? "Menyimpan..." : "Simpan Goal"}
           </Button>
         </SheetFooter>

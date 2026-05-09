@@ -104,7 +104,7 @@ export default function ExercisePickerCard({
                 </p>
                 {exercise.isFavorite ? (
                   <Sparkles
-                    className="h-3.5 w-3.5 shrink-0 text-amber-300"
+                    className="size-3.5 shrink-0 text-amber-300"
                     aria-hidden="true"
                   />
                 ) : null}

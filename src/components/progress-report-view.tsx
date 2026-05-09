@@ -430,7 +430,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
   return (
     <>
       <div className="space-y-6">
-        <section className="rounded-[32px] border border-white/6 bg-[linear-gradient(180deg,#12151E_0%,#0D1017_100%)] px-5 py-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+        <section className="rounded-[32px] border border-white/6 bg-[linear-gradient(180deg,#12151E_0%,#0D1017_100%)] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
           <p className="text-xs font-semibold uppercase tracking-[0.32em] text-emerald">
             Report
           </p>
@@ -445,10 +445,10 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
             </div>
             <Link
               href="/progress/history"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
+              className="inline-flex size-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white transition hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
               aria-label="Buka history progress"
             >
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              <ArrowUpRight className="size-4" aria-hidden="true" />
             </Link>
           </div>
 
@@ -481,7 +481,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
 
           <Link
             href="/progress/history"
-            className="mt-5 block rounded-[28px] border border-white/6 bg-[#222733] px-4 py-4 transition hover:border-emerald/40 hover:bg-[#252B39] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
+            className="mt-5 block rounded-[28px] border border-white/6 bg-[#222733] p-4 transition hover:border-emerald/40 hover:bg-[#252B39] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
           >
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -490,7 +490,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                 </p>
               </div>
               <ChevronRight
-                className="h-4 w-4 text-text-muted"
+                className="size-4 text-text-muted"
                 aria-hidden="true"
               />
             </div>
@@ -498,7 +498,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
           </Link>
         </section>
 
-        <section className="rounded-[30px] border border-white/6 bg-[#10141C] px-5 py-5">
+        <section className="rounded-[30px] border border-white/6 bg-[#10141C] p-5">
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
@@ -508,9 +508,9 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                 <Popover>
                   <PopoverTrigger
                     aria-label="Info delta mingguan"
-                    className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/12 text-text-muted transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
+                    className="inline-flex size-5 items-center justify-center rounded-full border border-white/12 text-text-muted transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
                   >
-                    <Info className="h-3.5 w-3.5" aria-hidden="true" />
+                    <Info className="size-3.5" aria-hidden="true" />
                   </PopoverTrigger>
                   <PopoverContent
                     side="top"
@@ -528,7 +528,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                 Pantau progres mingguanmu secara instan di halaman ini.
               </p>
             </div>
-            <TrendingUp className="h-5 w-5 text-emerald" aria-hidden="true" />
+            <TrendingUp className="size-5 text-emerald" aria-hidden="true" />
           </div>
 
           <div className="mt-5 space-y-3">
@@ -539,9 +539,9 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                   className="flex items-center justify-between rounded-[22px] border border-white/6 bg-white/[0.03] px-4 py-3"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald/10">
+                    <div className="flex size-10 items-center justify-center rounded-2xl bg-emerald/10">
                       <Dumbbell
-                        className="h-4 w-4 text-emerald"
+                        className="size-4 text-emerald"
                         aria-hidden="true"
                       />
                     </div>
@@ -580,13 +580,13 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
 
         <Link
           href="/progress/history"
-          className="block rounded-[30px] border border-white/6 bg-[linear-gradient(180deg,#131722_0%,#0D1118_100%)] px-5 py-5 transition hover:border-emerald/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
+          className="block rounded-[30px] border border-white/6 bg-[linear-gradient(180deg,#131722_0%,#0D1118_100%)] p-5 transition hover:border-emerald/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-2xl font-semibold text-white">This Week</p>
             </div>
-            <CalendarDays className="h-5 w-5 text-emerald" aria-hidden="true" />
+            <CalendarDays className="size-5 text-emerald" aria-hidden="true" />
           </div>
 
           <div className="mt-5 flex items-center justify-between gap-2">
@@ -602,7 +602,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                     {day.shortLabel}
                   </span>
                   <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-semibold ${
+                    className={`flex size-10 items-center justify-center rounded-full border text-sm font-semibold ${
                       isActive
                         ? "border-emerald/40 bg-emerald/30 text-white"
                         : "border-white/6 bg-white/[0.04] text-text-muted"
@@ -615,7 +615,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
             })}
           </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-4 rounded-[24px] border border-white/6 bg-black/20 px-4 py-4">
+          <div className="mt-5 grid grid-cols-2 gap-4 rounded-[24px] border border-white/6 bg-black/20 p-4">
             <div className="border-r border-white/6 pr-4">
               <p className="text-xs uppercase tracking-[0.14em] text-text-muted">
                 Today(mm:ss)
@@ -664,7 +664,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
           )}
         </section>
 
-        <section className="rounded-[32px] border border-white/6 bg-[linear-gradient(180deg,#131722_0%,#0E1118_100%)] px-5 py-5">
+        <section className="rounded-[32px] border border-white/6 bg-[linear-gradient(180deg,#131722_0%,#0E1118_100%)] p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-2xl font-semibold text-white">My Weight</p>
@@ -692,7 +692,7 @@ export default function ProgressReportView({ data }: ProgressReportViewProps) {
                   : "--"}
               </p>
               <div className="mt-3 flex items-center gap-2 text-sm text-text-muted">
-                <Flame className="h-4 w-4 text-emerald" aria-hidden="true" />
+                <Flame className="size-4 text-emerald" aria-hidden="true" />
                 <span>
                   {data.weight.changeKg !== null
                     ? `${data.weight.changeKg > 0 ? "+" : ""}${formatWeight(

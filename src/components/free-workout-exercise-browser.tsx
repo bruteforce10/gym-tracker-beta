@@ -136,14 +136,14 @@ export default function FreeWorkoutExerciseBrowser({
                 }
                 selectionIndicator={
                   <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-2xl border transition-colors ${
+                    className={`flex size-9 items-center justify-center rounded-2xl border transition-colors ${
                       selected
                         ? "border-emerald/40 bg-emerald text-[#09110E]"
                         : "border-white/10 bg-white/[0.04] text-text-muted"
                     }`}
                     aria-hidden="true"
                   >
-                    <Check className="h-4 w-4" />
+                    <Check className="size-4" />
                   </div>
                 }
               />
@@ -159,7 +159,7 @@ export default function FreeWorkoutExerciseBrowser({
       <div className="rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.12),transparent_38%),rgba(255,255,255,0.03)] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.22)] transition-colors focus-within:border-amber-300/35 focus-within:ring-2 focus-within:ring-amber-300/20">
         <div className="flex items-center gap-3">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-amber-300/20 bg-amber-300/10 text-amber-300">
-            <Search className="h-4 w-4" aria-hidden="true" />
+            <Search className="size-4" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted">
@@ -184,7 +184,7 @@ export default function FreeWorkoutExerciseBrowser({
         </div>
         <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-text-muted">
           <div className="flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-amber-300" aria-hidden="true" />
+            <Sparkles className="size-3.5 text-amber-300" aria-hidden="true" />
             Favorit diprioritaskan biar pilih exercise terasa cepat.
           </div>
           <span>{selectedIds.size} dipilih</span>

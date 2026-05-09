@@ -217,7 +217,7 @@ export default function WorkoutSessionCompleteView({
       <div className="mx-auto flex w-full max-w-md flex-col gap-4 pb-44 pt-2">
         <section className="px-1">
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald/20 bg-emerald/10 px-3 py-1.5 text-xs font-medium text-emerald">
-            <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+            <CheckCircle2 className="size-3.5" aria-hidden="true" />
             Workout completed
           </div>
 
@@ -235,8 +235,8 @@ export default function WorkoutSessionCompleteView({
               </p>
             </div>
 
-            <div className="glass-card flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-emerald/15 bg-emerald/10 text-emerald">
-              <Trophy className="h-5 w-5" aria-hidden="true" />
+            <div className="glass-card flex size-12 shrink-0 items-center justify-center rounded-2xl border-emerald/15 bg-emerald/10 text-emerald">
+              <Trophy className="size-5" aria-hidden="true" />
             </div>
           </div>
         </section>
@@ -256,12 +256,12 @@ export default function WorkoutSessionCompleteView({
                 </h2>
               </div>
               <div className="rounded-2xl border border-emerald/15 bg-[#0A0A0F]/30 p-2 text-emerald">
-                <Sparkles className="h-4 w-4" aria-hidden="true" />
+                <Sparkles className="size-4" aria-hidden="true" />
               </div>
             </div>
           </div>
 
-          <div className="px-5 py-5">
+          <div className="p-5">
             <div className="grid grid-cols-3 gap-4">
               <SummaryMetric label="Volume" value={`${formatWeight(totalVolume)} kg`} />
               <SummaryMetric label="Duration" value={durationLabel} />
@@ -275,20 +275,20 @@ export default function WorkoutSessionCompleteView({
 
             <div className="mt-4 flex flex-wrap gap-2">
               <InfoChip
-                icon={<Flame className="h-3.5 w-3.5" aria-hidden="true" />}
+                icon={<Flame className="size-3.5" aria-hidden="true" />}
                 label={`${totalCompletedSets} set selesai`}
               />
               <InfoChip
-                icon={<CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />}
+                icon={<CalendarDays className="size-3.5" aria-hidden="true" />}
                 label={`${completedExercises.length} exercise`}
               />
               <InfoChip
-                icon={<Clock3 className="h-3.5 w-3.5" aria-hidden="true" />}
+                icon={<Clock3 className="size-3.5" aria-hidden="true" />}
                 label={durationLabel}
               />
               {bestLiftChip ? (
                 <InfoChip
-                  icon={<Trophy className="h-3.5 w-3.5" aria-hidden="true" />}
+                  icon={<Trophy className="size-3.5" aria-hidden="true" />}
                   label={bestLiftChip}
                 />
               ) : null}
@@ -300,7 +300,7 @@ export default function WorkoutSessionCompleteView({
           {completedExercises.map((exercise) => (
             <section
               key={exercise.sessionExerciseId}
-              className="glass-card rounded-[1.5rem] px-4 py-4"
+              className="glass-card rounded-[1.5rem] p-4"
             >
               <h3
                 className="pr-4 text-[1.15rem] font-semibold tracking-tight text-foreground"
@@ -313,9 +313,9 @@ export default function WorkoutSessionCompleteView({
                 {exercise.sets.map((set, index) => (
                   <div
                     key={`${exercise.sessionExerciseId}-${index}`}
-                    className="flex items-start gap-3 rounded-2xl border border-white/[0.04] bg-white/[0.02] px-3 py-3"
+                    className="flex items-start gap-3 rounded-2xl border border-white/[0.04] bg-white/[0.02] p-3"
                   >
-                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald/10 text-[11px] font-semibold text-emerald">
+                    <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald/10 text-[11px] font-semibold text-emerald">
                       {index + 1}
                     </span>
 
@@ -344,7 +344,7 @@ export default function WorkoutSessionCompleteView({
           ))}
 
           {completedExercises.length === 0 ? (
-            <section className="glass-card rounded-[1.5rem] px-5 py-5 text-center">
+            <section className="glass-card rounded-[1.5rem] p-5 text-center">
               <p className="text-sm text-text-muted">
                 Belum ada set yang selesai pada sesi ini.
               </p>
@@ -363,7 +363,7 @@ export default function WorkoutSessionCompleteView({
               onClick={handleDownload}
               disabled={!summary || isExporting}
             >
-              <Download className="h-4 w-4" aria-hidden="true" />
+              <Download className="size-4" aria-hidden="true" />
               {isExporting ? "Menyiapkan…" : "Download PNG"}
             </Button>
 
@@ -373,7 +373,7 @@ export default function WorkoutSessionCompleteView({
               onClick={handleShare}
               disabled={!summary || isExporting}
             >
-              <Share2 className="h-4 w-4" aria-hidden="true" />
+              <Share2 className="size-4" aria-hidden="true" />
               {isExporting ? "Menyiapkan…" : "Share"}
             </Button>
           </div>

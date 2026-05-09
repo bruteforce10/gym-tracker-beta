@@ -15,7 +15,7 @@ export default function StatCard({ icon, label, value, suffix, delay = 0 }: Stat
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center text-emerald">
+        <div className="size-8 rounded-lg bg-emerald/10 flex items-center justify-center text-emerald">
           {icon}
         </div>
         <span className="text-xs text-text-muted font-medium">{label}</span>

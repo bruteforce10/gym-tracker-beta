@@ -41,9 +41,9 @@ export default function CompletionExerciseEditorSheet({
         side="bottom"
         className="max-h-[80vh] overflow-y-auto rounded-t-[30px] border-t border-white/8 bg-[#0B0D12] px-0"
       >
-        <SheetHeader className="border-b border-white/8 px-5 py-5">
+        <SheetHeader className="border-b border-white/8 p-5">
           <SheetTitle className="flex items-center gap-2 text-left text-lg font-bold text-foreground">
-            <Settings2 className="h-4 w-4 text-amber-300" aria-hidden="true" />
+            <Settings2 className="size-4 text-amber-300" aria-hidden="true" />
             Atur Exercise
           </SheetTitle>
           <SheetDescription className="text-left text-xs text-text-muted">
@@ -51,7 +51,7 @@ export default function CompletionExerciseEditorSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-4 px-5 py-5">
+        <div className="space-y-4 p-5">
           {configs.map((config, index) => (
             <div
               key={config.exercise.id}

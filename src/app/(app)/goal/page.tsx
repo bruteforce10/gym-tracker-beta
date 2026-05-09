@@ -54,8 +54,8 @@ function ConfirmDuplicateGoalDialog({
         className="max-w-md rounded-[28px] border border-white/10 bg-[#0B0D12] p-0"
       >
         <DialogHeader className="px-6 pt-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-emerald/20 bg-emerald/10 text-emerald">
-            <Target className="h-6 w-6" aria-hidden="true" />
+          <div className="flex size-14 items-center justify-center rounded-full border border-emerald/20 bg-emerald/10 text-emerald">
+            <Target className="size-6" aria-hidden="true" />
           </div>
           <DialogTitle className="pt-3 text-xl font-bold text-foreground">
             Goal Ini Sudah Pernah Selesai
@@ -313,7 +313,7 @@ export default function GoalPage() {
               disabled={activeGoalCount >= 3}
               className="h-10 rounded-xl bg-emerald px-4 text-sm font-semibold text-[#0A0A0F] hover:bg-emerald-dark disabled:opacity-50"
             >
-              <Plus className="mr-1.5 h-4 w-4" aria-hidden="true" />
+              <Plus className="mr-1.5 size-4" aria-hidden="true" />
               Tambah Goal
             </Button>
           }
@@ -323,7 +323,7 @@ export default function GoalPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald/20 bg-emerald/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald">
-                <Target className="h-3.5 w-3.5" aria-hidden="true" />
+                <Target className="size-3.5" aria-hidden="true" />
                 Goal Aktif
               </div>
             </div>
@@ -349,10 +349,10 @@ export default function GoalPage() {
                     <button
                       type="button"
                       onClick={() => applyGoalToForm(goal)}
-                      className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-[#0F1218]/90 text-text-muted transition-colors hover:border-emerald/20 hover:bg-white/[0.06] hover:text-emerald"
+                      className="flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-[#0F1218]/90 text-text-muted transition-colors hover:border-emerald/20 hover:bg-white/[0.06] hover:text-emerald"
                       aria-label={`Edit goal ${goal.exercise.name}`}
                     >
-                      <Edit3 className="h-4 w-4" aria-hidden="true" />
+                      <Edit3 className="size-4" aria-hidden="true" />
                     </button>
                   }
                 />
@@ -361,7 +361,7 @@ export default function GoalPage() {
           ) : (
             <div className="glass-card p-8 text-center">
               <Target
-                className="mx-auto h-10 w-10 text-emerald/80"
+                className="mx-auto size-10 text-emerald/80"
                 aria-hidden="true"
               />
               <p className="mt-4 text-base font-semibold text-foreground">
@@ -377,7 +377,7 @@ export default function GoalPage() {
         {completedGoals.length > 0 ? (
           <section className="space-y-3">
             <div className="flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-emerald" aria-hidden="true" />
+              <Trophy className="size-4 text-emerald" aria-hidden="true" />
               <h2
                 className="text-base font-bold text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
@@ -397,7 +397,7 @@ export default function GoalPage() {
           <section className="space-y-3">
             <div className="flex items-center gap-2">
               <AlertTriangle
-                className="h-4 w-4 text-danger"
+                className="size-4 text-danger"
                 aria-hidden="true"
               />
               <h2

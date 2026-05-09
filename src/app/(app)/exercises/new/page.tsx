@@ -11,7 +11,7 @@ export default function NewExercisePage() {
           href="/exercises"
           className="inline-flex items-center gap-2 text-sm text-text-muted transition-colors hover:text-foreground"
         >
-          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          <ChevronLeft className="size-4" aria-hidden="true" />
           Kembali ke katalog
         </Link>
 

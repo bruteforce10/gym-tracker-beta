@@ -28,20 +28,20 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-3 gap-3 mb-6">
         <StatCard
-          icon={<Activity className="w-4 h-4" />}
+          icon={<Activity className="size-4" />}
           label="Workouts"
           value={stats.totalWorkouts}
           delay={100}
         />
         <StatCard
-          icon={<Flame className="w-4 h-4" />}
+          icon={<Flame className="size-4" />}
           label="Streak"
           value={stats.streak}
           suffix="hari"
           delay={200}
         />
         <StatCard
-          icon={<Trophy className="w-4 h-4" />}
+          icon={<Trophy className="size-4" />}
           label="Best 1RM"
           value={stats.best1RM.toFixed(1)}
           suffix="kg"
@@ -60,8 +60,8 @@ export default async function DashboardPage() {
       {isAdmin ? (
         <Link href="/admin/exercises" className="mb-6 block">
           <div className="glass-card flex items-center gap-4 border border-emerald/20 p-4 transition-colors hover:border-emerald/40">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald/10 text-emerald">
-              <Shield className="h-5 w-5" aria-hidden="true" />
+            <div className="flex size-12 items-center justify-center rounded-xl bg-emerald/10 text-emerald">
+              <Shield className="size-5" aria-hidden="true" />
             </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground">

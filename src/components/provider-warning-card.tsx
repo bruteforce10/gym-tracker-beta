@@ -12,8 +12,8 @@ export default function ProviderWarningCard({
   return (
     <div className="glass-card border border-amber-500/20 bg-amber-500/8 p-4">
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-300">
-          <AlertTriangle className="h-5 w-5" aria-hidden="true" />
+        <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-300">
+          <AlertTriangle className="size-5" aria-hidden="true" />
         </div>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-foreground">{title}</p>

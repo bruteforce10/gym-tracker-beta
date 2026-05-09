@@ -108,8 +108,8 @@ export default function AddWorkoutSheet({ open, onOpenChange }: AddWorkoutSheetP
             style={{ fontFamily: "Outfit, sans-serif" }}
           >
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center">
-                <Dumbbell className="w-4 h-4 text-emerald" aria-hidden="true" />
+              <div className="size-8 rounded-lg bg-emerald/10 flex items-center justify-center">
+                <Dumbbell className="size-4 text-emerald" aria-hidden="true" />
               </div>
               Log Workout
             </div>
@@ -133,7 +133,7 @@ export default function AddWorkoutSheet({ open, onOpenChange }: AddWorkoutSheetP
                   !date && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4 text-emerald" aria-hidden="true" />
+                <CalendarIcon className="mr-2 size-4 text-emerald" aria-hidden="true" />
                 {date ? format(date, "PPP") : <span>Pilih tanggal</span>}
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 bg-surface border-border-subtle" align="start">
@@ -172,10 +172,10 @@ export default function AddWorkoutSheet({ open, onOpenChange }: AddWorkoutSheetP
                 {exercises.length > 1 && (
                   <button
                     onClick={() => removeExercise(index)}
-                    className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-text-muted hover:text-danger hover:bg-danger/10 transition-colors"
+                    className="absolute top-3 right-3 size-6 rounded-full bg-white/5 flex items-center justify-center text-text-muted hover:text-danger hover:bg-danger/10 transition-colors"
                     aria-label={`Hapus exercise ${index + 1}`}
                   >
-                    <X className="w-3.5 h-3.5" aria-hidden="true" />
+                    <X className="size-3.5" aria-hidden="true" />
                   </button>
                 )}
 
@@ -251,7 +251,7 @@ export default function AddWorkoutSheet({ open, onOpenChange }: AddWorkoutSheetP
 
                 {estimated1RM > 0 && (
                   <div className="flex items-center gap-2 pt-1 px-1">
-                    <Trophy className="w-3.5 h-3.5 text-emerald" aria-hidden="true" />
+                    <Trophy className="size-3.5 text-emerald" aria-hidden="true" />
                     <span className="text-xs text-text-muted">Est. 1RM:</span>
                     <span className="font-data text-sm font-bold text-emerald">
                       {estimated1RM.toFixed(1)} kg
@@ -267,7 +267,7 @@ export default function AddWorkoutSheet({ open, onOpenChange }: AddWorkoutSheetP
             className="w-full py-3 rounded-xl border border-dashed border-border-subtle text-text-muted hover:border-emerald/30 hover:text-emerald transition-colors flex items-center justify-center gap-2 text-sm"
             id="add-exercise-btn"
           >
-            <Plus className="w-4 h-4" aria-hidden="true" />
+            <Plus className="size-4" aria-hidden="true" />
             Tambah Exercise
           </button>
 
