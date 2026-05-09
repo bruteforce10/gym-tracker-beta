@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
         search: "",
       },
       {
+        pathname: "/grynx-logo-horizontal.png",
+        search: "",
+      },
+      {
         pathname: "/feature-mockup/**",
         search: "",
       },

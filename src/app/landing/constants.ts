@@ -36,13 +36,30 @@ export const FEATURES = [
   },
 ] as const;
 
-export const MARQUEE_TEXT =
-  "280+ EXERCISES • TRACK YOUR PROGRESS • SHARE YOUR WORKOUT • BUILD YOUR IDENTITY • REAL-TIME TRACKING •";
+export const MARQUEE_ITEMS = [
+  "280+ EXERCISES",
+  "TRACK PROGRESS",
+  "BUILD STREAK",
+  "SHARE WORKOUT",
+] as const;
 
 export const DIFFERENTIATION_CARDS = [
-  { title: "TRACK EVERYTHING" },
-  { title: "BUILD REAL PROGRESS" },
-  { title: "SHOW YOUR RESULTS" },
+  {
+    title: "TRACK EVERYTHING",
+    description: "280+ exercises, sets, reps, weights, and more.",
+    icon: "zap",
+  },
+  {
+    title: "BUILD REAL PROGRESS",
+    description: "Smart reports to help you get stronger.",
+    icon: "chart",
+  },
+  {
+    title: "SHOW YOUR RESULTS",
+    description: "Share workouts and inspire the community.",
+    icon: "share",
+    accent: true,
+  },
 ] as const;
 
 export const STATS = [

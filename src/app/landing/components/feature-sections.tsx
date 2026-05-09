@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 import { FEATURES } from "../constants";
 
 const FEATURE_MEDIA = [
@@ -7,35 +6,30 @@ const FEATURE_MEDIA = [
     src: "/feature-mockup/gambar 01.webp",
     width: 1419,
     height: 2796,
-    cta: "Start Tracking",
     rotation: "rotate-[5deg]",
   },
   {
     src: "/feature-mockup/gambar 02.webp",
     width: 1419,
     height: 2796,
-    cta: "View Plans",
     rotation: "-rotate-[6deg]",
   },
   {
     src: "/feature-mockup/gambar 03.webp",
     width: 1419,
     height: 2796,
-    cta: "Set Goal",
     rotation: "rotate-[4deg]",
   },
   {
     src: "/feature-mockup/gambar 04.webp",
     width: 1159,
     height: 1888,
-    cta: "Share To Feed",
     rotation: "-rotate-[5deg]",
   },
   {
     src: "/feature-mockup/gambar 05.webp",
     width: 1419,
     height: 2796,
-    cta: "Track Live",
     rotation: "rotate-[5deg]",
   },
 ] as const;
@@ -65,7 +59,7 @@ export default function FeatureSections() {
               aria-hidden="true"
             />
 
-            <div className="container relative z-10 mx-auto grid min-h-[640px] grid-cols-1 px-5 md:min-h-[430px] md:grid-cols-2 md:px-8 lg:min-h-[500px]">
+            <div className="container relative z-10 mx-auto grid min-h-[740px] grid-cols-1 px-5 md:min-h-[430px] md:grid-cols-2 md:px-8 lg:min-h-[500px]">
               <div
                 className={`flex min-w-0 flex-col justify-center py-12 md:py-16 lg:py-20 ${
                   imageFirst ? "md:order-2 md:pl-14" : "md:order-1 md:pr-14"
@@ -86,17 +80,6 @@ export default function FeatureSections() {
                   <p className="mt-7 max-w-[26rem] text-pretty text-lg leading-8 text-white/[0.82] md:text-xl">
                     {feature.description}
                   </p>
-
-                  <a
-                    href="/signup"
-                    className="mt-8 inline-flex min-h-11 w-fit items-center gap-4 text-base font-extrabold uppercase tracking-normal text-primary outline-offset-4 transition-[color] duration-200 hover:text-emerald-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary motion-reduce:transition-none md:text-lg"
-                  >
-                    <span>{media.cta}</span>
-                    <ArrowRight
-                      className="size-6 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-2 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
-                      aria-hidden="true"
-                    />
-                  </a>
                 </div>
               </div>
 
@@ -106,11 +89,15 @@ export default function FeatureSections() {
                 }`}
               >
                 <div
-                  className={`absolute bottom-[-118px] ${
+                  className={`absolute ${
+                    index === 3
+                      ? "top-1/2 -translate-y-1/2 md:top-auto md:translate-y-0 md:bottom-[-10px] lg:bottom-[-10px]"
+                      : "bottom-[-150px] md:bottom-[-170px] lg:bottom-[-210px]"
+                  } ${
                     imageFirst
                       ? "left-1/2 md:left-5 lg:left-12"
                       : "left-1/2 md:left-auto md:right-4 lg:right-14"
-                  } w-[min(74vw,300px)] -translate-x-1/2 md:bottom-[-170px] md:w-[min(36vw,340px)] md:translate-x-0 lg:bottom-[-210px] lg:w-[min(34vw,390px)]`}
+                  } w-[min(74vw,300px)] -translate-x-1/2 md:w-[min(36vw,340px)] md:translate-x-0 lg:w-[min(34vw,390px)]`}
                 >
                   <div className="absolute inset-8 rounded-[3rem] bg-primary/[0.35] blur-3xl transition-opacity duration-300 group-hover:opacity-80 motion-reduce:transition-none" />
                   <Image
