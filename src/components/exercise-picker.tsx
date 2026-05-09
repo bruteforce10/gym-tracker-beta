@@ -14,6 +14,7 @@ import {
   type ExerciseCatalogItem,
   type ExercisePlanBucket,
 } from "@/lib/exercise-catalog";
+import { updateFavoriteExerciseSections } from "@/lib/favorite-exercise-sections";
 import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 
 interface ExercisePickerProps {
@@ -84,17 +85,9 @@ export default function ExercisePicker({
     sections.results.length > 0;
 
   const updateFavoriteState = (exerciseId: string, nextValue: boolean) => {
-    setSections((current) => ({
-      favorites: current.favorites.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item,
-      ),
-      recent: current.recent.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item,
-      ),
-      results: current.results.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item,
-      ),
-    }));
+    setSections((current) =>
+      updateFavoriteExerciseSections(current, exerciseId, nextValue)
+    );
   };
 
   const renderSection = (

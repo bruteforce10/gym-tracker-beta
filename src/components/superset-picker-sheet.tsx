@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 import type { ExercisePlanBucket } from "@/lib/exercise-catalog";
+import { updateFavoriteExerciseSections } from "@/lib/favorite-exercise-sections";
 
 type SupersetPickerSheetProps = {
   open: boolean;
@@ -90,17 +91,9 @@ export default function SupersetPickerSheet({
   );
 
   const updateFavoriteState = (exerciseId: string, nextValue: boolean) => {
-    setSections((current) => ({
-      favorites: current.favorites.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
-      ),
-      recent: current.recent.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
-      ),
-      results: current.results.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
-      ),
-    }));
+    setSections((current) =>
+      updateFavoriteExerciseSections(current, exerciseId, nextValue)
+    );
     setSelectedExercise((current: FavoriteAwareExerciseItem | null) =>
       current?.id === exerciseId ? { ...current, isFavorite: nextValue } : current
     );

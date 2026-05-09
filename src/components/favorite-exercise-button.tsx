@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { Star } from "lucide-react";
 
-import { toggleFavoriteExercise } from "@/actions/exercises";
+import { setFavoriteExercise } from "@/actions/exercises";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +51,7 @@ export default function FavoriteExerciseButton({
         onFavoriteChange?.(optimisticNext);
 
         startTransition(async () => {
-          const result = await toggleFavoriteExercise(exerciseId);
+          const result = await setFavoriteExercise(exerciseId, optimisticNext);
 
           if (!result.success) {
             setIsFavorite(!optimisticNext);

@@ -11,6 +11,7 @@ import ExercisePickerCard from "@/components/exercise-picker-card";
 import { Badge } from "@/components/ui/badge";
 import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 import type { ExercisePlanBucket } from "@/lib/exercise-catalog";
+import { updateFavoriteExerciseSections } from "@/lib/favorite-exercise-sections";
 
 type QuickPickerSections = {
   favorites: FavoriteAwareExerciseItem[];
@@ -89,17 +90,9 @@ export default function FreeWorkoutExerciseBrowser({
   const isSearching = queryInput.trim().length > 0;
 
   const updateFavoriteState = (exerciseId: string, nextValue: boolean) => {
-    setSections((current) => ({
-      favorites: current.favorites.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
-      ),
-      recent: current.recent.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
-      ),
-      results: current.results.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
-      ),
-    }));
+    setSections((current) =>
+      updateFavoriteExerciseSections(current, exerciseId, nextValue)
+    );
   };
 
   const renderSection = (

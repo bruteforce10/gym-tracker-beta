@@ -231,6 +231,13 @@ export async function getExerciseQuickPickerData(params?: {
 }
 
 export async function toggleFavoriteExercise(exerciseId: string) {
+  return setFavoriteExercise(exerciseId);
+}
+
+export async function setFavoriteExercise(
+  exerciseId: string,
+  nextFavorited?: boolean
+) {
   const userId = await requireUserId();
   const viewer = await getViewerContext();
   const exercise = await fetchExerciseById(exerciseId, viewer);
@@ -251,19 +258,25 @@ export async function toggleFavoriteExercise(exerciseId: string) {
       },
     },
   });
+  const shouldFavorite = nextFavorited ?? !existing;
 
-  if (existing) {
-    await prisma.favoriteExercise.delete({
+  if (shouldFavorite) {
+    await prisma.favoriteExercise.upsert({
       where: {
         userId_exerciseId: {
           userId,
           exerciseId,
         },
       },
+      update: {},
+      create: {
+        userId,
+        exerciseId,
+      },
     });
   } else {
-    await prisma.favoriteExercise.create({
-      data: {
+    await prisma.favoriteExercise.deleteMany({
+      where: {
         userId,
         exerciseId,
       },
@@ -279,7 +292,7 @@ export async function toggleFavoriteExercise(exerciseId: string) {
   return {
     success: true,
     error: null,
-    favorited: !existing,
+    favorited: shouldFavorite,
   };
 }
 

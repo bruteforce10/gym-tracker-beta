@@ -52,6 +52,7 @@ import {
   type ExerciseCatalogItem,
   type ExercisePlanBucket,
 } from "@/lib/exercise-catalog";
+import { updateFavoriteExerciseSections } from "@/lib/favorite-exercise-sections";
 
 type PlanExercise = {
   id: string;
@@ -398,14 +399,9 @@ export default function PlanEditorSheet({
     selectedExercises.find((exercise) => exercise.exerciseId === editingExerciseId) ?? null;
 
   const updateFavoriteState = (exerciseId: string, nextValue: boolean) => {
-    setPickerSections((current) => ({
-      favorites: current.favorites.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
-      ),
-      results: current.results.map((item) =>
-        item.id === exerciseId ? { ...item, isFavorite: nextValue } : item
-      ),
-    }));
+    setPickerSections((current) =>
+      updateFavoriteExerciseSections(current, exerciseId, nextValue)
+    );
   };
 
   const toggleExercise = (exercise: ExerciseCatalogItem) => {
@@ -918,4 +914,3 @@ export default function PlanEditorSheet({
     </>
   );
 }
-
