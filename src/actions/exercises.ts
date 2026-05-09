@@ -35,6 +35,7 @@ export async function getExerciseCatalog(params?: {
   equipment?: string;
   type?: string;
   ownership?: "all" | "mine";
+  favoriteOnly?: boolean;
   limit?: number;
 }) {
   const viewer = await getViewerContext();
@@ -51,6 +52,7 @@ export async function getFavoriteAwareExerciseCatalog(params?: {
   equipment?: string;
   type?: string;
   ownership?: "all" | "mine";
+  favoriteOnly?: boolean;
   limit?: number;
 }) {
   const viewer = await getViewerContext();
@@ -60,6 +62,10 @@ export async function getFavoriteAwareExerciseCatalog(params?: {
   });
 
   if (!viewer.userId || exercises.length === 0) {
+    if (params?.favoriteOnly) {
+      return [];
+    }
+
     return exercises.map((exercise) => ({
       ...exercise,
       isFavorite: false,
@@ -79,7 +85,13 @@ export async function getFavoriteAwareExerciseCatalog(params?: {
   });
 
   const favoriteIdSet = new Set(favoriteRows.map((entry) => entry.exerciseId));
-  return withFavoriteState(exercises, favoriteIdSet);
+  const favoriteAwareExercises = withFavoriteState(exercises, favoriteIdSet);
+
+  if (params?.favoriteOnly) {
+    return favoriteAwareExercises.filter((exercise) => exercise.isFavorite);
+  }
+
+  return favoriteAwareExercises;
 }
 
 export async function searchExercises(params?: {

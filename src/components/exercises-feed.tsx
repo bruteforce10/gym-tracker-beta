@@ -24,6 +24,7 @@ type ExercisesFeedProps = {
       exerciseId: string;
     }>;
   }>;
+  favoriteOnly?: boolean;
 };
 
 const INITIAL_BATCH_SIZE = 18;
@@ -44,6 +45,7 @@ function getExerciseMonogram(name: string) {
 export default function ExercisesFeed({
   exercises,
   plans,
+  favoriteOnly = false,
 }: ExercisesFeedProps) {
   const [items, setItems] = useState(exercises);
   const [visibleCount, setVisibleCount] = useState(
@@ -158,11 +160,13 @@ export default function ExercisesFeed({
                         initialFavorite={exercise.isFavorite}
                         onFavoriteChange={(nextValue) => {
                           setItems((current) =>
-                            current.map((item) =>
-                              item.id === exercise.id
-                                ? { ...item, isFavorite: nextValue }
-                                : item,
-                            ),
+                            favoriteOnly && !nextValue
+                              ? current.filter((item) => item.id !== exercise.id)
+                              : current.map((item) =>
+                                  item.id === exercise.id
+                                    ? { ...item, isFavorite: nextValue }
+                                    : item,
+                                ),
                           );
                         }}
                       />

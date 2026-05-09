@@ -19,6 +19,7 @@ type ExercisePageProps = {
     equipment?: string;
     type?: string;
     ownership?: string;
+    favoriteOnly?: string;
   }>;
 };
 
@@ -40,12 +41,14 @@ export default async function ExercisesPage({
     TRAINING_TYPE_FILTER_OPTIONS,
   );
   const ownership = params.ownership === "mine" ? "mine" : "all";
+  const favoriteOnly = params.favoriteOnly === "1";
   const exercises = await getFavoriteAwareExerciseCatalog({
     query,
     bodyPart,
     equipment,
     type,
     ownership,
+    favoriteOnly,
     limit: 300,
   });
   const plans = await getWorkoutPlans();
@@ -73,18 +76,23 @@ export default async function ExercisesPage({
       </div>
 
       <ExerciseFilterForm
-        key={`${query}:${bodyPart}:${equipment}:${type}:${ownership}`}
+        key={`${query}:${bodyPart}:${equipment}:${type}:${ownership}:${favoriteOnly ? "favorites" : "all"}`}
         query={query}
         bodyPart={bodyPart}
         equipment={equipment}
         type={type}
         ownership={ownership}
+        favoriteOnly={favoriteOnly}
         bodyPartOptions={BODY_PART_FILTER_OPTIONS}
         equipmentOptions={EQUIPMENT_FILTER_OPTIONS}
         typeOptions={TRAINING_TYPE_FILTER_OPTIONS}
       />
 
-      <ExercisesFeed exercises={exercises} plans={plans} />
+      <ExercisesFeed
+        exercises={exercises}
+        plans={plans}
+        favoriteOnly={favoriteOnly}
+      />
     </div>
   );
 }

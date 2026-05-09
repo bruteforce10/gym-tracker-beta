@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,7 @@ type ExerciseFilterFormProps = {
   equipment: string;
   type: string;
   ownership: "all" | "mine";
+  favoriteOnly: boolean;
   bodyPartOptions: readonly string[];
   equipmentOptions: readonly string[];
   typeOptions: readonly string[];
@@ -68,6 +69,7 @@ export default function ExerciseFilterForm({
   equipment,
   type,
   ownership,
+  favoriteOnly,
   bodyPartOptions,
   equipmentOptions,
   typeOptions,
@@ -84,6 +86,7 @@ export default function ExerciseFilterForm({
   const [selectedOwnership, setSelectedOwnership] = useState<
     "all" | "mine"
   >(ownership);
+  const [selectedFavoriteOnly, setSelectedFavoriteOnly] = useState(favoriteOnly);
 
   const applyFilters = (nextValues?: {
     q?: string;
@@ -91,6 +94,7 @@ export default function ExerciseFilterForm({
     equipment?: string;
     type?: string;
     ownership?: "all" | "mine";
+    favoriteOnly?: boolean;
   }) => {
     const params = new URLSearchParams();
     const nextQuery = nextValues?.q ?? searchQuery;
@@ -98,6 +102,8 @@ export default function ExerciseFilterForm({
     const nextEquipment = nextValues?.equipment ?? selectedEquipment;
     const nextType = nextValues?.type ?? selectedType;
     const nextOwnership = nextValues?.ownership ?? selectedOwnership;
+    const nextFavoriteOnly =
+      nextValues?.favoriteOnly ?? selectedFavoriteOnly;
 
     if (nextQuery.trim()) params.set("q", nextQuery.trim());
     if (nextBodyPart && nextBodyPart !== "all")
@@ -106,6 +112,7 @@ export default function ExerciseFilterForm({
       params.set("equipment", nextEquipment);
     if (nextType && nextType !== "all") params.set("type", nextType);
     if (nextOwnership === "mine") params.set("ownership", "mine");
+    if (nextFavoriteOnly) params.set("favoriteOnly", "1");
 
     const nextUrl = params.toString()
       ? `${pathname}?${params.toString()}`
@@ -175,6 +182,37 @@ export default function ExerciseFilterForm({
         />
       </div>
 
+      <div className="flex items-center justify-between rounded-xl border border-border-subtle bg-surface-elevated px-3 py-2.5">
+        <div className="space-y-0.5">
+          <p className="text-sm font-medium text-foreground">Favorit saja</p>
+          <p className="text-xs text-text-muted">
+            Tampilkan exercise yang sudah diberi bintang.
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-pressed={selectedFavoriteOnly}
+          aria-label={
+            selectedFavoriteOnly
+              ? "Matikan filter favorit saja"
+              : "Aktifkan filter favorit saja"
+          }
+          className={`flex h-10 min-w-[104px] items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium transition-colors ${
+            selectedFavoriteOnly
+              ? "border-amber-300/35 bg-amber-300/10 text-amber-300"
+              : "border-border-subtle bg-[#151823] text-text-muted hover:bg-surface"
+          }`}
+          onClick={() => setSelectedFavoriteOnly((current) => !current)}
+        >
+          <Star
+            className="size-4"
+            fill={selectedFavoriteOnly ? "currentColor" : "none"}
+            aria-hidden="true"
+          />
+          {selectedFavoriteOnly ? "Aktif" : "Nonaktif"}
+        </button>
+      </div>
+
       <div className="flex gap-2 flex-row">
         <Button
           type="submit"
@@ -194,6 +232,7 @@ export default function ExerciseFilterForm({
             setSelectedEquipment("all");
             setSelectedType("all");
             setSelectedOwnership("all");
+            setSelectedFavoriteOnly(false);
             startTransition(() => {
               applyFilters({
                 q: "",
@@ -201,6 +240,7 @@ export default function ExerciseFilterForm({
                 equipment: "all",
                 type: "all",
                 ownership: "all",
+                favoriteOnly: false,
               });
             });
           }}
