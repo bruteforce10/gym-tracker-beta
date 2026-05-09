@@ -31,7 +31,10 @@ import {
   type ExerciseCatalogItem,
   type ExerciseDisplayCategory,
 } from "@/lib/exercise-catalog";
-import { buildSessionExercise, WORKOUT_SESSION_STORAGE_KEY } from "@/lib/workout-session";
+import {
+  buildSessionExercise,
+  WORKOUT_SESSION_STORAGE_KEY,
+} from "@/lib/workout-session";
 
 type PlanExercise = {
   id: string;
@@ -52,7 +55,11 @@ type Plan = {
 };
 
 type StartMode = "plan" | "free";
-type Step = "choose-mode" | "choose-plan" | "choose-plan-exercises" | "choose-free-exercises";
+type Step =
+  | "choose-mode"
+  | "choose-plan"
+  | "choose-plan-exercises"
+  | "choose-free-exercises";
 type EditableFreeExercise = FavoriteAwareExerciseItem & {
   defaultSets: number;
   defaultReps: number;
@@ -65,12 +72,22 @@ export default function WorkoutStartClient() {
   const preselectedPlanId = searchParams.get("planId");
 
   const [plans, setPlans] = useState<Plan[]>([]);
-  const [mode, setMode] = useState<StartMode>(preselectedPlanId ? "plan" : "plan");
-  const [step, setStep] = useState<Step>(preselectedPlanId ? "choose-plan-exercises" : "choose-mode");
+  const [mode, setMode] = useState<StartMode>(
+    preselectedPlanId ? "plan" : "plan",
+  );
+  const [step, setStep] = useState<Step>(
+    preselectedPlanId ? "choose-plan-exercises" : "choose-mode",
+  );
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-  const [selectedPlanExerciseIds, setSelectedPlanExerciseIds] = useState<Set<string>>(new Set());
-  const [selectedFreeExercises, setSelectedFreeExercises] = useState<EditableFreeExercise[]>([]);
-  const [editingFreeExerciseId, setEditingFreeExerciseId] = useState<string | null>(null);
+  const [selectedPlanExerciseIds, setSelectedPlanExerciseIds] = useState<
+    Set<string>
+  >(new Set());
+  const [selectedFreeExercises, setSelectedFreeExercises] = useState<
+    EditableFreeExercise[]
+  >([]);
+  const [editingFreeExerciseId, setEditingFreeExerciseId] = useState<
+    string | null
+  >(null);
   const [editorSets, setEditorSets] = useState("");
   const [editorReps, setEditorReps] = useState("");
   const [editorRest, setEditorRest] = useState("");
@@ -90,7 +107,7 @@ export default function WorkoutStartClient() {
         if (plan) {
           setSelectedPlan(plan);
           setSelectedPlanExerciseIds(
-            new Set(plan.exercises.map((exercise) => exercise.exerciseId))
+            new Set(plan.exercises.map((exercise) => exercise.exerciseId)),
           );
         }
       }
@@ -114,7 +131,9 @@ export default function WorkoutStartClient() {
     });
   };
 
-  const freeSelectedIds = new Set(selectedFreeExercises.map((exercise) => exercise.id));
+  const freeSelectedIds = new Set(
+    selectedFreeExercises.map((exercise) => exercise.id),
+  );
 
   const toggleFreeExercise = (exercise: FavoriteAwareExerciseItem) => {
     setSelectedFreeExercises((current) => {
@@ -136,10 +155,14 @@ export default function WorkoutStartClient() {
   };
 
   const editingFreeExercise =
-    selectedFreeExercises.find((exercise) => exercise.id === editingFreeExerciseId) ?? null;
+    selectedFreeExercises.find(
+      (exercise) => exercise.id === editingFreeExerciseId,
+    ) ?? null;
 
   const handleOpenFreeEditor = (exerciseId: string) => {
-    const item = selectedFreeExercises.find((exercise) => exercise.id === exerciseId);
+    const item = selectedFreeExercises.find(
+      (exercise) => exercise.id === exerciseId,
+    );
     if (!item) return;
 
     setEditingFreeExerciseId(exerciseId);
@@ -164,10 +187,13 @@ export default function WorkoutStartClient() {
               ...exercise,
               defaultSets: parsePositiveInt(editorSets, exercise.defaultSets),
               defaultReps: parsePositiveInt(editorReps, exercise.defaultReps),
-              defaultRestTime: parsePositiveInt(editorRest, exercise.defaultRestTime),
+              defaultRestTime: parsePositiveInt(
+                editorRest,
+                exercise.defaultRestTime,
+              ),
             }
-          : exercise
-      )
+          : exercise,
+      ),
     );
     setEditingFreeExerciseId(null);
   };
@@ -194,7 +220,10 @@ export default function WorkoutStartClient() {
         })),
     };
 
-    sessionStorage.setItem(WORKOUT_SESSION_STORAGE_KEY, JSON.stringify(sessionData));
+    sessionStorage.setItem(
+      WORKOUT_SESSION_STORAGE_KEY,
+      JSON.stringify(sessionData),
+    );
     router.push("/workout/session");
   };
 
@@ -217,7 +246,10 @@ export default function WorkoutStartClient() {
       })),
     };
 
-    sessionStorage.setItem(WORKOUT_SESSION_STORAGE_KEY, JSON.stringify(sessionData));
+    sessionStorage.setItem(
+      WORKOUT_SESSION_STORAGE_KEY,
+      JSON.stringify(sessionData),
+    );
     router.push("/workout/session");
   };
 
@@ -261,7 +293,10 @@ export default function WorkoutStartClient() {
             id="back-btn"
             aria-label="Kembali"
           >
-            <ChevronLeft className="size-5 text-foreground" aria-hidden="true" />
+            <ChevronLeft
+              className="size-5 text-foreground"
+              aria-hidden="true"
+            />
           </button>
 
           <div className="min-w-0 flex-1">
@@ -280,15 +315,6 @@ export default function WorkoutStartClient() {
                     ? "Pilih Plan"
                     : "Atur Exercise"}
             </h1>
-            <p className="mt-1 text-xs text-text-muted">
-              {step === "choose-mode"
-                ? "Pilih flow yang paling cocok untuk sesi latihan hari ini."
-                : mode === "free"
-                  ? `${selectedFreeExercises.length} exercise siap untuk sesi spontanmu`
-                  : selectedPlan
-                    ? `${selectedPlanExerciseIds.size} exercise aktif dari ${selectedPlan.name}`
-                    : "Plan mana yang mau kamu jalani hari ini?"}
-            </p>
           </div>
         </div>
 
@@ -313,15 +339,17 @@ export default function WorkoutStartClient() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-base font-semibold text-foreground">Dari Plan</p>
+                        <p className="text-base font-semibold text-foreground">
+                          Dari Plan
+                        </p>
                         <ChevronRight
                           className="size-4 text-text-muted transition-transform group-hover:translate-x-1 group-hover:text-emerald"
                           aria-hidden="true"
                         />
                       </div>
                       <p className="mt-1 text-sm leading-6 text-text-muted">
-                        Pilih plan yang sudah kamu susun, lalu aktifkan hanya exercise
-                        yang ingin dijalankan hari ini.
+                        Pilih plan yang sudah kamu susun, lalu aktifkan hanya
+                        exercise yang ingin dijalankan hari ini.
                       </p>
                     </div>
                   </div>
@@ -341,15 +369,17 @@ export default function WorkoutStartClient() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-base font-semibold text-foreground">Mode Bebas</p>
+                        <p className="text-base font-semibold text-foreground">
+                          Mode Bebas
+                        </p>
                         <ChevronRight
                           className="size-4 text-text-muted transition-transform group-hover:translate-x-1 group-hover:text-amber-300"
                           aria-hidden="true"
                         />
                       </div>
                       <p className="mt-1 text-sm leading-6 text-text-muted">
-                        Cari exercise dari seluruh database, ambil favorit, lalu mulai
-                        sesi spontan tanpa harus masuk plan dulu.
+                        Cari exercise, ambil favorit, lalu mulai sesi spontan
+                        tanpa harus masuk plan dulu.
                       </p>
                     </div>
                   </div>
@@ -366,8 +396,8 @@ export default function WorkoutStartClient() {
                 new Set(
                   plan.exercises
                     .map((exercise) => exercise.exercise.category)
-                    .filter(Boolean) as ExerciseDisplayCategory[]
-                )
+                    .filter(Boolean) as ExerciseDisplayCategory[],
+                ),
               );
 
               return (
@@ -377,7 +407,9 @@ export default function WorkoutStartClient() {
                     setMode("plan");
                     setSelectedPlan(plan);
                     setSelectedPlanExerciseIds(
-                      new Set(plan.exercises.map((exercise) => exercise.exerciseId))
+                      new Set(
+                        plan.exercises.map((exercise) => exercise.exerciseId),
+                      ),
                     );
                     setStep("choose-plan-exercises");
                   }}
@@ -386,7 +418,9 @@ export default function WorkoutStartClient() {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-base font-semibold text-foreground">{plan.name}</p>
+                      <p className="text-base font-semibold text-foreground">
+                        {plan.name}
+                      </p>
                       <p className="mt-1 text-xs uppercase tracking-[0.18em] text-text-muted">
                         {plan.type}
                       </p>
@@ -406,7 +440,9 @@ export default function WorkoutStartClient() {
                       </span>
                     ))}
                   </div>
-                  <p className="mt-3 text-xs text-text-muted">{plan.exercises.length} exercise total</p>
+                  <p className="mt-3 text-xs text-text-muted">
+                    {plan.exercises.length} exercise total
+                  </p>
                 </button>
               );
             })}
@@ -421,14 +457,17 @@ export default function WorkoutStartClient() {
               </p>
               <div className="mt-2 flex items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground">{selectedPlan.name}</h2>
-                  <p className="mt-1 text-sm text-text-muted">
-                    Pilih hanya exercise yang ingin kamu jalankan sekarang.
-                  </p>
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {selectedPlan.name}
+                  </h2>
                 </div>
                 <div className="rounded-2xl border border-emerald/20 bg-emerald/10 px-3 py-2 text-center">
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-emerald/75">Ready</p>
-                  <p className="text-lg font-semibold text-emerald">{selectedPlanExerciseIds.size}</p>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-emerald/75">
+                    Ready
+                  </p>
+                  <p className="text-lg font-semibold text-emerald">
+                    {selectedPlanExerciseIds.size}
+                  </p>
                 </div>
               </div>
             </section>
@@ -439,7 +478,7 @@ export default function WorkoutStartClient() {
                 if (!grouped.has(category)) grouped.set(category, []);
                 grouped.get(category)?.push(exercise);
                 return grouped;
-              }, new Map<ExerciseDisplayCategory, PlanExercise[]>())
+              }, new Map<ExerciseDisplayCategory, PlanExercise[]>()),
             ).map(([category, items]) => (
               <section key={category} className="space-y-2">
                 <div
@@ -450,7 +489,9 @@ export default function WorkoutStartClient() {
 
                 <div className="space-y-2">
                   {items.map((item) => {
-                    const isSelected = selectedPlanExerciseIds.has(item.exerciseId);
+                    const isSelected = selectedPlanExerciseIds.has(
+                      item.exerciseId,
+                    );
 
                     return (
                       <button
@@ -477,7 +518,8 @@ export default function WorkoutStartClient() {
                             {item.exercise.name}
                           </p>
                           <p className="mt-1 text-[11px] text-text-muted">
-                            {item.defaultSets}x{item.defaultReps} · Rest {item.restTime}s
+                            {item.defaultSets}x{item.defaultReps} · Rest{" "}
+                            {item.restTime}s
                           </p>
                         </div>
                         <span
@@ -487,7 +529,9 @@ export default function WorkoutStartClient() {
                               : "bg-amber-500/20 text-amber-300"
                           }`}
                         >
-                          {item.exercise.trainingStyle === "compound" ? "Compound" : "Isolation"}
+                          {item.exercise.trainingStyle === "compound"
+                            ? "Compound"
+                            : "Isolation"}
                         </span>
                       </button>
                     );
@@ -500,30 +544,6 @@ export default function WorkoutStartClient() {
 
         {step === "choose-free-exercises" ? (
           <div className="flex min-h-0 flex-1 flex-col">
-            <section className="mb-5 overflow-hidden rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.16),transparent_32%),rgba(255,255,255,0.03)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-300/80">
-                    Free Workout
-                  </p>
-                  <h2
-                    className="mt-2 text-[1.55rem] font-bold leading-tight text-foreground"
-                    style={{ fontFamily: "Outfit, sans-serif" }}
-                  >
-                    Ambil exercise, mulai cepat, tambah lagi saat sesi jalan.
-                  </h2>
-                </div>
-                <div className="hidden rounded-[24px] border border-white/10 bg-white/[0.05] p-3 text-right sm:block">
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-text-muted">Search</p>
-                  <Search className="ml-auto mt-2 size-5 text-amber-300" aria-hidden="true" />
-                </div>
-              </div>
-              <p className="mt-3 max-w-[30ch] text-sm leading-6 text-text-muted">
-                Pilih minimal satu exercise dulu. Stopwatch baru mulai setelah kamu
-                tekan tombol mulai.
-              </p>
-            </section>
-
             {selectedFreeExercises.length > 0 ? (
               <section className="mb-5 rounded-[26px] border border-white/10 bg-white/[0.04] p-4">
                 <div className="flex items-center justify-between gap-3">
@@ -536,7 +556,9 @@ export default function WorkoutStartClient() {
                     </p>
                   </div>
                   <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-center">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-amber-300/75">Ready</p>
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-amber-300/75">
+                      Ready
+                    </p>
                     <p className="text-lg font-semibold text-amber-300">
                       {selectedFreeExercises.length}
                     </p>
@@ -558,8 +580,8 @@ export default function WorkoutStartClient() {
                             {exercise.name}
                           </p>
                           <p className="mt-1 text-[11px] text-text-muted">
-                            {exercise.defaultSets} set · {exercise.defaultReps} reps · Rest{" "}
-                            {exercise.defaultRestTime}s
+                            {exercise.defaultSets} set · {exercise.defaultReps}{" "}
+                            reps · Rest {exercise.defaultRestTime}s
                           </p>
                         </div>
                       </div>
@@ -595,7 +617,8 @@ export default function WorkoutStartClient() {
           </div>
         ) : null}
 
-        {(step === "choose-plan-exercises" || step === "choose-free-exercises") ? (
+        {step === "choose-plan-exercises" ||
+        step === "choose-free-exercises" ? (
           <div className="fixed inset-x-0 bottom-0 border-t border-white/8 bg-[#07090D]/88 p-4 backdrop-blur-xl">
             <div className="mx-auto max-w-md">
               <button
@@ -723,7 +746,8 @@ export default function WorkoutStartClient() {
               </div>
 
               <p className="text-xs text-text-muted">
-                Nilai kosong atau kurang dari 1 akan otomatis kembali ke nilai sebelumnya.
+                Nilai kosong atau kurang dari 1 akan otomatis kembali ke nilai
+                sebelumnya.
               </p>
 
               <Button

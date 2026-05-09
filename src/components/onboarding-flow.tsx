@@ -22,7 +22,11 @@ import { getExerciseById } from "@/actions/exercises";
 import ExercisePicker from "@/components/exercise-picker";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { formatDateInputValue, parseDateInputValue } from "@/lib/date";
 import { cn } from "@/lib/utils";
 import {
@@ -70,49 +74,54 @@ const STEPS: StepDefinition[] = [
   {
     key: "goalSetup",
     title: "Set goal utamamu dulu",
-    description: "Pilih exercise target, angka yang ingin kamu capai, dan deadline. Plan akan dibentuk mengikuti goal ini.",
+    description:
+      "Pilih exercise target, angka yang ingin kamu capai, dan deadline. Plan akan dibentuk mengikuti goal ini.",
     icon: Target,
   },
   {
     key: "primaryGoal",
     title: "Fokus program utamamu apa?",
-    description: "Ini jadi lapisan kedua setelah goal, supaya struktur latihan terasa lebih sesuai dengan caramu mau progres.",
+    description:
+      "Ini jadi lapisan kedua setelah goal, supaya struktur latihan terasa lebih sesuai dengan caramu mau progres.",
     icon: Sparkles,
   },
   {
     key: "secondaryGoal",
     title: "Fokus kedua yang ingin ikut dijaga apa?",
-    description: "Sistem tetap memprioritaskan tujuan utama, tapi akan memberi penyesuaian kecil.",
+    description:
+      "Sistem tetap memprioritaskan tujuan utama, tapi akan memberi penyesuaian kecil.",
     icon: Sparkles,
   },
   {
     key: "trainingDaysPerWeek",
     title: "Berapa hari kamu realistis latihan tiap minggu?",
-    description: "Jawaban ini dipakai untuk memilih split plan yang paling masuk akal.",
+    description: "",
     icon: CalendarRange,
   },
   {
     key: "experienceLevel",
     title: "Level gym kamu sekarang ada di mana?",
-    description: "Volume dan kompleksitas plan akan mengikuti ritme latihanmu saat ini.",
+    description:
+      "Volume dan kompleksitas plan akan mengikuti ritme latihanmu saat ini.",
     icon: Trophy,
   },
   {
     key: "loadLevel",
     title: "Kalau soal beban, kemampuanmu lebih dekat ke level mana?",
-    description: "Kami pakai ini untuk membuat target awal yang cukup menantang tapi tetap realistis.",
+    description: "",
     icon: BarChart3,
   },
   {
     key: "equipmentAccess",
     title: "Kamu biasanya latihan pakai setup seperti apa?",
-    description: "Plan akan menyesuaikan alat yang paling mungkin kamu pakai secara rutin.",
+    description: "",
     icon: Dumbbell,
   },
   {
     key: "gender",
     title: "Gender kamu?",
-    description: "Dipakai hanya untuk penyesuaian minor dan bahasa rekomendasi.",
+    description:
+      "Dipakai hanya untuk penyesuaian minor dan bahasa rekomendasi.",
     icon: VenusAndMars,
   },
 ];
@@ -120,7 +129,6 @@ const STEPS: StepDefinition[] = [
 function OptionCard({
   selected,
   title,
-  description,
   onClick,
   accent = "emerald",
 }: {
@@ -145,24 +153,25 @@ function OptionCard({
         "cursor-pointer rounded-2xl border p-4 text-left transition-[border-color,background-color,transform,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40",
         selected
           ? `${accentClasses} shadow-[0_18px_48px_rgba(16,185,129,0.12)]`
-          : "border-border-subtle bg-surface-elevated/75 text-foreground hover:border-emerald/20 hover:bg-surface-elevated hover:-translate-y-0.5"
+          : "border-border-subtle bg-surface-elevated/75 text-foreground hover:border-emerald/20 hover:bg-surface-elevated hover:-translate-y-0.5",
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold">{title}</p>
-          <p className="mt-1 text-xs leading-5 text-text-muted">{description}</p>
         </div>
         <div
           className={cn(
             "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border",
             selected
               ? "border-current bg-current/20"
-              : "border-border-subtle bg-background/60"
+              : "border-border-subtle bg-background/60",
           )}
           aria-hidden="true"
         >
-          {selected ? <div className="size-2.5 rounded-full bg-current" /> : null}
+          {selected ? (
+            <div className="size-2.5 rounded-full bg-current" />
+          ) : null}
         </div>
       </div>
     </button>
@@ -186,11 +195,13 @@ function DayOption({
         "cursor-pointer rounded-2xl border px-4 py-5 text-center transition-[border-color,background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40",
         selected
           ? "border-emerald/35 bg-emerald/12 text-foreground"
-          : "border-border-subtle bg-surface-elevated/70 text-text-muted hover:border-emerald/20 hover:text-foreground"
+          : "border-border-subtle bg-surface-elevated/70 text-text-muted hover:border-emerald/20 hover:text-foreground",
       )}
     >
       <div className="font-heading text-2xl font-bold">{value}</div>
-      <div className="mt-1 text-xs">{value === 1 ? "hari" : "hari / minggu"}</div>
+      <div className="mt-1 text-xs">
+        {value === 1 ? "hari" : "hari / minggu"}
+      </div>
     </button>
   );
 }
@@ -208,9 +219,12 @@ function GeneratingState() {
         <div className="mb-6 flex size-14 items-center justify-center rounded-2xl border border-emerald/20 bg-emerald/10 text-emerald">
           <Flame className="size-6 animate-pulse" aria-hidden="true" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground">Menyusun plan pertamamu</h2>
+        <h2 className="text-2xl font-bold text-foreground">
+          Menyusun plan pertamamu
+        </h2>
         <p className="mt-2 text-sm leading-6 text-text-muted">
-          Kami sedang memilih split yang paling masuk akal, volume awal, dan target pertama yang cukup realistis.
+          Kami sedang memilih split yang paling masuk akal, volume awal, dan
+          target pertama yang cukup realistis.
         </p>
         <div className="mt-6 space-y-3">
           {messages.map((message, index) => (
@@ -219,7 +233,10 @@ function GeneratingState() {
               className="flex items-center gap-3 rounded-2xl border border-white/6 bg-white/[0.03] px-4 py-3 animate-fade-in-up"
               style={{ animationDelay: `${120 + index * 120}ms` }}
             >
-              <div className="size-2.5 rounded-full bg-emerald shimmer" aria-hidden="true" />
+              <div
+                className="size-2.5 rounded-full bg-emerald shimmer"
+                aria-hidden="true"
+              />
               <p className="text-sm text-foreground/88">{message}</p>
             </div>
           ))}
@@ -241,12 +258,16 @@ export default function OnboardingFlow({
   const [selectedGoalExercise, setSelectedGoalExercise] =
     useState<ExerciseCatalogItem | null>(null);
   const [answers, setAnswers] = useState<OnboardingAnswers>(
-    defaultAnswers ?? DEFAULT_ANSWERS
+    defaultAnswers ?? DEFAULT_ANSWERS,
   );
 
   useEffect(() => {
     const goalExerciseId = defaultAnswers?.goalExerciseId;
-    if (typeof goalExerciseId !== "string" || goalExerciseId.length === 0 || selectedGoalExercise) {
+    if (
+      typeof goalExerciseId !== "string" ||
+      goalExerciseId.length === 0 ||
+      selectedGoalExercise
+    ) {
       return;
     }
     const stableGoalExerciseId = goalExerciseId;
@@ -279,14 +300,14 @@ export default function OnboardingFlow({
         description: "Biarkan sistem fokus penuh ke tujuan utama dulu.",
       },
     ],
-    [answers.primaryGoal]
+    [answers.primaryGoal],
   );
   const canProceed =
     currentStep.key === "goalSetup"
       ? Boolean(
           selectedGoalExercise &&
-            answers.goalTargetWeight > 0 &&
-            parseDateInputValue(answers.goalDeadline)
+          answers.goalTargetWeight > 0 &&
+          parseDateInputValue(answers.goalDeadline),
         )
       : true;
 
@@ -298,7 +319,9 @@ export default function OnboardingFlow({
 
     startPending(async () => {
       setError("");
-      const result = await saveOnboardingDraft(answers as unknown as Record<string, unknown>);
+      const result = await saveOnboardingDraft(
+        answers as unknown as Record<string, unknown>,
+      );
       if (!result.success) {
         setError(result.error);
         return;
@@ -327,7 +350,11 @@ export default function OnboardingFlow({
             type="button"
             onClick={goBack}
             className="flex size-11 cursor-pointer items-center justify-center rounded-2xl border border-border-subtle bg-surface-elevated/70 text-foreground transition-[border-color,background-color] duration-200 hover:border-emerald/25 hover:bg-surface-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40"
-            aria-label={stepIndex === 0 ? "Kembali ke dashboard" : "Kembali ke pertanyaan sebelumnya"}
+            aria-label={
+              stepIndex === 0
+                ? "Kembali ke dashboard"
+                : "Kembali ke pertanyaan sebelumnya"
+            }
           >
             <ArrowLeft className="size-5" aria-hidden="true" />
           </button>
@@ -376,7 +403,6 @@ export default function OnboardingFlow({
                     goalExerciseId: exercise?.id ?? "",
                   }));
                 }}
-                helperText="Pilih exercise yang benar-benar ingin kamu capai targetnya. Plan akan menyesuaikan area dan pola latihan dari goal ini."
               />
 
               <div className="grid gap-4 sm:grid-cols-[0.95fr_1.05fr]">
@@ -408,9 +434,6 @@ export default function OnboardingFlow({
                     className="h-12 w-full rounded-2xl border border-border-subtle bg-surface-elevated px-3.5 text-sm text-foreground outline-none transition-colors focus:border-emerald/30 focus:ring-2 focus:ring-emerald/15"
                     placeholder="Contoh 60"
                   />
-                  <p className="mt-2 text-[11px] leading-5 text-text-muted">
-                    Masukkan target yang ingin kamu capai untuk exercise ini.
-                  </p>
                 </div>
 
                 <div>
@@ -421,14 +444,18 @@ export default function OnboardingFlow({
                     <PopoverTrigger
                       className={cn(
                         "flex h-12 w-full cursor-pointer items-center justify-start rounded-2xl border border-border-subtle bg-surface-elevated px-3.5 text-left text-sm text-foreground transition-colors hover:border-emerald/20 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/40",
-                        !answers.goalDeadline && "text-text-muted"
+                        !answers.goalDeadline && "text-text-muted",
                       )}
                     >
-                      <CalendarIcon className="mr-2 size-4 text-emerald" aria-hidden="true" />
+                      <CalendarIcon
+                        className="mr-2 size-4 text-emerald"
+                        aria-hidden="true"
+                      />
                       {answers.goalDeadline ? (
                         format(
-                          parseDateInputValue(answers.goalDeadline) ?? new Date(),
-                          "PPP"
+                          parseDateInputValue(answers.goalDeadline) ??
+                            new Date(),
+                          "PPP",
                         )
                       ) : (
                         <span>Pilih deadline</span>
@@ -440,11 +467,15 @@ export default function OnboardingFlow({
                     >
                       <Calendar
                         mode="single"
-                        selected={parseDateInputValue(answers.goalDeadline) ?? undefined}
+                        selected={
+                          parseDateInputValue(answers.goalDeadline) ?? undefined
+                        }
                         onSelect={(date) =>
                           setAnswers((current) => ({
                             ...current,
-                            goalDeadline: date ? formatDateInputValue(date) : "",
+                            goalDeadline: date
+                              ? formatDateInputValue(date)
+                              : "",
                           }))
                         }
                         initialFocus
@@ -452,17 +483,16 @@ export default function OnboardingFlow({
                       />
                     </PopoverContent>
                   </Popover>
-                  <p className="mt-2 text-[11px] leading-5 text-text-muted">
-                    Deadline ini dipakai untuk membentuk ritme awal programmu.
-                  </p>
                 </div>
               </div>
 
               {selectedGoalExercise ? (
                 <div className="rounded-2xl border border-emerald/15 bg-emerald/8 px-4 py-3 text-sm text-emerald-50">
                   Goal utama kamu sekarang mengarah ke{" "}
-                  <span className="font-semibold">{selectedGoalExercise.name}</span>.
-                  Plan akan mengutamakan kategori{" "}
+                  <span className="font-semibold">
+                    {selectedGoalExercise.name}
+                  </span>
+                  . Plan akan mengutamakan kategori{" "}
                   <span className="font-semibold">
                     {selectedGoalExercise.primaryLabel.toLowerCase()}
                   </span>{" "}
@@ -500,14 +530,18 @@ export default function OnboardingFlow({
               {secondaryGoalOptions.map((option) => (
                 <OptionCard
                   key={option.value}
-                  selected={answers.secondaryGoal === option.value || (!answers.secondaryGoal && option.value === "none")}
+                  selected={
+                    answers.secondaryGoal === option.value ||
+                    (!answers.secondaryGoal && option.value === "none")
+                  }
                   title={option.shortLabel}
                   description={option.description}
                   accent="blue"
                   onClick={() =>
                     setAnswers((current) => ({
                       ...current,
-                      secondaryGoal: option.value === "none" ? null : option.value,
+                      secondaryGoal:
+                        option.value === "none" ? null : option.value,
                     }))
                   }
                 />
@@ -598,7 +632,6 @@ export default function OnboardingFlow({
                   key={option.value}
                   selected={answers.gender === option.value}
                   title={option.label}
-                  description="Dipakai hanya untuk minor adjustment."
                   onClick={() =>
                     setAnswers((current) => ({
                       ...current,
@@ -620,11 +653,6 @@ export default function OnboardingFlow({
           ) : null}
 
           <div className="mt-6 flex items-center justify-between gap-3">
-            <div className="hidden text-xs text-text-muted sm:block">
-              {stepIndex === STEPS.length - 1
-                ? "Langkah terakhir. Setelah ini kami siapkan review plan."
-                : "Kamu masih bisa ubah semua jawaban di review nanti."}
-            </div>
             <Button
               type="button"
               onClick={goNext}

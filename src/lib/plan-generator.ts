@@ -63,21 +63,24 @@ function createFullBodyTemplate(trainingDaysPerWeek: number): ProgramTemplate {
       name: "Full Body A",
       type: "custom",
       focusLabel: "Full Body",
-      description: "Campuran compound utama untuk memulai minggu dengan ritme stabil.",
+      description:
+        "Campuran compound utama untuk memulai minggu dengan ritme stabil.",
       categories: ["chest", "back", "quads", "shoulder", "hamstrings"],
     },
     {
       name: "Full Body B",
       type: "custom",
       focusLabel: "Full Body",
-      description: "Variasi kedua untuk menjaga progres tanpa pola yang monoton.",
+      description:
+        "Variasi kedua untuk menjaga progres tanpa pola yang monoton.",
       categories: ["back", "glutes", "chest", "arms", "quads"],
     },
     {
       name: "Full Body C",
       type: "custom",
       focusLabel: "Full Body",
-      description: "Sesi ketiga dengan emphasis balance dan recovery yang tetap aman.",
+      description:
+        "Sesi ketiga dengan emphasis balance dan recovery yang tetap aman.",
       categories: ["shoulder", "back", "glutes", "arms", "hamstrings"],
     },
   ];
@@ -85,7 +88,8 @@ function createFullBodyTemplate(trainingDaysPerWeek: number): ProgramTemplate {
   return {
     key: "full_body_rotation",
     label: "Full Body Rotation",
-    description: "Split fleksibel untuk frekuensi latihan rendah sampai menengah.",
+    description:
+      "Split fleksibel untuk frekuensi latihan rendah sampai menengah.",
     days: variants.slice(0, trainingDaysPerWeek).map((variant) => ({
       ...variant,
       exerciseCount: 0,
@@ -97,7 +101,8 @@ function createUpperLowerTemplate(): ProgramTemplate {
   return {
     key: "upper_lower_split",
     label: "Upper Lower Split",
-    description: "Split klasik untuk progres yang rapi dengan frekuensi 4 hari.",
+    description:
+      "Split klasik untuk progres yang rapi dengan frekuensi 4 hari.",
     days: [
       {
         name: "Upper A",
@@ -111,7 +116,8 @@ function createUpperLowerTemplate(): ProgramTemplate {
         name: "Lower A",
         type: "lower",
         focusLabel: "Lower Body",
-        description: "Lower session untuk quad, hamstring, dan glute foundation.",
+        description:
+          "Lower session untuk quad, hamstring, dan glute foundation.",
         categories: ["quads", "hamstrings", "glutes", "calves"],
         exerciseCount: 0,
       },
@@ -119,7 +125,8 @@ function createUpperLowerTemplate(): ProgramTemplate {
         name: "Upper B",
         type: "upper",
         focusLabel: "Upper Body",
-        description: "Upper variation untuk volume tambahan dan keseimbangan otot.",
+        description:
+          "Upper variation untuk volume tambahan dan keseimbangan otot.",
         categories: ["back", "chest", "shoulder", "arms"],
         exerciseCount: 0,
       },
@@ -127,7 +134,8 @@ function createUpperLowerTemplate(): ProgramTemplate {
         name: "Lower B",
         type: "lower",
         focusLabel: "Lower Body",
-        description: "Lower variation dengan emphasis posterior chain dan stabilitas.",
+        description:
+          "Lower variation dengan emphasis posterior chain dan stabilitas.",
         categories: ["glutes", "hamstrings", "quads", "calves"],
         exerciseCount: 0,
       },
@@ -139,7 +147,8 @@ function createFiveDayTemplate(): ProgramTemplate {
   return {
     key: "five_day_hybrid",
     label: "Five Day Hybrid",
-    description: "Hybrid split untuk user yang siap volume lebih tinggi dengan ritme tetap terarah.",
+    description:
+      "Hybrid split untuk user yang siap volume lebih tinggi dengan ritme tetap terarah.",
     days: [
       {
         name: "Push",
@@ -161,7 +170,8 @@ function createFiveDayTemplate(): ProgramTemplate {
         name: "Legs",
         type: "lower",
         focusLabel: "Lower Body",
-        description: "Hari kaki dengan fondasi strength dan hypertrophy yang seimbang.",
+        description:
+          "Hari kaki dengan fondasi strength dan hypertrophy yang seimbang.",
         categories: ["quads", "hamstrings", "glutes", "calves"],
         exerciseCount: 0,
       },
@@ -169,7 +179,8 @@ function createFiveDayTemplate(): ProgramTemplate {
         name: "Upper Focus",
         type: "upper",
         focusLabel: "Upper Body",
-        description: "Upper volume tambahan untuk progres mingguan yang lebih padat.",
+        description:
+          "Upper volume tambahan untuk progres mingguan yang lebih padat.",
         categories: ["chest", "back", "shoulder", "arms"],
         exerciseCount: 0,
       },
@@ -177,7 +188,8 @@ function createFiveDayTemplate(): ProgramTemplate {
         name: "Lower Focus",
         type: "lower",
         focusLabel: "Lower Body",
-        description: "Lower variation untuk menutup minggu dengan workload efisien.",
+        description:
+          "Lower variation untuk menutup minggu dengan workload efisien.",
         categories: ["glutes", "quads", "hamstrings", "calves"],
         exerciseCount: 0,
       },
@@ -189,7 +201,8 @@ function createPushPullLegsTemplate(): ProgramTemplate {
   return {
     key: "push_pull_legs_x2",
     label: "Push Pull Legs",
-    description: "Template frekuensi tinggi untuk user yang siap latihan hampir setiap hari.",
+    description:
+      "Template frekuensi tinggi untuk user yang siap latihan hampir setiap hari.",
     days: [
       {
         name: "Push A",
@@ -219,7 +232,8 @@ function createPushPullLegsTemplate(): ProgramTemplate {
         name: "Push B",
         type: "custom",
         focusLabel: "Push",
-        description: "Push variation untuk volume tambahan tanpa mengulang pola sepenuhnya.",
+        description:
+          "Push variation untuk volume tambahan tanpa mengulang pola sepenuhnya.",
         categories: ["shoulder", "chest", "arms"],
         exerciseCount: 0,
       },
@@ -250,33 +264,39 @@ function normalizeEquipmentToken(value: string) {
 function matchesEquipmentHints(
   exercise: ExerciseCatalogItem,
   hints: string[],
-  excludedHints: string[] = []
+  excludedHints: string[] = [],
 ) {
   const equipmentTokens = exercise.equipments.map(normalizeEquipmentToken);
 
-  if (excludedHints.some((hint) => equipmentTokens.some((token) => token.includes(hint)))) {
+  if (
+    excludedHints.some((hint) =>
+      equipmentTokens.some((token) => token.includes(hint)),
+    )
+  ) {
     return false;
   }
 
-  return hints.some((hint) => equipmentTokens.some((token) => token.includes(hint)));
+  return hints.some((hint) =>
+    equipmentTokens.some((token) => token.includes(hint)),
+  );
 }
 
 function filterByEquipment(
   exercises: ExerciseCatalogItem[],
-  equipmentAccess: EquipmentAccess
+  equipmentAccess: EquipmentAccess,
 ) {
   if (equipmentAccess === "full_gym") return exercises;
 
   if (equipmentAccess === "bodyweight") {
     const matched = exercises.filter((exercise) =>
-      matchesEquipmentHints(exercise, BODYWEIGHT_HINTS)
+      matchesEquipmentHints(exercise, BODYWEIGHT_HINTS),
     );
     return matched.length > 0 ? matched : exercises;
   }
 
   if (equipmentAccess === "home_gym") {
     const matched = exercises.filter((exercise) =>
-      matchesEquipmentHints(exercise, HOME_GYM_HINTS)
+      matchesEquipmentHints(exercise, HOME_GYM_HINTS),
     );
     return matched.length > 0 ? matched : exercises;
   }
@@ -285,17 +305,21 @@ function filterByEquipment(
     (exercise) =>
       !exercise.equipments.some((equipment) =>
         LIMITED_GYM_EXCLUDED.some((hint) =>
-          normalizeEquipmentToken(equipment).includes(hint)
-        )
-      )
+          normalizeEquipmentToken(equipment).includes(hint),
+        ),
+      ),
   );
   return matched.length > 0 ? matched : exercises;
 }
 
-function getExerciseCount(experienceLevel: ExperienceLevel, primaryGoal: PrimaryGoal) {
+function getExerciseCount(
+  experienceLevel: ExperienceLevel,
+  primaryGoal: PrimaryGoal,
+) {
   const baseCount = CATEGORY_EXERCISE_COUNT[experienceLevel];
   if (primaryGoal === "fat_loss") return Math.max(4, baseCount - 1);
-  if (primaryGoal === "muscle_gain" && experienceLevel !== "beginner") return baseCount + 1;
+  if (primaryGoal === "muscle_gain" && experienceLevel !== "beginner")
+    return baseCount + 1;
   return baseCount;
 }
 
@@ -318,7 +342,7 @@ function getProgramTemplate(answers: OnboardingAnswers): ProgramTemplate {
 function getGoalExercisePriorityBoost(
   exercise: ExerciseCatalogItem,
   goalExercise: ExerciseCatalogItem,
-  answers: OnboardingAnswers
+  answers: OnboardingAnswers,
 ) {
   let score = 0;
 
@@ -334,14 +358,20 @@ function getGoalExercisePriorityBoost(
     score += 2;
   }
 
-  if (answers.primaryGoal === "strength" && exercise.trainingStyle === "compound") {
+  if (
+    answers.primaryGoal === "strength" &&
+    exercise.trainingStyle === "compound"
+  ) {
     score += 2;
   }
 
   return score;
 }
 
-function scoreExercise(exercise: ExerciseCatalogItem, answers: OnboardingAnswers) {
+function scoreExercise(
+  exercise: ExerciseCatalogItem,
+  answers: OnboardingAnswers,
+) {
   let score = 0;
 
   if (answers.primaryGoal === "strength") {
@@ -360,7 +390,10 @@ function scoreExercise(exercise: ExerciseCatalogItem, answers: OnboardingAnswers
     score += exercise.trainingStyle === "compound" ? 4 : 2;
   }
 
-  if (answers.secondaryGoal === "strength" && exercise.trainingStyle === "compound") {
+  if (
+    answers.secondaryGoal === "strength" &&
+    exercise.trainingStyle === "compound"
+  ) {
     score += 2;
   }
 
@@ -368,7 +401,10 @@ function scoreExercise(exercise: ExerciseCatalogItem, answers: OnboardingAnswers
     score += 1;
   }
 
-  if (answers.experienceLevel === "beginner" && exercise.trainingStyle === "compound") {
+  if (
+    answers.experienceLevel === "beginner" &&
+    exercise.trainingStyle === "compound"
+  ) {
     score += 1;
   }
 
@@ -392,7 +428,7 @@ function scoreExercise(exercise: ExerciseCatalogItem, answers: OnboardingAnswers
 function sortByGoalAwareScore(
   exercises: ExerciseCatalogItem[],
   answers: OnboardingAnswers,
-  goalExercise: ExerciseCatalogItem
+  goalExercise: ExerciseCatalogItem,
 ) {
   return [...exercises].sort((left, right) => {
     const rightScore =
@@ -409,7 +445,7 @@ function sortByGoalAwareScore(
 
 function chooseRestTime(
   trainingStyle: ExerciseCatalogItem["trainingStyle"],
-  primaryGoal: PrimaryGoal
+  primaryGoal: PrimaryGoal,
 ) {
   if (primaryGoal === "strength") {
     return trainingStyle === "compound" ? 120 : 75;
@@ -426,7 +462,7 @@ function chooseRestTime(
 function chooseSets(
   trainingStyle: ExerciseCatalogItem["trainingStyle"],
   primaryGoal: PrimaryGoal,
-  experienceLevel: ExperienceLevel
+  experienceLevel: ExperienceLevel,
 ) {
   if (primaryGoal === "strength") {
     return trainingStyle === "compound" ? 5 : 3;
@@ -435,14 +471,16 @@ function chooseSets(
     return trainingStyle === "compound" ? 3 : 3;
   }
   if (primaryGoal === "muscle_gain") {
-    return trainingStyle === "compound" && experienceLevel !== "beginner" ? 4 : 3;
+    return trainingStyle === "compound" && experienceLevel !== "beginner"
+      ? 4
+      : 3;
   }
   return trainingStyle === "compound" ? 4 : 3;
 }
 
 function chooseReps(
   trainingStyle: ExerciseCatalogItem["trainingStyle"],
-  primaryGoal: PrimaryGoal
+  primaryGoal: PrimaryGoal,
 ) {
   if (primaryGoal === "strength") {
     return trainingStyle === "compound" ? 5 : 8;
@@ -458,15 +496,21 @@ function chooseReps(
 
 function buildExerciseRationale(
   exercise: ExerciseCatalogItem,
-  answers: OnboardingAnswers
+  answers: OnboardingAnswers,
 ) {
-  if (answers.primaryGoal === "strength" && exercise.trainingStyle === "compound") {
+  if (
+    answers.primaryGoal === "strength" &&
+    exercise.trainingStyle === "compound"
+  ) {
     return "Dipilih sebagai anchor compound untuk progres kekuatan yang lebih jelas.";
   }
   if (answers.primaryGoal === "fat_loss") {
     return "Dipilih karena efisien untuk sesi yang padat dan mudah dijaga konsistensinya.";
   }
-  if (answers.primaryGoal === "muscle_gain" && exercise.trainingStyle === "isolation") {
+  if (
+    answers.primaryGoal === "muscle_gain" &&
+    exercise.trainingStyle === "isolation"
+  ) {
     return "Dipilih untuk menambah volume otot tanpa membebani struktur sesi terlalu berat.";
   }
   return "Dipilih agar sesi tetap seimbang dan sesuai dengan profil latihanmu.";
@@ -474,7 +518,7 @@ function buildExerciseRationale(
 
 function toDraftExercise(
   exercise: ExerciseCatalogItem,
-  answers: OnboardingAnswers
+  answers: OnboardingAnswers,
 ): DraftPlanExercise {
   return {
     exerciseId: exercise.id,
@@ -485,7 +529,7 @@ function toDraftExercise(
     defaultSets: chooseSets(
       exercise.trainingStyle,
       answers.primaryGoal,
-      answers.experienceLevel
+      answers.experienceLevel,
     ),
     defaultReps: chooseReps(exercise.trainingStyle, answers.primaryGoal),
     restTime: chooseRestTime(exercise.trainingStyle, answers.primaryGoal),
@@ -495,7 +539,7 @@ function toDraftExercise(
 
 function pickCategoryExercise(
   exercises: ExerciseCatalogItem[],
-  usedIds: Set<string>
+  usedIds: Set<string>,
 ) {
   const fresh = exercises.find((exercise) => !usedIds.has(exercise.id));
   return fresh ?? exercises[0] ?? null;
@@ -506,14 +550,14 @@ function buildPlanDraft(
   answers: OnboardingAnswers,
   filteredCatalog: ExerciseCatalogItem[],
   usedIds: Set<string>,
-  goalExercise: ExerciseCatalogItem
+  goalExercise: ExerciseCatalogItem,
 ): DraftWorkoutPlan {
   const desiredCount = getExerciseCount(
     answers.experienceLevel,
-    answers.primaryGoal
+    answers.primaryGoal,
   );
   const goalExerciseInTemplate = template.categories.includes(
-    goalExercise.category ?? "arms"
+    goalExercise.category ?? "arms",
   );
   const selected: ExerciseCatalogItem[] = goalExerciseInTemplate
     ? [goalExercise]
@@ -523,7 +567,7 @@ function buildPlanDraft(
     const categoryMatches = sortByGoalAwareScore(
       filteredCatalog.filter((exercise) => exercise.category === category),
       answers,
-      goalExercise
+      goalExercise,
     );
     const selected = pickCategoryExercise(categoryMatches, usedIds);
     return selected ? [selected] : [];
@@ -539,10 +583,10 @@ function buildPlanDraft(
     filteredCatalog.filter(
       (exercise) =>
         template.categories.includes(exercise.category ?? "arms") &&
-        !selected.some((item) => item.id === exercise.id)
+        !selected.some((item) => item.id === exercise.id),
     ),
     answers,
-    goalExercise
+    goalExercise,
   );
 
   for (const exercise of fallbackPool) {
@@ -552,9 +596,11 @@ function buildPlanDraft(
 
   while (selected.length < Math.max(4, desiredCount)) {
     const fallback = sortByGoalAwareScore(
-      filteredCatalog.filter((exercise) => !selected.some((item) => item.id === exercise.id)),
+      filteredCatalog.filter(
+        (exercise) => !selected.some((item) => item.id === exercise.id),
+      ),
       answers,
-      goalExercise
+      goalExercise,
     )[0];
     if (!fallback) break;
     selected.push(fallback);
@@ -567,7 +613,9 @@ function buildPlanDraft(
     type: template.type,
     focusLabel: template.focusLabel,
     description: template.description,
-    exercises: selected.slice(0, desiredCount).map((exercise) => toDraftExercise(exercise, answers)),
+    exercises: selected
+      .slice(0, desiredCount)
+      .map((exercise) => toDraftExercise(exercise, answers)),
   };
   if (
     goalExerciseInTemplate &&
@@ -584,14 +632,16 @@ function buildPlanDraft(
 
 function buildGoalDraft(
   goalExercise: ExerciseCatalogItem,
-  answers: OnboardingAnswers
+  answers: OnboardingAnswers,
 ): DraftGoal {
   return {
     exerciseId: goalExercise.id,
     exerciseName: goalExercise.name,
     targetWeight: answers.goalTargetWeight,
     currentWeight: 0,
-    deadline: parseDateInputValue(answers.goalDeadline)?.toISOString() ?? new Date().toISOString(),
+    deadline:
+      parseDateInputValue(answers.goalDeadline)?.toISOString() ??
+      new Date().toISOString(),
     rationale:
       answers.primaryGoal === "strength"
         ? "Goal ini kamu set langsung saat onboarding, lalu program disusun untuk membantu progres ke target tersebut."
@@ -602,19 +652,19 @@ function buildGoalDraft(
 function buildRecommendationSummary(
   template: ProgramTemplate,
   answers: OnboardingAnswers,
-  goalExercise: ExerciseCatalogItem
+  goalExercise: ExerciseCatalogItem,
 ) {
   return `${template.label} dipilih untuk membantu kamu mengejar ${goalExercise.name} sampai ${answers.goalTargetWeight.toFixed(
-    1
+    1,
   )} kg, dengan fokus program ${getGoalMeta(
-    answers.primaryGoal
+    answers.primaryGoal,
   ).shortLabel.toLowerCase()} dan frekuensi ${answers.trainingDaysPerWeek} hari per minggu.`;
 }
 
 function buildRationale(
   template: ProgramTemplate,
   answers: OnboardingAnswers,
-  goalExercise: ExerciseCatalogItem
+  goalExercise: ExerciseCatalogItem,
 ) {
   return [
     `${goalExercise.name} jadi anchor utama onboarding, jadi plan akan lebih sering menyentuh kategori ${goalExercise.primaryLabel.toLowerCase()} dan gerakan pendukungnya.`,
@@ -626,7 +676,7 @@ function buildRationale(
 }
 
 export async function generateOnboardingDraft(
-  answers: OnboardingAnswers
+  answers: OnboardingAnswers,
 ): Promise<GeneratedOnboardingDraft> {
   const catalog = await fetchExerciseCatalog({ limit: 240 });
   const goalExercise = await fetchExerciseById(answers.goalExerciseId);
@@ -637,7 +687,7 @@ export async function generateOnboardingDraft(
   const template = getProgramTemplate(answers);
   const usedIds = new Set<string>();
   const plans = template.days.map((day) =>
-    buildPlanDraft(day, answers, filteredCatalog, usedIds, goalExercise)
+    buildPlanDraft(day, answers, filteredCatalog, usedIds, goalExercise),
   );
   const goal = buildGoalDraft(goalExercise, answers);
 
@@ -645,7 +695,11 @@ export async function generateOnboardingDraft(
     version: ONBOARDING_PLAN_VERSION,
     generatedAt: new Date().toISOString(),
     templateKey: template.key,
-    recommendationSummary: buildRecommendationSummary(template, answers, goalExercise),
+    recommendationSummary: buildRecommendationSummary(
+      template,
+      answers,
+      goalExercise,
+    ),
     rationale: buildRationale(template, answers, goalExercise),
     answers,
     plans,

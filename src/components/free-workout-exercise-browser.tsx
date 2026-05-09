@@ -91,14 +91,14 @@ export default function FreeWorkoutExerciseBrowser({
 
   const updateFavoriteState = (exerciseId: string, nextValue: boolean) => {
     setSections((current) =>
-      updateFavoriteExerciseSections(current, exerciseId, nextValue)
+      updateFavoriteExerciseSections(current, exerciseId, nextValue),
     );
   };
 
   const renderSection = (
     title: string,
     items: FavoriteAwareExerciseItem[],
-    tone: "favorite" | "recent" | "search"
+    tone: "favorite" | "recent" | "search",
   ) => {
     if (items.length === 0) return null;
 
@@ -162,9 +162,6 @@ export default function FreeWorkoutExerciseBrowser({
             <Search className="size-4" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted">
-              Live Search
-            </p>
             <input
               id="free-workout-search"
               name="free-workout-search"
@@ -182,19 +179,16 @@ export default function FreeWorkoutExerciseBrowser({
             />
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-text-muted">
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="size-3.5 text-amber-300" aria-hidden="true" />
-            Favorit diprioritaskan biar pilih exercise terasa cepat.
-          </div>
-          <span>{selectedIds.size} dipilih</span>
-        </div>
       </div>
 
       <div className="mt-5 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {isSearching ? (
           <>
-            {renderSection("Hasil Pencarian", visibleSections.results, "search")}
+            {renderSection(
+              "Hasil Pencarian",
+              visibleSections.results,
+              "search",
+            )}
             {!isPending && visibleSections.results.length === 0 ? (
               <div className="rounded-[22px] border border-dashed border-white/10 bg-white/[0.02] px-4 py-6 text-center text-sm text-text-muted">
                 Hasil pencarian tidak ada.
@@ -207,13 +201,18 @@ export default function FreeWorkoutExerciseBrowser({
           <>
             {renderSection("Favorite", visibleSections.favorites, "favorite")}
             {renderSection("Recent", visibleSections.recent, "recent")}
-            {renderSection("Explore Semua Exercise", visibleSections.results, "search")}
+            {renderSection(
+              "Explore Semua Exercise",
+              visibleSections.results,
+              "search",
+            )}
           </>
         )}
 
         {!isPending && !hasItems ? (
           <div className="rounded-[22px] border border-dashed border-white/10 bg-white/[0.02] px-4 py-6 text-center text-sm text-text-muted">
-            Tidak ada exercise yang cocok. Coba kata kunci lain atau buka tab favoritmu.
+            Tidak ada exercise yang cocok. Coba kata kunci lain atau buka tab
+            favoritmu.
           </div>
         ) : null}
 
