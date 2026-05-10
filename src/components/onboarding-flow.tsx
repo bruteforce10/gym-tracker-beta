@@ -134,7 +134,7 @@ function OptionCard({
 }: {
   selected: boolean;
   title: string;
-  description: string;
+  description?: string;
   onClick: () => void;
   accent?: "emerald" | "amber" | "blue";
 }) {
